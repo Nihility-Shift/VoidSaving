@@ -8,13 +8,6 @@ namespace VoidSaving
 {
     public class SaveGameData
     {
-        public SaveGameData(int alloys, int biomass, List<GUIDUnion> relics, List<GUIDUnion> looseItems, List<GUIDUnion> unlockedBPs)
-        {
-            Relics = relics;
-            LooseItems = looseItems;
-            UnlockedBPs = unlockedBPs;
-        }
-
         public int Alloy;
 
         public int Biomass;
