@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CG.Ship.Repair;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,32 +10,37 @@ namespace VoidSaving
 {
     public class SaveGameData
     {
+        public uint SaveDataVersion = 0;
+
+        //Data about resources
+
         public int Alloy;
 
         public int Biomass;
 
-        public List<GUIDUnion> Relics;
+        //Data about ship
 
-        public List<GUIDUnion> LooseItems;
+        public GUIDUnion[] Relics;
 
-        public List<GUIDUnion> UnlockedBPs;
+        public GUIDUnion[] UnlockedBPs;
 
-        public QuestData QuestData;
+        public float ShipHealth;
 
-        public ShipData ShipData;
-    }
+        public float RepairableShipHealth;
 
-    public class ShipData
-    {
+        public BreachCondition[] Breaches;
 
-    }
+        //Contains ShipType, Modules, loose carryables.
+        public JObject ShipLoadout;
 
-    public class QuestData
-    {
-        public QuestData(GameSession session)
-        {
-            GameSessionManager.ActiveSector.
-            session.ActiveQuest.
-        }
+        //Data about quest/session/sectors
+
+        public int seed;
+
+        public Random random;
+
+        public int JumpCounter;
+
+        public int InterdictionCounter;
     }
 }
