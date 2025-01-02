@@ -1,25 +1,17 @@
-﻿using Gameplay.Quests;
+﻿using CG.Ship.Repair;
+using CG.Space;
+using Gameplay.Quests;
 using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Services.CloudSave;
 
 namespace VoidSaving
 {
     [HarmonyPatch]
     internal class LoadingPatches
     {
-        [HarmonyPatch(typeof(EndlessQuestGenerator), "CreateEndlessQuest"), HarmonyPostfix]
+        [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
         static void QuestLoadPatch(Quest __result)
         {
-            EndlessQuest quest = __result as EndlessQuest;
-            if (!SaveHandler.LoadSavedData || quest == null) return;
-            {
-
-            }
+            if (!SaveHandler.LoadSavedData || __result is not EndlessQuest quest) return;
 
             SaveGameData saveData = SaveHandler.ActiveData;
 
@@ -29,10 +21,34 @@ namespace VoidSaving
             quest.context.Random = saveData.random;
         }
 
-        [HarmonyPatch(typeof(GameSession), "LoadGameSessionNetworkedAssets"), HarmonyPrefix]
-        static void ShipLoadPatch(GameSession __instance)
+        [HarmonyPatch(typeof(GameSessionManager), "LoadGameSessionNetworkedAssets"), HarmonyPrefix]
+        static void ShipLoadPatch(GameSessionManager __instance)
         {
-            __instance.ToLoadShipData = ShipLoadout.FromJObject(SaveHandler.ActiveData.ShipLoadout);
+            if (!SaveHandler.LoadSavedData) return;
+
+            __instance.activeGameSession.ToLoadShipData = ShipLoadout.FromJObject(SaveHandler.ActiveData.ShipLoadout);
+        }
+
+        [HarmonyPatch(typeof(AbstractPlayerControlledShip), "Awake"), HarmonyPostfix]
+        static void PostShipLoadPatch(AbstractPlayerControlledShip __instance)
+        {
+            if (!SaveHandler.LoadSavedData) return;
+            SaveGameData activeData = SaveHandler.ActiveData;
+
+            __instance.hitPoints = activeData.ShipHealth;
+            HullDamageController HDC = __instance.GetComponentInChildren<HullDamageController>();
+            HDC.State.repairableHp = activeData.RepairableShipHealth;
+            Helpers.ApplyBreachStatesToBreaches(HDC.breaches, activeData.Breaches);
+            Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
+            Helpers.AddRelicsToShip(__instance, activeData.Relics);
+
+            GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
+            GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;
+
+
+            //Last piece of code called
+            SaveHandler.LoadSavedData = false;
+            SaveHandler.ActiveData = null;
         }
     }
 }

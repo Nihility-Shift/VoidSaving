@@ -9,13 +9,26 @@ namespace VoidSaving
 {
     internal class SaveHandler
     {
+        public const string SaveFolderName = "Saves";
+
+        public const string SaveExtension = ".voidsave";
+
+        public static string SaveLocation
+        {
+            get
+            {
+                return $"{Directory.GetCurrentDirectory()}\\{SaveFolderName}";
+            }
+        }
+
         public static SaveGameData ActiveData { get; internal set; }
 
         public static bool StartedAsHost { get; internal set; }
 
         internal static bool LoadSavedData = false;
 
-        public static string SavesLocation
+        
+        /*public static string SavesLocation
         {
             get
             {
@@ -25,7 +38,7 @@ namespace VoidSaving
             {
                 Config.SavesLocation.Value = value;
             }
-        }
+        }*/
 
         internal static SaveGameData GetSessionSaveGameData()
         {
@@ -36,13 +49,14 @@ namespace VoidSaving
             //Ship data
             saveGameData.Alloy = GameSessionSuppliesManager.Instance.AlloyAmount;
             saveGameData.Biomass = GameSessionSuppliesManager.Instance.BiomassAmount;
-            saveGameData.ShipHealth = ClientGame.Current.PlayerShip.HitPoints;
+            saveGameData.ShipHealth = playerShip.HitPoints;
 
-            saveGameData.ShipLoadout = new ShipLoadout(PlayerShipManager.Instance.ActivePlayerShip).AsJObject();
+            saveGameData.ShipLoadoutGUID = GameSessionManager.Instance.PreviousSessionShipLoadout;
+            saveGameData.ShipLoadout = new ShipLoadout(playerShip.GetComponent<PlayerShip>()).AsJObject();
             saveGameData.Relics = Helpers.RelicGUIDsFromShip(playerShip);
             saveGameData.UnlockedBPs = Helpers.UnlockedBPGUIDsFromShip(playerShip);
 
-            HullDamageController HDC = ClientGame.Current.PlayerShip.GetComponent<HullDamageController>();
+            HullDamageController HDC = playerShip.GetComponentInChildren<HullDamageController>();
             saveGameData.RepairableShipHealth = HDC.State.repairableHp;
             saveGameData.Breaches = Helpers.BreachesAsConditionsArray(HDC.breaches);
 
@@ -60,13 +74,34 @@ namespace VoidSaving
 
         public static bool LoadSave(string SavePath)
         {
+            BepinPlugin.Log.LogInfo("Attempting to load save: " + SavePath);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(SavePath));
+
             SaveGameData data = new SaveGameData();
 
             using (FileStream fileStream = File.OpenRead(SavePath))
             {
+                BepinPlugin.Log.LogInfo($"Starting read save: {fileStream.Length} Bytes");
                 using (BinaryReader reader = new BinaryReader(fileStream))
                 {
+                    data.SaveDataVersion = reader.ReadUInt32();
+                    data.Alloy = reader.ReadInt32();
+                    data.Biomass = reader.ReadInt32();
+                    data.ShipHealth = reader.ReadSingle();
 
+                    data.ShipLoadoutGUID = reader.ReadGUIDUnion();
+                    data.ShipLoadout = reader.ReadJObject();
+                    data.Relics = reader.ReadGUIDUnionArray();
+                    data.UnlockedBPs = reader.ReadGUIDUnionArray();
+
+                    data.RepairableShipHealth = reader.ReadSingle();
+                    data.Breaches = Array.ConvertAll(reader.ReadInt32Array(), value => (BreachCondition)value);
+
+                    data.seed = reader.ReadInt32();
+                    data.JumpCounter = reader.ReadInt32();
+                    data.InterdictionCounter = reader.ReadInt32();
+                    data.random = reader.ReadRandom();
                 }
             }
 
@@ -76,15 +111,44 @@ namespace VoidSaving
 
         public static bool WriteSave(string SavePath)
         {
+            BepinPlugin.Log.LogInfo("Attempting to write save: " + SavePath);
+
+            if(!SavePath.EndsWith(SaveExtension))
+            {
+                SavePath += SaveExtension;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(SavePath));
+
+            SaveGameData data = GetSessionSaveGameData();
             try
             {
-                FileStream fileStream = File.Create(SavePath);
-                using (BinaryWriter writer = new BinaryWriter(fileStream))
+                using (FileStream fileStream = File.Create(SavePath))
                 {
+                    using (BinaryWriter writer = new BinaryWriter(fileStream))
+                    {
+                        writer.Write(data.SaveDataVersion);
+                        writer.Write(data.Alloy);
+                        writer.Write(data.Biomass);
+                        writer.Write(data.ShipHealth);
 
+                        writer.Write(data.ShipLoadoutGUID);
+                        writer.Write(data.ShipLoadout);
+                        writer.Write(data.Relics);
+                        writer.Write(data.UnlockedBPs);
+
+                        writer.Write(data.RepairableShipHealth);
+                        writer.Write(Array.ConvertAll(data.Breaches, value => (int)value));
+
+                        writer.Write(data.seed);
+                        writer.Write(data.JumpCounter);
+                        writer.Write(data.InterdictionCounter);
+                        writer.Write(data.random);
+                    }
+                    BepinPlugin.Log.LogInfo($"Finished writing save: {fileStream.Length} Bytes");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 BepinPlugin.Log.LogError(ex);
             }

@@ -40,9 +40,10 @@ namespace VoidSaving
             switch (input.CallType)
             {
                 case CallType.HostCreateRoom:
+                    return new SessionChangedReturn() { SetMod_Session = true };
                 case CallType.HostChange:
                 case CallType.HostStartSession:
-                    if (input.IsHost && GameSessionManager.InHub)
+                    if (input.IsHost && GameSessionManager.HasActiveSession && GameSessionManager.InHub)
                         return new SessionChangedReturn() { SetMod_Session = true };
                     break;
             }
