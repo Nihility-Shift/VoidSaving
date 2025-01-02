@@ -1,10 +1,6 @@
 ﻿using CG.Ship.Repair;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VoidSaving
 {
@@ -17,6 +13,7 @@ namespace VoidSaving
         public int Alloy;
 
         public int Biomass;
+
 
         //Data about ship
 
@@ -31,7 +28,10 @@ namespace VoidSaving
         public BreachCondition[] Breaches;
 
         //Contains ShipType, Modules, loose carryables.
+        public GUIDUnion ShipLoadoutGUID;
+
         public JObject ShipLoadout;
+
 
         //Data about quest/session/sectors
 
