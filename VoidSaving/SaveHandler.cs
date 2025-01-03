@@ -1,6 +1,7 @@
 ﻿using CG.Game;
 using CG.Ship.Repair;
 using CG.Space;
+using Gameplay.Power;
 using Gameplay.Quests;
 using System;
 using System.IO;
@@ -60,6 +61,10 @@ namespace VoidSaving
             saveGameData.RepairableShipHealth = HDC.State.repairableHp;
             saveGameData.Breaches = Helpers.BreachesAsConditionsArray(HDC.breaches);
 
+
+            ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
+            saveGameData.ShipPowered = powerSystem.IsPowered();
+
             //Quest data
             EndlessQuest activeQuest = session.ActiveQuest as EndlessQuest;
 
@@ -97,6 +102,8 @@ namespace VoidSaving
 
                     data.RepairableShipHealth = reader.ReadSingle();
                     data.Breaches = Array.ConvertAll(reader.ReadInt32Array(), value => (BreachCondition)value);
+
+                    data.ShipPowered = reader.ReadBoolean();
 
                     data.seed = reader.ReadInt32();
                     data.JumpCounter = reader.ReadInt32();
@@ -139,6 +146,8 @@ namespace VoidSaving
 
                         writer.Write(data.RepairableShipHealth);
                         writer.Write(Array.ConvertAll(data.Breaches, value => (int)value));
+
+                        writer.Write(data.ShipPowered);
 
                         writer.Write(data.seed);
                         writer.Write(data.JumpCounter);

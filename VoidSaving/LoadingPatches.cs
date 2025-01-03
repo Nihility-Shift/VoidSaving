@@ -42,6 +42,8 @@ namespace VoidSaving
             Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
             Helpers.AddRelicsToShip(__instance, activeData.Relics);
 
+            if (activeData.ShipPowered) { __instance.ShipsPowerSystem.PowerOn() };
+
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
             GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;
 

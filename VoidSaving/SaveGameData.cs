@@ -32,6 +32,7 @@ namespace VoidSaving
 
         public JObject ShipLoadout;
 
+        public bool ShipPowered;
 
         //Data about quest/session/sectors
 
