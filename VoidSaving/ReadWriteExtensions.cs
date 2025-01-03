@@ -58,12 +58,33 @@ namespace VoidSaving
         public static int[] ReadInt32Array(this BinaryReader Reader)
         {
             int count = Reader.ReadInt32();
-            int[] unions = new int[count];
+            int[] ints = new int[count];
             for (int i = 0; i < count; i++)
             {
-                unions[i] = Reader.ReadInt32();
+                ints[i] = Reader.ReadInt32();
             }
-            return unions;
+            return ints;
+        }
+
+
+        public static void Write(this BinaryWriter Writer, bool[] bools)
+        {
+            Writer.Write(bools.Length);
+            foreach (bool booly in bools)
+            {
+                Writer.Write(booly);
+            }
+        }
+
+        public static bool[] ReadBooleanArray(this BinaryReader Reader)
+        {
+            int count = Reader.ReadInt32();
+            bool[] bools = new bool[count];
+            for (int i = 0; i < count; i++)
+            {
+                bools[i] = Reader.ReadBoolean();
+            }
+            return bools;
         }
 
 
