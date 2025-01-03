@@ -1,4 +1,6 @@
-﻿using CG.Ship.Repair;
+﻿using CG.Game.SpaceObjects.Controllers;
+using CG.Ship.Hull;
+using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.Quests;
 using HarmonyLib;
@@ -42,7 +44,18 @@ namespace VoidSaving
             Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
             Helpers.AddRelicsToShip(__instance, activeData.Relics);
 
-            if (activeData.ShipPowered) { __instance.ShipsPowerSystem.PowerOn() };
+            if (activeData.ShipPowered) { __instance.ShipsPowerSystem.PowerOn(); }
+
+            BuildSocketController bsc = __instance.GetComponent<BuildSocketController>();
+            int currentValue = 0;
+            foreach (BuildSocket socket in bsc.Sockets)
+            {
+                if (socket.InstalledModule != null && socket.InstalledModule.PowerDrain != null)
+                {
+                    socket.InstalledModule.PowerDrain.IsOn = activeData.ModulePowerStates[currentValue];
+                    currentValue++;
+                }
+            }
 
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
             GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;

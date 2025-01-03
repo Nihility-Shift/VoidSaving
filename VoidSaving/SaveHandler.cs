@@ -1,9 +1,12 @@
 ﻿using CG.Game;
+using CG.Game.SpaceObjects.Controllers;
+using CG.Ship.Hull;
 using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.Power;
 using Gameplay.Quests;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace VoidSaving
@@ -61,6 +64,16 @@ namespace VoidSaving
             saveGameData.RepairableShipHealth = HDC.State.repairableHp;
             saveGameData.Breaches = Helpers.BreachesAsConditionsArray(HDC.breaches);
 
+            List<bool> PoweredValues = new();
+            BuildSocketController bsc = playerShip.GetComponent<BuildSocketController>();
+            foreach (BuildSocket socket in bsc.Sockets)
+            {
+                if (socket.InstalledModule != null)
+                {
+                    PoweredValues.Add(socket.InstalledModule.IsPowered);
+                }
+            }
+            saveGameData.ModulePowerStates = PoweredValues.ToArray();
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = powerSystem.IsPowered();
@@ -105,6 +118,8 @@ namespace VoidSaving
 
                     data.ShipPowered = reader.ReadBoolean();
 
+                    data.ModulePowerStates = reader.ReadBooleanArray();
+
                     data.seed = reader.ReadInt32();
                     data.JumpCounter = reader.ReadInt32();
                     data.InterdictionCounter = reader.ReadInt32();
@@ -148,6 +163,8 @@ namespace VoidSaving
                         writer.Write(Array.ConvertAll(data.Breaches, value => (int)value));
 
                         writer.Write(data.ShipPowered);
+
+                        writer.Write(data.ModulePowerStates);
 
                         writer.Write(data.seed);
                         writer.Write(data.JumpCounter);

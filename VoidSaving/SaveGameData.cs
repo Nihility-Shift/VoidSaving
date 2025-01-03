@@ -34,6 +34,8 @@ namespace VoidSaving
 
         public bool ShipPowered;
 
+        public bool[] ModulePowerStates;
+
         //Data about quest/session/sectors
 
         public int seed;
