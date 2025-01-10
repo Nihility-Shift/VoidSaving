@@ -91,14 +91,15 @@ namespace VoidSaving
         }
 
         public static bool LoadSave(string SavePath)
+        public static void LoadSave(string SaveName)
         {
-            BepinPlugin.Log.LogInfo("Attempting to load save: " + SavePath);
+            BepinPlugin.Log.LogInfo("Attempting to load save: " + SaveName);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(SavePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(SaveName));
 
             SaveGameData data = new SaveGameData();
 
-            using (FileStream fileStream = File.OpenRead(SavePath))
+            using (FileStream fileStream = File.OpenRead(SaveName))
             {
                 BepinPlugin.Log.LogInfo($"Starting read save: {fileStream.Length} Bytes");
                 using (BinaryReader reader = new BinaryReader(fileStream))
@@ -127,8 +128,8 @@ namespace VoidSaving
                 }
             }
 
+            LoadSavedData = true;
             ActiveData = data;
-            return false;
         }
 
         public static bool WriteSave(string SavePath)
@@ -173,6 +174,7 @@ namespace VoidSaving
                     }
                     BepinPlugin.Log.LogInfo($"Finished writing save: {fileStream.Length} Bytes");
                 }
+                return true;
             }
             catch (Exception ex)
             {
