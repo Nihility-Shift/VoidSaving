@@ -1,6 +1,9 @@
 ﻿using CG.Game;
 using CG.Game.SpaceObjects.Controllers;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using VoidManager.CustomGUI;
 using static UnityEngine.GUILayout;
 
@@ -13,14 +16,47 @@ namespace VoidSaving
             return MyPluginInfo.USERS_PLUGIN_NAME;
         }
 
+        Dictionary<string, DateTime> SaveNames;
+
+        string SelectedSaveName;
+
+        Vector2 SaveScrollPosition;
+
+
+        string ToSaveFileName;
+
+
         public override void Draw()
         {
             if (GameSessionManager.InHub)
             {
-                if (Button("Load Save"))
+                BeginScrollView(SaveScrollPosition);
+                foreach (KeyValuePair<string, DateTime> KVP in SaveNames)
                 {
-                    SaveHandler.LoadSave(Path.Combine(SaveHandler.SaveLocation, "autosave_1.voidsave"));
-                    SaveHandler.LoadSavedData = true;
+                    if (VoidManager.Utilities.GUITools.DrawButtonSelected($"{KVP.Key} - {KVP.Value.ToLocalTime()}", SelectedSaveName == KVP.Key))
+                    {
+                        SelectedSaveName = KVP.Key;
+                    }
+                }
+                EndScrollView();
+
+                if (SelectedSaveName == null)
+                {
+                    Label("Select a save");
+                }
+                else if (Button(SaveHandler.LoadSavedData ? $"Loading {SelectedSaveName} on next session start" : "Load Save"))
+                {
+                    SaveHandler.LoadSave(Path.Combine(SaveHandler.SaveLocation, SelectedSaveName + SaveHandler.SaveExtension));
+                }
+
+
+                if (SaveHandler.LoadSavedData)
+                {
+                    if (Button("Cancel")) { SaveHandler.CancelLoad(); }
+                }
+                else
+                {
+                    Label(string.Empty);
                 }
             }
             else 
@@ -33,13 +69,20 @@ namespace VoidSaving
                 }
                 else
                 {
-                    Label("Not Implimented yet");
+                    ToSaveFileName = TextField(ToSaveFileName);
+
                     if(Button("Save Game"))
                     {
-
+                        SaveHandler.WriteSave(Path.Combine(SaveHandler.SaveLocation, ToSaveFileName));
                     }
                 }
             }
+        }
+
+        public override void OnOpen()
+        {
+            SelectedSaveName = null;
+            SaveNames = SaveHandler.GetSaveFileNames();
         }
     }
 }

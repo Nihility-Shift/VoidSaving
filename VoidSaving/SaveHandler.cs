@@ -6,8 +6,10 @@ using CG.Space;
 using Gameplay.Power;
 using Gameplay.Quests;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace VoidSaving
 {
@@ -31,7 +33,7 @@ namespace VoidSaving
 
         internal static bool LoadSavedData = false;
 
-        
+
         /*public static string SavesLocation
         {
             get
@@ -43,6 +45,25 @@ namespace VoidSaving
                 Config.SavesLocation.Value = value;
             }
         }*/
+
+        public static Dictionary<string, DateTime> GetSaveFileNames()
+        {
+            string[] Files = Directory.GetFiles(SaveLocation);
+            Dictionary<string, DateTime> FilesAndDates = new();
+
+            foreach (string file in Files)
+            {
+                if (file.EndsWith(SaveExtension))
+                {
+                    FilesAndDates.Add(Path.GetFileNameWithoutExtension(file), Directory.GetLastWriteTime(file));
+                }
+            }
+
+            //sort by date
+            FilesAndDates.OrderBy(x => x.Value);
+
+            return FilesAndDates;
+        }
 
         internal static SaveGameData GetSessionSaveGameData()
         {
@@ -90,7 +111,19 @@ namespace VoidSaving
             return saveGameData;
         }
 
-        public static bool LoadSave(string SavePath)
+        /// <summary>
+        /// Cancels load of save data
+        /// </summary>
+        public static void CancelLoad()
+        {
+            LoadSavedData = false;
+            ActiveData = null;
+        }
+
+        /// <summary>
+        /// Loads file with name from save directory
+        /// </summary>
+        /// <param name="SaveName">File name and extension</param>
         public static void LoadSave(string SaveName)
         {
             BepinPlugin.Log.LogInfo("Attempting to load save: " + SaveName);
@@ -132,6 +165,11 @@ namespace VoidSaving
             ActiveData = data;
         }
 
+        /// <summary>
+        /// Writes file to path. Adds extension if missing.
+        /// </summary>
+        /// <param name="SavePath">Full save path with/without extension</param>
+        /// <returns>Success</returns>
         public static bool WriteSave(string SavePath)
         {
             BepinPlugin.Log.LogInfo("Attempting to write save: " + SavePath);
