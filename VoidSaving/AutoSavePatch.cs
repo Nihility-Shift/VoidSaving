@@ -7,17 +7,16 @@ namespace VoidSaving
     [HarmonyPatch(typeof(VoidJumpSystem), "EnterVoid")]
     internal class AutoSavePatch
     {
-        static int AutoSaveCount = 0;
         static void Postfix()
         {
             if (!Config.AutoSavingEnabled.Value) return;
 
-            AutoSaveCount++;
-            if (AutoSaveCount > Config.AutoSaveLimit.Value)
+            Config.LastAutoSave.Value++;
+            if (Config.LastAutoSave.Value > Config.AutoSaveLimit.Value)
             {
-                AutoSaveCount = 1;
+                Config.LastAutoSave.Value = 1;
             }
-            SaveHandler.WriteSave(Path.Combine(SaveHandler.SaveLocation, $"AutoSave_{AutoSaveCount}.voidsave"));
+            SaveHandler.WriteSave(Path.Combine(SaveHandler.SaveLocation, $"AutoSave_{Config.LastAutoSave.Value}"));
         }
     }
 }
