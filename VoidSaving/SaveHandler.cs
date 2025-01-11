@@ -46,7 +46,12 @@ namespace VoidSaving
             }
         }*/
 
-        public static Dictionary<string, DateTime> GetSaveFileNames()
+        internal static void DeleteSaveFile(string SaveName)
+        {
+
+        }
+
+        internal static Dictionary<string, DateTime> GetSaveFileNames()
         {
             string[] Files = Directory.GetFiles(SaveLocation);
             Dictionary<string, DateTime> FilesAndDates = new();
@@ -126,6 +131,8 @@ namespace VoidSaving
         /// <param name="SaveName">File name and extension</param>
         public static void LoadSave(string SaveName)
         {
+            SaveName = Path.Combine(SaveLocation, SaveName);
+
             BepinPlugin.Log.LogInfo("Attempting to load save: " + SaveName);
 
             Directory.CreateDirectory(Path.GetDirectoryName(SaveName));

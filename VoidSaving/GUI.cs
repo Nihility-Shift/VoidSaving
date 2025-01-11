@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using VoidManager.CustomGUI;
+using VoidManager.Utilities;
 using static UnityEngine.GUILayout;
 
 namespace VoidSaving
@@ -25,6 +26,10 @@ namespace VoidSaving
 
         string ToSaveFileName;
 
+        string ToDeleteFileName;
+
+        bool ConfirmedDelete;
+
 
         public override void Draw()
         {
@@ -33,12 +38,34 @@ namespace VoidSaving
                 BeginScrollView(SaveScrollPosition);
                 foreach (KeyValuePair<string, DateTime> KVP in SaveNames)
                 {
-                    if (VoidManager.Utilities.GUITools.DrawButtonSelected($"{KVP.Key} - {KVP.Value.ToLocalTime()}", SelectedSaveName == KVP.Key))
+                    BeginHorizontal();
+                    if (GUITools.DrawButtonSelected($"{KVP.Key} - {KVP.Value.ToLocalTime()}", SelectedSaveName == KVP.Key))
                     {
                         SelectedSaveName = KVP.Key;
                     }
+                    if (Button("X", MaxWidth(20f)))
+                    {
+                        ToDeleteFileName = KVP.Key;
+                    }
+                    EndHorizontal();
+
+                    if (ToDeleteFileName == KVP.Key)
+                    {
+                        if (Button("Confirm delete file?"))
+                        {
+                        }
+                    }
                 }
                 EndScrollView();
+
+                if (ConfirmedDelete)
+                {
+                    ConfirmedDelete = false;
+                    SaveNames.Remove(ToDeleteFileName);
+                    SaveHandler.DeleteSaveFile(ToDeleteFileName + SaveHandler.SaveExtension);
+                    ToDeleteFileName = null;
+                }
+
 
                 if (SelectedSaveName == null)
                 {
@@ -46,7 +73,7 @@ namespace VoidSaving
                 }
                 else if (Button(SaveHandler.LoadSavedData ? $"Loading {SelectedSaveName} on next session start" : "Load Save"))
                 {
-                    SaveHandler.LoadSave(Path.Combine(SaveHandler.SaveLocation, SelectedSaveName + SaveHandler.SaveExtension));
+                    SaveHandler.LoadSave(SelectedSaveName + SaveHandler.SaveExtension);
                 }
 
 
