@@ -43,7 +43,7 @@ namespace VoidSaving
                     {
                         SelectedSaveName = KVP.Key;
                     }
-                    if (Button("X", MaxWidth(20f)))
+                    if (Button("X", MaxWidth(25f)))
                     {
                         ToDeleteFileName = KVP.Key;
                     }
