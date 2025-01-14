@@ -39,6 +39,7 @@ namespace VoidSaving
             int ControlerCount = RSCs.Length;
             for (int i = 0; i < ControlerCount; i++)
             {
+                if (relicIDs[i] == GUIDUnion.Empty()) { continue; }
                 try
                 {
                     CarryableObject carryable = SpawnUtils.SpawnCarryable(relicIDs[i], RSCs[i].transform.position, RSCs[i].transform.rotation) as CarryableObject;
@@ -62,7 +63,7 @@ namespace VoidSaving
 
         public static void AddBlueprintsToFabricator(AbstractPlayerControlledShip playerShip, GUIDUnion[] BPGUIDs)
         {
-            playerShip.GetComponent<FabricatorTerminal>().Data.CraftingData.SessionUnlockedItems.AddRange(BPGUIDs);
+            playerShip.GetComponentInChildren<FabricatorTerminal>().Data.CraftingData.SessionUnlockedItems.AddRange(BPGUIDs);
         }
     }
 }

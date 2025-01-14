@@ -31,7 +31,7 @@ namespace VoidSaving
             __instance.activeGameSession.ToLoadShipData = ShipLoadout.FromJObject(SaveHandler.ActiveData.ShipLoadout);
         }
 
-        [HarmonyPatch(typeof(AbstractPlayerControlledShip), "Awake"), HarmonyPostfix]
+        [HarmonyPatch(typeof(AbstractPlayerControlledShip), "Start"), HarmonyPostfix]
         static void PostShipLoadPatch(AbstractPlayerControlledShip __instance)
         {
             if (!SaveHandler.LoadSavedData) return;
@@ -60,10 +60,13 @@ namespace VoidSaving
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
             GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;
 
+        }
 
-            //Last piece of code called
-            SaveHandler.LoadSavedData = false;
-            SaveHandler.ActiveData = null;
+        //VJS start puts VJ into inactive. Put into travelling state after load.
+        [HarmonyPatch(typeof(VoidJumpSystem), "Start"), HarmonyPostfix]
+        static void PostVoidJumpSystemStartPatch(VoidJumpSystem __instance)
+        {
+            __instance.DebugTransitionToTravellingState();
         }
     }
 }
