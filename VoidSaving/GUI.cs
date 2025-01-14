@@ -53,6 +53,7 @@ namespace VoidSaving
                     {
                         if (Button("Confirm delete file?"))
                         {
+                            ConfirmedDelete = true;
                         }
                     }
                 }

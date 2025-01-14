@@ -48,7 +48,7 @@ namespace VoidSaving
 
         internal static void DeleteSaveFile(string SaveName)
         {
-
+            File.Delete(Path.Combine(SaveLocation, SaveName));
         }
 
         internal static Dictionary<string, DateTime> GetSaveFileNames()
