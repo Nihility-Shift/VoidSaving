@@ -60,6 +60,7 @@ namespace VoidSaving
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
             GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;
 
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.AbstractPlayerShipStart);
         }
 
         //VJS start puts VJ into inactive. Put into travelling state after load.
@@ -67,6 +68,7 @@ namespace VoidSaving
         static void PostVoidJumpSystemStartPatch(VoidJumpSystem __instance)
         {
             __instance.DebugTransitionToTravellingState();
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
         }
     }
 }

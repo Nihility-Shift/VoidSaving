@@ -6,7 +6,6 @@ using CG.Space;
 using Gameplay.Power;
 using Gameplay.Quests;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -116,13 +115,34 @@ namespace VoidSaving
             return saveGameData;
         }
 
+        [Flags]
+        public enum LoadingStage
+        {
+            None = 0,
+            VoidJumpStart = 1,
+            AbstractPlayerShipStart = 2,
+        }
+
+        static LoadingStage CompletedStages;
+
+        public static void CompleteLoadingStage(LoadingStage stage)
+        {
+            CompletedStages |= stage;
+            
+            if (CompletedStages.HasFlag(LoadingStage.VoidJumpStart) && CompletedStages.HasFlag(LoadingStage.AbstractPlayerShipStart))
+            {
+                CancelOrFinalzeLoad();
+            }
+        }
+
         /// <summary>
-        /// Cancels load of save data
+        /// Cancels or clears loading of save data
         /// </summary>
-        public static void CancelLoad()
+        public static void CancelOrFinalzeLoad()
         {
             LoadSavedData = false;
             ActiveData = null;
+            CompletedStages = LoadingStage.None;
         }
 
         /// <summary>
@@ -181,7 +201,7 @@ namespace VoidSaving
         {
             BepinPlugin.Log.LogInfo("Attempting to write save: " + SavePath);
 
-            if(!SavePath.EndsWith(SaveExtension))
+            if (!SavePath.EndsWith(SaveExtension))
             {
                 SavePath += SaveExtension;
             }

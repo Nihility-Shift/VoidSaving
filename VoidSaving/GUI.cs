@@ -80,7 +80,7 @@ namespace VoidSaving
 
                 if (SaveHandler.LoadSavedData)
                 {
-                    if (Button("Cancel")) { SaveHandler.CancelLoad(); }
+                    if (Button("Cancel")) { SaveHandler.CancelOrFinalzeLoad(); }
                 }
                 else
                 {
