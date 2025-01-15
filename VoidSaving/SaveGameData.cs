@@ -38,6 +38,8 @@ namespace VoidSaving
 
         public bool[] ModulePowerStates;
 
+        public bool[] ShipSystemPowerStates;
+
         //Data about quest/session/sectors
 
         public int seed;

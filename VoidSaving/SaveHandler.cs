@@ -1,6 +1,7 @@
 ﻿using CG.Game;
 using CG.Game.SpaceObjects.Controllers;
 using CG.Ship.Hull;
+using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.Power;
@@ -89,16 +90,24 @@ namespace VoidSaving
             saveGameData.RepairableShipHealth = HDC.State.repairableHp;
             saveGameData.Breaches = Helpers.BreachesAsConditionsArray(HDC.breaches);
 
-            List<bool> PoweredValues = new();
+            List<bool> ShipSystemPoweredValues = new();
+            foreach (CellModule module in playerShip.CoreSystems)
+            {
+                ShipSystemPoweredValues.Add(module.IsPowered);
+            }
+            saveGameData.ShipSystemPowerStates = ShipSystemPoweredValues.ToArray();
+
             BuildSocketController bsc = playerShip.GetComponent<BuildSocketController>();
+            List<bool> ModulePoweredValues = new();
             foreach (BuildSocket socket in bsc.Sockets)
             {
                 if (socket.InstalledModule != null)
                 {
-                    PoweredValues.Add(socket.InstalledModule.IsPowered);
+                    ModulePoweredValues.Add(socket.InstalledModule.IsPowered);
                 }
             }
-            saveGameData.ModulePowerStates = PoweredValues.ToArray();
+            saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
+
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = powerSystem.IsPowered();
@@ -162,33 +171,34 @@ namespace VoidSaving
 
             try
             {
-            using (FileStream fileStream = File.OpenRead(SaveName))
-            {
-                BepinPlugin.Log.LogInfo($"Starting read save: {fileStream.Length} Bytes");
-                using (BinaryReader reader = new BinaryReader(fileStream))
+                using (FileStream fileStream = File.OpenRead(SaveName))
                 {
-                    data.SaveDataVersion = reader.ReadUInt32();
-                    data.Alloy = reader.ReadInt32();
-                    data.Biomass = reader.ReadInt32();
-                    data.ShipHealth = reader.ReadSingle();
+                    BepinPlugin.Log.LogInfo($"Starting read save: {fileStream.Length} Bytes");
+                    using (BinaryReader reader = new BinaryReader(fileStream))
+                    {
+                        data.SaveDataVersion = reader.ReadUInt32();
+                        data.Alloy = reader.ReadInt32();
+                        data.Biomass = reader.ReadInt32();
+                        data.ShipHealth = reader.ReadSingle();
 
-                    data.ShipLoadoutGUID = reader.ReadGUIDUnion();
-                    data.ShipLoadout = reader.ReadJObject();
-                    data.Relics = reader.ReadGUIDUnionArray();
-                    data.UnlockedBPs = reader.ReadGUIDUnionArray();
+                        data.ShipLoadoutGUID = reader.ReadGUIDUnion();
+                        data.ShipLoadout = reader.ReadJObject();
+                        data.Relics = reader.ReadGUIDUnionArray();
+                        data.UnlockedBPs = reader.ReadGUIDUnionArray();
 
-                    data.RepairableShipHealth = reader.ReadSingle();
-                    data.Breaches = Array.ConvertAll(reader.ReadInt32Array(), value => (BreachCondition)value);
+                        data.RepairableShipHealth = reader.ReadSingle();
+                        data.Breaches = Array.ConvertAll(reader.ReadInt32Array(), value => (BreachCondition)value);
 
-                    data.ShipPowered = reader.ReadBoolean();
+                        data.ShipPowered = reader.ReadBoolean();
 
-                    data.ModulePowerStates = reader.ReadBooleanArray();
+                        data.ShipSystemPowerStates = reader.ReadBooleanArray();
+                        data.ModulePowerStates = reader.ReadBooleanArray();
 
-                    data.seed = reader.ReadInt32();
-                    data.JumpCounter = reader.ReadInt32();
-                    data.InterdictionCounter = reader.ReadInt32();
-                    data.random = reader.ReadRandom();
-                }
+                        data.seed = reader.ReadInt32();
+                        data.JumpCounter = reader.ReadInt32();
+                        data.InterdictionCounter = reader.ReadInt32();
+                        data.random = reader.ReadRandom();
+                    }
                 }
             }
             catch (Exception ex)
@@ -240,6 +250,7 @@ namespace VoidSaving
 
                         writer.Write(data.ShipPowered);
 
+                        writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);
 
                         writer.Write(data.seed);

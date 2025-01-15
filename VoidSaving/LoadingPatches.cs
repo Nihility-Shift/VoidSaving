@@ -1,5 +1,6 @@
 ﻿using CG.Game.SpaceObjects.Controllers;
 using CG.Ship.Hull;
+using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.Quests;
@@ -46,13 +47,29 @@ namespace VoidSaving
 
             if (activeData.ShipPowered) { __instance.ShipsPowerSystem.PowerOn(); }
 
-            BuildSocketController bsc = __instance.GetComponent<BuildSocketController>();
             int currentValue = 0;
+            foreach (CellModule module in __instance.CoreSystems)
+            {
+                if (module != null && module.PowerDrain != null)
+                {
+                    if (activeData.ShipSystemPowerStates[currentValue])
+                    {
+                        module.TurnOn();
+                    }
+                    currentValue++;
+                }
+            }
+
+            BuildSocketController bsc = __instance.GetComponent<BuildSocketController>();
+            currentValue = 0;
             foreach (BuildSocket socket in bsc.Sockets)
             {
                 if (socket.InstalledModule != null && socket.InstalledModule.PowerDrain != null)
                 {
-                    socket.InstalledModule.PowerDrain.IsOn = activeData.ModulePowerStates[currentValue];
+                    if (activeData.ModulePowerStates[currentValue])
+                    {
+                        socket.InstalledModule.TurnOn();
+                    }
                     currentValue++;
                 }
             }
