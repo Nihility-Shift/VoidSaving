@@ -6,6 +6,8 @@ namespace VoidSaving
 {
     public class SaveGameData
     {
+        public string FileName;
+
         public uint SaveDataVersion = 0;
 
         //Data about resources

@@ -149,7 +149,7 @@ namespace VoidSaving
         /// Loads file with name from save directory
         /// </summary>
         /// <param name="SaveName">File name and extension</param>
-        public static void LoadSave(string SaveName)
+        public static bool LoadSave(string SaveName)
         {
             SaveName = Path.Combine(SaveLocation, SaveName);
 
@@ -158,7 +158,10 @@ namespace VoidSaving
             Directory.CreateDirectory(Path.GetDirectoryName(SaveName));
 
             SaveGameData data = new SaveGameData();
+            data.FileName = SaveName.Replace(SaveExtension, string.Empty);
 
+            try
+            {
             using (FileStream fileStream = File.OpenRead(SaveName))
             {
                 BepinPlugin.Log.LogInfo($"Starting read save: {fileStream.Length} Bytes");
@@ -186,10 +189,17 @@ namespace VoidSaving
                     data.InterdictionCounter = reader.ReadInt32();
                     data.random = reader.ReadRandom();
                 }
+                }
+            }
+            catch (Exception ex)
+            {
+                BepinPlugin.Log.LogError($"Failed to load save {SaveName}\n{ex.Message}");
+                return false;
             }
 
             LoadSavedData = true;
             ActiveData = data;
+            return true;
         }
 
         /// <summary>

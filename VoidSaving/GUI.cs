@@ -23,6 +23,8 @@ namespace VoidSaving
 
         Vector2 SaveScrollPosition;
 
+        bool FailedToLoadLastSave;
+
 
         string ToSaveFileName;
 
@@ -74,9 +76,13 @@ namespace VoidSaving
                 }
                 else if (Button(SaveHandler.LoadSavedData ? $"Loading {SelectedSaveName} on next session start" : "Load Save"))
                 {
-                    SaveHandler.LoadSave(SelectedSaveName + SaveHandler.SaveExtension);
+                    FailedToLoadLastSave = !SaveHandler.LoadSave(SelectedSaveName + SaveHandler.SaveExtension);
                 }
 
+                if (FailedToLoadLastSave)
+                {
+                    Label($"<color=red>Failed to load {SelectedSaveName}</color>");
+                }
 
                 if (SaveHandler.LoadSavedData)
                 {
@@ -109,7 +115,7 @@ namespace VoidSaving
 
         public override void OnOpen()
         {
-            SelectedSaveName = null;
+            FailedToLoadLastSave = false;
             SelectedSaveName = SaveHandler.ActiveData?.FileName;
             SaveNames = SaveHandler.GetSaveFileNames();
         }
