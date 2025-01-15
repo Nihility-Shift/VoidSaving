@@ -110,6 +110,7 @@ namespace VoidSaving
         public override void OnOpen()
         {
             SelectedSaveName = null;
+            SelectedSaveName = SaveHandler.ActiveData?.FileName;
             SaveNames = SaveHandler.GetSaveFileNames();
         }
     }
