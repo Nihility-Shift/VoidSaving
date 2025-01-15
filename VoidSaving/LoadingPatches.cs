@@ -87,8 +87,8 @@ namespace VoidSaving
             if (!SaveHandler.LoadSavedData) return;
 
             __instance.DebugTransitionToExitVectorSetState();
-            __instance.DebugTransitionToSpinningUpState();
             __instance.DebugTransitionToRotatingState();
+            __instance.DebugTransitionToSpinningUpState();
             __instance.DebugTransitionToTravellingState();
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
         }
