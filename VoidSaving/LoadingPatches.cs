@@ -67,6 +67,11 @@ namespace VoidSaving
         [HarmonyPatch(typeof(VoidJumpSystem), "Start"), HarmonyPostfix]
         static void PostVoidJumpSystemStartPatch(VoidJumpSystem __instance)
         {
+            if (!SaveHandler.LoadSavedData) return;
+
+            __instance.DebugTransitionToExitVectorSetState();
+            __instance.DebugTransitionToSpinningUpState();
+            __instance.DebugTransitionToRotatingState();
             __instance.DebugTransitionToTravellingState();
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
         }
