@@ -11,6 +11,32 @@ namespace VoidSaving
     [HarmonyPatch]
     internal class LoadingPatches
     {
+        //Sets Random prior to generation of next section
+        static void SetRandomPatchMethod(EndlessQuest Instance)
+        {
+            SaveHandler.LatestRandom = SaveHandler.ActiveData.random;
+            Instance.context.Random = SaveHandler.ActiveData.random.DeepCopy();
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestDataRandomSet);
+        }
+
+        [HarmonyPatch(typeof(EndlessQuest), MethodType.Constructor), HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> EndlessQuestLoadPatch(IEnumerable<CodeInstruction> instructions)
+        {
+            CodeInstruction[] targetSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new CodeInstruction(OpCodes.Call),
+                new CodeInstruction(OpCodes.Ret),
+            };
+
+            CodeInstruction[] patchSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(LoadingPatches), "SetRandomPatchMethod")),
+            };
+
+            return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.BEFORE, CheckMode.NONNULL);
+        }
         [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
         static void QuestLoadPatch(Quest __result)
         {

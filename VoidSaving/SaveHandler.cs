@@ -70,6 +70,12 @@ namespace VoidSaving
             return FilesAndDates;
         }
 
+
+        //Captured Data from current run (must grab prior to mid-void to avoid dirty data)
+        internal static Random LatestRandom;
+
+
+
         internal static SaveGameData GetSessionSaveGameData()
         {
             SaveGameData saveGameData = new SaveGameData();
@@ -119,6 +125,7 @@ namespace VoidSaving
             saveGameData.JumpCounter = activeQuest.JumpCounter;
             saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
             saveGameData.random = activeQuest.Context.Random;
+            saveGameData.random = LatestRandom;
 
 
             return saveGameData;
@@ -130,6 +137,7 @@ namespace VoidSaving
             None = 0,
             VoidJumpStart = 1,
             AbstractPlayerShipStart = 2,
+            QuestDataRandomSet = 4,
         }
 
         static LoadingStage CompletedStages;
@@ -138,7 +146,7 @@ namespace VoidSaving
         {
             CompletedStages |= stage;
             
-            if (CompletedStages.HasFlag(LoadingStage.VoidJumpStart) && CompletedStages.HasFlag(LoadingStage.AbstractPlayerShipStart))
+            if (CompletedStages.HasFlag(LoadingStage.VoidJumpStart) && CompletedStages.HasFlag(LoadingStage.AbstractPlayerShipStart) && CompletedStages.HasFlag(LoadingStage.QuestDataRandomSet))
             {
                 CancelOrFinalzeLoad();
             }
