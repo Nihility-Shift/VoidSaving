@@ -257,8 +257,9 @@ namespace VoidSaving
                         writer.Write(data.JumpCounter);
                         writer.Write(data.InterdictionCounter);
                         writer.Write(data.random);
+
+                        BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
                     }
-                    BepinPlugin.Log.LogInfo($"Finished writing save: {fileStream.Length} Bytes");
                 }
                 return true;
             }
