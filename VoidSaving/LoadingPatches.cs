@@ -18,12 +18,14 @@ namespace VoidSaving
         //Sets Random prior to generation of next section
         static void SetRandomPatchMethod(EndlessQuest Instance)
         {
+            if (!SaveHandler.LoadSavedData) return;
+
             SaveHandler.LatestRandom = SaveHandler.ActiveData.random;
             Instance.context.Random = SaveHandler.ActiveData.random.DeepCopy();
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestDataRandomSet);
         }
 
-        [HarmonyPatch(typeof(EndlessQuest), MethodType.Constructor), HarmonyTranspiler]
+        [HarmonyPatch(typeof(EndlessQuest), "GenerateStartingSection"), HarmonyTranspiler]
         static IEnumerable<CodeInstruction> EndlessQuestLoadPatch(IEnumerable<CodeInstruction> instructions)
         {
             CodeInstruction[] targetSequence = new CodeInstruction[]
