@@ -93,7 +93,7 @@ namespace VoidSaving
                     Label(string.Empty);
                 }
             }
-            else 
+            else if(GameSessionManager.HasActiveSession)
             {
                 VoidJumpSystem voidJumpSystem = ClientGame.Current?.PlayerShip?.transform?.GetComponent<VoidJumpSystem>();
                 VoidJumpState voidJumpState = voidJumpSystem?.ActiveState;
@@ -110,6 +110,10 @@ namespace VoidSaving
                         SaveHandler.WriteSave(Path.Combine(SaveHandler.SaveLocation, ToSaveFileName));
                     }
                 }
+            }
+            else
+            {
+                Label("Must be in hub");
             }
         }
 
