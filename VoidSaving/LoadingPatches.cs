@@ -3,8 +3,12 @@ using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Space;
+using Client.Utils;
 using Gameplay.Quests;
 using HarmonyLib;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using static VoidManager.Utilities.HarmonyHelpers;
 
 namespace VoidSaving
 {
@@ -37,19 +41,28 @@ namespace VoidSaving
 
             return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.BEFORE, CheckMode.NONNULL);
         }
+
+        //Sets seed at earliest point
         [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
-        static void QuestLoadPatch(Quest __result)
+        static void QuestLoadPrefix(QuestParameters questParameters)
+        {
+            if (!SaveHandler.LoadSavedData) return;
+
+            questParameters.Seed = SaveHandler.ActiveData.seed;
+        }
+
+        //Sets jump and interdiction counters prior to first usage
+        [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
+        static void QuestLoadPostfix(Quest __result)
         {
             if (!SaveHandler.LoadSavedData || __result is not EndlessQuest quest) return;
 
-            SaveGameData saveData = SaveHandler.ActiveData;
-
-            quest.QuestParameters.Seed = saveData.seed;
-            quest.JumpCounter = saveData.JumpCounter;
-            quest.InterdictionCounter = saveData.InterdictionCounter;
-            quest.context.Random = saveData.random;
+            //Load JumpCounter prior to jump to keep Interdiction chance the same.
+            quest.JumpCounter = SaveHandler.ActiveData.JumpCounter - 1;
+            quest.InterdictionCounter = SaveHandler.ActiveData.InterdictionCounter;
         }
 
+        //Loads ship from vanilla ship data save/load system
         [HarmonyPatch(typeof(GameSessionManager), "LoadGameSessionNetworkedAssets"), HarmonyPrefix]
         static void ShipLoadPatch(GameSessionManager __instance)
         {
@@ -58,6 +71,7 @@ namespace VoidSaving
             __instance.activeGameSession.ToLoadShipData = ShipLoadout.FromJObject(SaveHandler.ActiveData.ShipLoadout);
         }
 
+        //loads various ship data at start.
         [HarmonyPatch(typeof(AbstractPlayerControlledShip), "Start"), HarmonyPostfix]
         static void PostShipLoadPatch(AbstractPlayerControlledShip __instance)
         {
