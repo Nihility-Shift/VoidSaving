@@ -74,6 +74,8 @@ namespace VoidSaving
         //Captured Data from current run (must grab prior to mid-void to avoid dirty data)
         internal static Random LatestRandom;
 
+        internal static float LatestCurrentInterdictionChance;
+
 
 
         internal static SaveGameData GetSessionSaveGameData()
@@ -124,7 +126,7 @@ namespace VoidSaving
             saveGameData.seed = activeQuest.QuestParameters.Seed;
             saveGameData.JumpCounter = activeQuest.JumpCounter;
             saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
-            saveGameData.random = activeQuest.Context.Random;
+            saveGameData.CurrentInterdictionChance = LatestCurrentInterdictionChance;
             saveGameData.random = LatestRandom;
 
 
@@ -205,6 +207,7 @@ namespace VoidSaving
                         data.seed = reader.ReadInt32();
                         data.JumpCounter = reader.ReadInt32();
                         data.InterdictionCounter = reader.ReadInt32();
+                        data.CurrentInterdictionChance = reader.ReadSingle();
                         data.random = reader.ReadRandom();
                     }
                 }
@@ -264,6 +267,7 @@ namespace VoidSaving
                         writer.Write(data.seed);
                         writer.Write(data.JumpCounter);
                         writer.Write(data.InterdictionCounter);
+                        writer.Write(data.CurrentInterdictionChance);
                         writer.Write(data.random);
 
                         BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");

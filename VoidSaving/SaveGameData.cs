@@ -49,5 +49,7 @@ namespace VoidSaving
         public int JumpCounter;
 
         public int InterdictionCounter;
+
+        public float CurrentInterdictionChance;
     }
 }
