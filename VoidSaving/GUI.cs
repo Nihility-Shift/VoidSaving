@@ -37,7 +37,7 @@ namespace VoidSaving
         {
             if (GameSessionManager.InHub)
             {
-                BeginScrollView(SaveScrollPosition);
+                SaveScrollPosition = BeginScrollView(SaveScrollPosition);
                 foreach (KeyValuePair<string, DateTime> KVP in SaveNames)
                 {
                     BeginHorizontal();
