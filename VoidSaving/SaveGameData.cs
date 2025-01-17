@@ -42,14 +42,30 @@ namespace VoidSaving
 
         //Data about quest/session/sectors
 
-        public int seed;
+        public int Seed;
 
-        public Random random;
+        public Random Random;
 
         public int JumpCounter;
 
         public int InterdictionCounter;
 
         public float CurrentInterdictionChance;
+
+        public int NextSectorID;
+
+        public int ActiveSolarSystemID;
+
+        public int NextSolarSystemID;
+
+        public int NextSectionIndex;
+
+        public int EnemyLevelRangeMin;
+
+        public int EnemyLevelRangeMax;
+
+        public int SectorsUsedInSolarSystem;
+
+        public int SectorsToUseInSolarSystem;
     }
 }

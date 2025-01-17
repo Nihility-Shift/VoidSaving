@@ -75,7 +75,14 @@ namespace VoidSaving
         internal static Random LatestRandom;
 
         internal static float LatestCurrentInterdictionChance;
-
+        internal static int LatestNextSectorID;
+        internal static int LatestActiveSolarSystemID;
+        internal static int LatestNextSolarSystemID;
+        internal static int LatestSectionIndex;
+        internal static int LatestEnemyLevelMin;
+        internal static int LatestEnemyLevelMax;
+        internal static int LatestSectorsUsedInSolarSystem;
+        internal static int LatestSectorsToUseInSolarSystem;
 
 
         internal static SaveGameData GetSessionSaveGameData()
@@ -123,11 +130,18 @@ namespace VoidSaving
             //Quest data
             EndlessQuest activeQuest = session.ActiveQuest as EndlessQuest;
 
-            saveGameData.seed = activeQuest.QuestParameters.Seed;
+            saveGameData.Seed = activeQuest.QuestParameters.Seed;
             saveGameData.JumpCounter = activeQuest.JumpCounter;
             saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
             saveGameData.CurrentInterdictionChance = LatestCurrentInterdictionChance;
-            saveGameData.random = LatestRandom;
+            saveGameData.Random = LatestRandom;
+            saveGameData.NextSectorID = LatestNextSectorID;
+            saveGameData.NextSolarSystemID = LatestNextSolarSystemID;
+            saveGameData.NextSectionIndex = LatestSectionIndex;
+            saveGameData.EnemyLevelRangeMin = LatestEnemyLevelMin;
+            saveGameData.EnemyLevelRangeMax = LatestEnemyLevelMax;
+            saveGameData.SectorsToUseInSolarSystem = LatestSectorsToUseInSolarSystem;
+            saveGameData.SectorsUsedInSolarSystem = LatestSectorsUsedInSolarSystem;
 
 
             return saveGameData;
@@ -204,11 +218,19 @@ namespace VoidSaving
                         data.ShipSystemPowerStates = reader.ReadBooleanArray();
                         data.ModulePowerStates = reader.ReadBooleanArray();
 
-                        data.seed = reader.ReadInt32();
+                        data.Seed = reader.ReadInt32();
                         data.JumpCounter = reader.ReadInt32();
                         data.InterdictionCounter = reader.ReadInt32();
                         data.CurrentInterdictionChance = reader.ReadSingle();
-                        data.random = reader.ReadRandom();
+                        data.Random = reader.ReadRandom();
+                        data.NextSectorID = reader.ReadInt32();
+                        data.ActiveSolarSystemID = reader.ReadInt32();
+                        data.NextSolarSystemID = reader.ReadInt32();
+                        data.NextSectionIndex = reader.ReadInt32();
+                        data.EnemyLevelRangeMin = reader.ReadInt32();
+                        data.EnemyLevelRangeMax = reader.ReadInt32();
+                        data.SectorsUsedInSolarSystem = reader.ReadInt32();
+                        data.SectorsToUseInSolarSystem = reader.ReadInt32();
                     }
                 }
             }
@@ -264,11 +286,19 @@ namespace VoidSaving
                         writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);
 
-                        writer.Write(data.seed);
+                        writer.Write(data.Seed);
                         writer.Write(data.JumpCounter);
                         writer.Write(data.InterdictionCounter);
                         writer.Write(data.CurrentInterdictionChance);
-                        writer.Write(data.random);
+                        writer.Write(data.Random);
+                        writer.Write(data.NextSectorID);
+                        writer.Write(data.ActiveSolarSystemID);
+                        writer.Write(data.NextSolarSystemID);
+                        writer.Write(data.NextSectionIndex);
+                        writer.Write(data.EnemyLevelRangeMin);
+                        writer.Write(data.EnemyLevelRangeMax);
+                        writer.Write(data.SectorsUsedInSolarSystem);
+                        writer.Write(data.SectorsToUseInSolarSystem);
 
                         BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
                     }
