@@ -219,6 +219,7 @@ namespace VoidSaving
                         data.ModulePowerStates = reader.ReadBooleanArray();
 
                         data.Seed = reader.ReadInt32();
+                        data.ParametersSeed = reader.ReadInt32();
                         data.JumpCounter = reader.ReadInt32();
                         data.InterdictionCounter = reader.ReadInt32();
                         data.CurrentInterdictionChance = reader.ReadSingle();
@@ -289,6 +290,7 @@ namespace VoidSaving
                         writer.Write(data.ModulePowerStates);
 
                         writer.Write(data.Seed);
+                        writer.Write(data.ParametersSeed);
                         writer.Write(data.JumpCounter);
                         writer.Write(data.InterdictionCounter);
                         writer.Write(data.CurrentInterdictionChance);
