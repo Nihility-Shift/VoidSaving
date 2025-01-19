@@ -44,6 +44,8 @@ namespace VoidSaving
 
         public int Seed;
 
+        public int ParametersSeed;
+
         public Random Random;
 
         public int JumpCounter;
@@ -67,5 +69,7 @@ namespace VoidSaving
         public int SectorsUsedInSolarSystem;
 
         public int SectorsToUseInSolarSystem;
+
+        public int SideObjectiveGuaranteeInterval;
     }
 }

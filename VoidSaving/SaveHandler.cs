@@ -29,6 +29,26 @@ namespace VoidSaving
 
         public static SaveGameData ActiveData { get; internal set; }
 
+
+        //Captured Data from current run (must grab prior to mid-void to avoid dirty data)
+
+        private static SaveGameData m_LatestData;
+
+        internal static SaveGameData LatestData { 
+            get
+            {
+                if (m_LatestData == null)
+                {
+                    m_LatestData = new SaveGameData();
+                }
+                return m_LatestData;
+            }
+            set
+            {
+                m_LatestData = value;
+            }
+        }
+
         public static bool StartedAsHost { get; internal set; }
 
         internal static bool LoadSavedData = false;
@@ -71,23 +91,10 @@ namespace VoidSaving
         }
 
 
-        //Captured Data from current run (must grab prior to mid-void to avoid dirty data)
-        internal static Random LatestRandom;
-
-        internal static float LatestCurrentInterdictionChance;
-        internal static int LatestNextSectorID;
-        internal static int LatestActiveSolarSystemID;
-        internal static int LatestNextSolarSystemID;
-        internal static int LatestSectionIndex;
-        internal static int LatestEnemyLevelMin;
-        internal static int LatestEnemyLevelMax;
-        internal static int LatestSectorsUsedInSolarSystem;
-        internal static int LatestSectorsToUseInSolarSystem;
-
 
         internal static SaveGameData GetSessionSaveGameData()
         {
-            SaveGameData saveGameData = new SaveGameData();
+            SaveGameData saveGameData = LatestData;
             GameSession session = GameSessionManager.Instance.activeGameSession;
             AbstractPlayerControlledShip playerShip = ClientGame.Current.PlayerShip;
 
@@ -133,16 +140,6 @@ namespace VoidSaving
             saveGameData.Seed = activeQuest.QuestParameters.Seed;
             saveGameData.JumpCounter = activeQuest.JumpCounter;
             saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
-            saveGameData.CurrentInterdictionChance = LatestCurrentInterdictionChance;
-            saveGameData.Random = LatestRandom;
-            saveGameData.NextSectorID = LatestNextSectorID;
-            saveGameData.NextSolarSystemID = LatestNextSolarSystemID;
-            saveGameData.NextSectionIndex = LatestSectionIndex;
-            saveGameData.EnemyLevelRangeMin = LatestEnemyLevelMin;
-            saveGameData.EnemyLevelRangeMax = LatestEnemyLevelMax;
-            saveGameData.SectorsToUseInSolarSystem = LatestSectorsToUseInSolarSystem;
-            saveGameData.SectorsUsedInSolarSystem = LatestSectorsUsedInSolarSystem;
-
 
             return saveGameData;
         }
@@ -153,7 +150,7 @@ namespace VoidSaving
             None = 0,
             VoidJumpStart = 1,
             AbstractPlayerShipStart = 2,
-            QuestDataRandomSet = 4,
+            QuestData = 4,
         }
 
         static LoadingStage CompletedStages;
@@ -161,9 +158,12 @@ namespace VoidSaving
         public static void CompleteLoadingStage(LoadingStage stage)
         {
             CompletedStages |= stage;
+            BepinPlugin.Log.LogInfo("Completed Loading Stage: " + stage);
             
-            if (CompletedStages.HasFlag(LoadingStage.VoidJumpStart) && CompletedStages.HasFlag(LoadingStage.AbstractPlayerShipStart) && CompletedStages.HasFlag(LoadingStage.QuestDataRandomSet))
+            if (CompletedStages == (LoadingStage.VoidJumpStart | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData))
             {
+                BepinPlugin.Log.LogInfo("Finished all loading stages");
+                LatestData = ActiveData;
                 CancelOrFinalzeLoad();
             }
         }
@@ -231,6 +231,8 @@ namespace VoidSaving
                         data.EnemyLevelRangeMax = reader.ReadInt32();
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
+
+                        BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
                     }
                 }
             }

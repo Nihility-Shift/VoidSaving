@@ -12,29 +12,26 @@ namespace VoidSaving
     [HarmonyPatch]
     internal class LoadingPatches
     {
-        [HarmonyPatch(typeof(Quest), "NextJumpInterdictionCheck")]
+        [HarmonyPatch(typeof(Quest), "NextJumpInterdictionCheck"), HarmonyPostfix]
+        static void NJISeedCheck(int seed)
+        {
+            BepinPlugin.Log.LogInfo($"NJI Seed check: " + seed);
+        }
+
+        [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnEnter")]
         internal class CapturePreJumpPatch
         {
-            static void Prefix(Quest __instance)
+            static void Prefix()
             {
-                if (__instance is not EndlessQuest endlessQuest) return;
+                if (GameSessionManager.ActiveSession.ActiveQuest is not EndlessQuest endlessQuest) return;
 
-                if (SaveHandler.LoadSavedData)
+                if (!SaveHandler.LoadSavedData)
                 {
-                    SaveGameData activeData = SaveHandler.ActiveData;
-
-                    SaveHandler.LatestRandom = activeData.Random;
-                    endlessQuest.context.Random = activeData.Random.DeepCopy();
-
-                    SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestDataRandomSet);
+                    SaveHandler.LatestData.CurrentInterdictionChance = endlessQuest.CurrentInterdictionChance;
                 }
                 else
                 {
-                    //Capture current random and quest data for saving prior to generation of next section.
-                    SaveHandler.LatestRandom = endlessQuest.Context.Random.DeepCopy();
-                    BepinPlugin.Log.LogInfo($"LatestRandom: {SaveHandler.LatestRandom.Next()}; CurrantRandom: {endlessQuest.Context.Random.Next()}");
-                    SaveHandler.LatestCurrentInterdictionChance = endlessQuest.CurrentInterdictionChance;
-
+                    endlessQuest.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
                 }
             }
         }
@@ -42,10 +39,13 @@ namespace VoidSaving
         [HarmonyPatch(typeof(EndlessQuest), "GenerateNextSection"), HarmonyPrefix]
         static void SectionDataLoadPatch(EndlessQuest __instance)
         {
+            BepinPlugin.Log.LogInfo("GNS called");
+
             if (SaveHandler.LoadSavedData)
             {
                 SaveGameData activeData = SaveHandler.ActiveData;
 
+                __instance.context.NextSectionParameters.Seed = activeData.ParametersSeed;
                 __instance.context.NextSectionParameters.NextSectorId = activeData.NextSectorID;
 
                 __instance.context.ActiveSolarSystemIndex = activeData.ActiveSolarSystemID;
@@ -57,17 +57,26 @@ namespace VoidSaving
                 __instance.context.NextSectionParameters.EnemyLevelRange.Max = activeData.EnemyLevelRangeMax;
                 __instance.context.SectorsUsedInSolarSystem = activeData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = activeData.SectorsToUseInSolarSystem;
+
+                SaveHandler.LatestData.Random = activeData.Random;
+                __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
+                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
             }
             else
             {
-                SaveHandler.LatestNextSectorID = __instance.context.NextSectionParameters.NextSectorId;
-                SaveHandler.LatestActiveSolarSystemID = __instance.context.ActiveSolarSystemIndex;
-                SaveHandler.LatestNextSolarSystemID = __instance.context.NextSolarSystemIndex;
-                SaveHandler.LatestSectionIndex = __instance.context.NextSectionParameters.SectionIndex;
-                SaveHandler.LatestEnemyLevelMin = __instance.context.NextSectionParameters.EnemyLevelRange.Min;
-                SaveHandler.LatestEnemyLevelMax = __instance.context.NextSectionParameters.EnemyLevelRange.Max;
-                SaveHandler.LatestSectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
-                SaveHandler.LatestSectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
+                //Capture current random and quest data for saving prior to generation of next section.
+                SaveHandler.LatestData.ParametersSeed = __instance.Context.NextSectionParameters.Seed;
+                SaveHandler.LatestData.NextSectorID = __instance.context.NextSectionParameters.NextSectorId;
+                SaveHandler.LatestData.ActiveSolarSystemID = __instance.context.ActiveSolarSystemIndex;
+                SaveHandler.LatestData.NextSolarSystemID = __instance.context.NextSolarSystemIndex;
+                SaveHandler.LatestData.NextSectionIndex = __instance.context.NextSectionParameters.SectionIndex;
+                SaveHandler.LatestData.EnemyLevelRangeMin = __instance.context.NextSectionParameters.EnemyLevelRange.Min;
+                SaveHandler.LatestData.EnemyLevelRangeMax = __instance.context.NextSectionParameters.EnemyLevelRange.Max;
+                SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
+                SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
+
+
+                SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
             }
         }
 
@@ -81,7 +90,7 @@ namespace VoidSaving
                 SaveGameData activeData = SaveHandler.ActiveData;
 
 
-                SaveHandler.LatestRandom = activeData.Random;
+                SaveHandler.LatestData.Random = activeData.Random;
                 Instance.context.Random = activeData.Random.DeepCopy();
 
                 Instance.context.NextSectionParameters.NextSectorId = activeData.NextSectorID;
@@ -94,7 +103,7 @@ namespace VoidSaving
                 Instance.context.NextSectionParameters.EnemyLevelRange.Min = activeData.EnemyLevelRangeMin;
                 Instance.context.NextSectionParameters.EnemyLevelRange.Max = activeData.EnemyLevelRangeMax;
 
-                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestDataRandomSet);
+
             }
         }
 
