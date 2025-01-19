@@ -80,52 +80,6 @@ namespace VoidSaving
             }
         }
 
-
-        /*
-        //Sets quest data prior to generation of next section
-        static void SetQuestDataPatchMethod(EndlessQuest Instance)
-        {
-            if (SaveHandler.LoadSavedData)
-            {
-                SaveGameData activeData = SaveHandler.ActiveData;
-
-
-                SaveHandler.LatestData.Random = activeData.Random;
-                Instance.context.Random = activeData.Random.DeepCopy();
-
-                Instance.context.NextSectionParameters.NextSectorId = activeData.NextSectorID;
-
-                Instance.context.ActiveSolarSystemIndex = activeData.ActiveSolarSystemID;
-                Instance.context.NextSectionParameters.SolarSystem = Instance.parameters.SolarSystems[activeData.ActiveSolarSystemID];
-
-                Instance.context.NextSolarSystemIndex = activeData.NextSolarSystemID;
-                Instance.context.NextSectionParameters.SectionIndex = activeData.NextSectionIndex;
-                Instance.context.NextSectionParameters.EnemyLevelRange.Min = activeData.EnemyLevelRangeMin;
-                Instance.context.NextSectionParameters.EnemyLevelRange.Max = activeData.EnemyLevelRangeMax;
-
-
-            }
-        }
-
-        [HarmonyPatch(typeof(EndlessQuest), "GenerateStartingSection"), HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> EndlessQuestLoadPatch(IEnumerable<CodeInstruction> instructions)
-        {
-            CodeInstruction[] targetSequence = new CodeInstruction[]
-            {
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call),
-                new CodeInstruction(OpCodes.Ret),
-            };
-
-            CodeInstruction[] patchSequence = new CodeInstruction[]
-            {
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(LoadingPatches), "SetQuestDataPatchMethod")),
-            };
-
-            return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.BEFORE, CheckMode.NONNULL);
-        }*/
-
         //Sets seed at earliest point
         [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
         static void QuestLoadPrefix(QuestParameters questParameters)
