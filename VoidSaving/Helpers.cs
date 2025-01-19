@@ -1,5 +1,6 @@
 ﻿using CG.Game.Scenarios;
 using CG.Objects;
+using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Space;
 using System;
@@ -63,7 +64,10 @@ namespace VoidSaving
 
         public static void AddBlueprintsToFabricator(AbstractPlayerControlledShip playerShip, GUIDUnion[] BPGUIDs)
         {
-            playerShip.GetComponentInChildren<FabricatorTerminal>().Data.CraftingData.SessionUnlockedItems.AddRange(BPGUIDs);
+            foreach (GUIDUnion UnlockedItem in BPGUIDs)
+            {
+                playerShip.GetComponentInChildren<FabricatorModule>().TryAddItemToSharedUnlockPool(UnlockedItem, false);
+            }
         }
     }
 }
