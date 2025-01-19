@@ -121,6 +121,7 @@ namespace VoidSaving
         {
             FailedToLoadLastSave = false;
             SelectedSaveName = SaveHandler.ActiveData?.FileName;
+            ToDeleteFileName = null;
             SaveNames = SaveHandler.GetSaveFileNames();
         }
     }
