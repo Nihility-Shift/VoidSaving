@@ -141,6 +141,8 @@ namespace VoidSaving
             saveGameData.JumpCounter = activeQuest.JumpCounter;
             saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
 
+            saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);
+
             return saveGameData;
         }
 
@@ -233,6 +235,8 @@ namespace VoidSaving
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
 
+                        data.CompletedSectors = reader.ReadSectors();
+
                         BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
                     }
                 }
@@ -303,6 +307,8 @@ namespace VoidSaving
                         writer.Write(data.EnemyLevelRangeMax);
                         writer.Write(data.SectorsUsedInSolarSystem);
                         writer.Write(data.SectorsToUseInSolarSystem);
+
+                        writer.Write(data.CompletedSectors);
 
                         BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
                     }

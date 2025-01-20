@@ -1,6 +1,8 @@
-﻿using CG.Ship.Repair;
+﻿using CG.Game.Scenarios;
+using CG.Ship.Repair;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace VoidSaving
 {
@@ -71,5 +73,25 @@ namespace VoidSaving
         public int SectorsToUseInSolarSystem;
 
         public int SideObjectiveGuaranteeInterval;
+
+        public SectorData[] CompletedSectors;
+    }
+
+    public struct SectorData
+    {
+        public GUIDUnion ObjectiveGUID;
+
+        public DifficultyModifier Difficulty;
+
+        public ObjectiveState State;
+
+        public SectorData(GUIDUnion objectiveGUID, DifficultyModifier difficulty, ObjectiveState state)
+        {
+            ObjectiveGUID = objectiveGUID;
+            Difficulty = difficulty;
+            State = state;
+        }
+
+        public SectorData() { }
     }
 }

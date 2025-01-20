@@ -60,6 +60,11 @@ namespace VoidSaving
 
                 SaveHandler.LatestData.Random = activeData.Random;
                 __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
+
+                __instance.context.CompletedSectors = Helpers.LoadCompletedSectors(__instance, activeData.CompletedSectors);
+                __instance.context.CompletedSectorStatus = Helpers.LoadCompletedSectorStatus(activeData.CompletedSectors);
+
+
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
             }
             else

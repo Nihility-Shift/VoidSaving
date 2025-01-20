@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using CG.Game.Scenarios;
+using Gameplay.Quests;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace VoidSaving
 {
@@ -28,7 +32,7 @@ namespace VoidSaving
         public static void Write(this BinaryWriter Writer, GUIDUnion[] unions)
         {
             Writer.Write(unions.Length);
-            foreach(GUIDUnion union in unions)
+            foreach (GUIDUnion union in unions)
             {
                 Writer.Write(union);
             }
@@ -110,6 +114,37 @@ namespace VoidSaving
             Random returnValue = new();
             returnValue.SetSeedArray(reader.ReadInt32Array());
             return returnValue;
+        }
+
+
+        public static void Write(this BinaryWriter Writer, SectorData[] sectorDatas)
+        {
+            Writer.Write(sectorDatas.Length);
+            foreach (SectorData sectorData in sectorDatas)
+            {
+                Writer.Write(sectorData.ObjectiveGUID);
+                Writer.Write((byte)sectorData.Difficulty);
+                Writer.Write((byte)sectorData.State);
+            }
+        }
+
+
+        public static SectorData[] ReadSectors(this BinaryReader reader)
+        {
+            int length = reader.ReadInt32();
+            SectorData[] sectors = new SectorData[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                sectors[i] = new SectorData()
+                {
+                    ObjectiveGUID = reader.ReadGUIDUnion(),
+                    Difficulty = (DifficultyModifier)reader.ReadByte(),
+                    State = (ObjectiveState)reader.ReadByte()
+                };
+            }
+
+            return sectors;
         }
     }
 }
