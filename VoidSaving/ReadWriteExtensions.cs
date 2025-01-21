@@ -1,4 +1,5 @@
 ﻿using CG.Game.Scenarios;
+using CG.Ship.Modules;
 using Gameplay.Quests;
 using Newtonsoft.Json.Linq;
 using System;
@@ -145,6 +146,38 @@ namespace VoidSaving
             }
 
             return sectors;
+        }
+
+
+        public static void Write(this BinaryWriter Writer, BoosterStatus[] boosterStatuses)
+        {
+            Writer.Write(boosterStatuses.Length);
+            foreach (BoosterStatus boosterStatus in boosterStatuses)
+            {
+                Writer.Write((byte)boosterStatus.BoosterState);
+                Writer.Write(boosterStatus.CooldownTimer);
+                Writer.Write(boosterStatus.ChargeTimer);
+                Writer.Write(boosterStatus.DischargeTimer);
+            }
+        }
+
+        public static BoosterStatus[] ReadBoosterStatuses(this BinaryReader reader)
+        {
+            int length = reader.ReadInt32();
+            BoosterStatus[] BoosterStatuses = new BoosterStatus[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                BoosterStatuses[i] = new BoosterStatus()
+                {
+                    BoosterState = (ThrusterBoosterState)reader.ReadByte(),
+                    CooldownTimer = reader.ReadSingle(),
+                    ChargeTimer = reader.ReadSingle(),
+                    DischargeTimer = reader.ReadSingle(),
+                };
+            }
+
+            return BoosterStatuses;
         }
     }
 }

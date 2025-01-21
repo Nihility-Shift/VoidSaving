@@ -130,6 +130,8 @@ namespace VoidSaving
             }
             saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
 
+            saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
+
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = powerSystem.IsPowered();
@@ -220,6 +222,8 @@ namespace VoidSaving
                         data.ShipSystemPowerStates = reader.ReadBooleanArray();
                         data.ModulePowerStates = reader.ReadBooleanArray();
 
+                        data.BoosterStates = reader.ReadBoosterStatuses();
+
                         data.Seed = reader.ReadInt32();
                         data.ParametersSeed = reader.ReadInt32();
                         data.JumpCounter = reader.ReadInt32();
@@ -292,6 +296,8 @@ namespace VoidSaving
 
                         writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);
+
+                        writer.Write(data.BoosterStates);
 
                         writer.Write(data.Seed);
                         writer.Write(data.ParametersSeed);

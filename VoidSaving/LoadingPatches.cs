@@ -157,6 +157,8 @@ namespace VoidSaving
                 }
             }
 
+            Helpers.LoadBoosterStates(__instance, activeData.BoosterStates);
+
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
             GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;
 

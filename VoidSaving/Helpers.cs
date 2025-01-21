@@ -130,5 +130,31 @@ namespace VoidSaving
 
             return completedInfos;
         }
+
+        public static BoosterStatus[] GetBoosterStates(AbstractPlayerControlledShip PlayerShip)
+        {
+            ThrusterBoosterController TBC = PlayerShip.GetComponent<ThrusterBoosterController>();
+            int length = TBC.ThrusterBoosters.Count();
+            BoosterStatus[] boosterstatuses = new BoosterStatus[length];
+            for (int i = 0; i < length; i++)
+            {
+                ThrusterBooster currentBoster = TBC.ThrusterBoosters[i];
+                boosterstatuses[i] = new BoosterStatus(currentBoster.State, currentBoster.DischargeTimer, currentBoster.ChargeTimer, currentBoster.CooldownTimer);
+            }
+            return boosterstatuses;
+        }
+
+        public static void LoadBoosterStates(AbstractPlayerControlledShip PlayerShip, BoosterStatus[] boosterStatuses)
+        {
+            ThrusterBoosterController TBC = PlayerShip.GetComponent<ThrusterBoosterController>();
+            for (int i = 0; i < boosterStatuses.Length; i++)
+            {
+                ThrusterBooster currentBoster = TBC.ThrusterBoosters[i];
+                currentBoster.ChangeState(boosterStatuses[i].BoosterState);
+                currentBoster.ChargeTimer = boosterStatuses[i].ChargeTimer;
+                currentBoster.CooldownTimer = boosterStatuses[i].CooldownTimer;
+                currentBoster.DischargeTimer = boosterStatuses[i].DischargeTimer;
+            }
+        }
     }
 }

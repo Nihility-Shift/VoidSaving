@@ -1,4 +1,5 @@
 ﻿using CG.Game.Scenarios;
+using CG.Ship.Modules;
 using CG.Ship.Repair;
 using Newtonsoft.Json.Linq;
 using System;
@@ -41,6 +42,8 @@ namespace VoidSaving
         public bool[] ModulePowerStates;
 
         public bool[] ShipSystemPowerStates;
+
+        public BoosterStatus[] BoosterStates;
 
         //Data about quest/session/sectors
 
@@ -93,5 +96,24 @@ namespace VoidSaving
         }
 
         public SectorData() { }
+    }
+
+    public struct BoosterStatus
+    {
+        public BoosterStatus(ThrusterBoosterState state, float dischargeTimer, float chargeTimer, float cooldownTimer)
+        {
+            BoosterState = state;
+            DischargeTimer = dischargeTimer;
+            ChargeTimer = chargeTimer;
+            CooldownTimer = cooldownTimer;
+        }
+
+        public ThrusterBoosterState BoosterState;
+
+        public float DischargeTimer;
+
+        public float ChargeTimer;
+
+        public float CooldownTimer;
     }
 }
