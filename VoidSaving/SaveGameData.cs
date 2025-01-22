@@ -13,15 +13,14 @@ namespace VoidSaving
 
         public uint SaveDataVersion = 0;
 
-        //Data about resources
 
+        //Data about resources
         public int Alloy;
 
         public int Biomass;
 
 
         //Data about ship
-
         public GUIDUnion[] Relics;
 
         public GUIDUnion[] UnlockedBPs;
@@ -31,6 +30,7 @@ namespace VoidSaving
         public float RepairableShipHealth;
 
         public BreachCondition[] Breaches;
+
 
         //Contains ShipType, Modules, loose carryables.
         public GUIDUnion ShipLoadoutGUID;
@@ -49,8 +49,13 @@ namespace VoidSaving
 
         public float[] KPDBullets;
 
-        //Data about quest/session/sectors
+        //List is best, as I have no idea how many ammo/power containers will be read and fixing later is too much work.
+        public List<float> AmmoResourceValues = new List<float>();
 
+        public List<float> PowerResourceValues = new List<float>();
+
+
+        //Data about quest/session/sectors
         public int Seed;
 
         public int ParametersSeed;

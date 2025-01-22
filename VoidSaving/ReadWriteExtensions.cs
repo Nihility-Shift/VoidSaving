@@ -114,6 +114,27 @@ namespace VoidSaving
         }
 
 
+        public static void Write(this BinaryWriter Writer, List<float> floats)
+        {
+            Writer.Write(floats.Count);
+            foreach (float floaty in floats)
+            {
+                Writer.Write(floaty);
+            }
+        }
+
+        public static List<float> ReadSingleList(this BinaryReader Reader)
+        {
+            int count = Reader.ReadInt32();
+            List<float> floats = new List<float>(count);
+            for (int i = 0; i < count; i++)
+            {
+                floats[i] = Reader.ReadSingle();
+            }
+            return floats;
+        }
+
+
         public static void Write(this BinaryWriter Writer, JObject jobject)
         {
             //Converts JObject to string, then writes string, converting to byte[]. It's more preferable to convert the JObject directly to a byte[], but I'm not sure if that's possible

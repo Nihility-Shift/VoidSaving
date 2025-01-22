@@ -225,6 +225,8 @@ namespace VoidSaving
 
                         data.ShipLoadoutGUID = reader.ReadGUIDUnion();
                         data.ShipLoadout = reader.ReadJObject();
+                        data.AmmoResourceValues = reader.ReadSingleList();
+                        data.PowerResourceValues = reader.ReadSingleList();
                         data.Relics = reader.ReadGUIDUnionArray();
                         data.UnlockedBPs = reader.ReadGUIDUnionArray();
 
@@ -302,6 +304,8 @@ namespace VoidSaving
 
                         writer.Write(data.ShipLoadoutGUID);
                         writer.Write(data.ShipLoadout);
+                        writer.Write(data.AmmoResourceValues);
+                        writer.Write(data.PowerResourceValues);
                         writer.Write(data.Relics);
                         writer.Write(data.UnlockedBPs);
 

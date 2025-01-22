@@ -1,8 +1,13 @@
-﻿using CG.Ship.Hull;
+﻿using CG.Objects;
+using CG.Ship.Hull;
 using CG.Ship.Modules;
+using CG.Ship.Object;
 using HarmonyLib;
+using ResourceAssets;
+using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using UnityEngine;
 using static VoidManager.Utilities.HarmonyHelpers;
 
 namespace VoidSaving
@@ -32,10 +37,60 @@ namespace VoidSaving
             }
         }
 
+
+        //Run as carryables are loade, utilizing resource values from active data.
+        static void LoadResourceContainers(CarryableObject carryable)
+        {
+            if (carryable is ResourceContainer resourceContainer)
+            {
+                if (resourceContainer is PowerResourceContainer)
+                {
+                    resourceContainer.amount = SaveHandler.ActiveData.PowerResourceValues[0];
+                    SaveHandler.ActiveData.PowerResourceValues.RemoveAt(0);
+                }
+                else if (resourceContainer is AmmoContainer)
+                {
+                    resourceContainer.amount = SaveHandler.ActiveData.AmmoResourceValues[0];
+                    SaveHandler.ActiveData.AmmoResourceValues.RemoveAt(0);
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(ShipLoadout), "InitializeShip"), HarmonyTranspiler]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Method Declaration", "Harmony003:Harmony non-ref patch parameters modified", Justification = "N/A")]
         static IEnumerable<CodeInstruction> ModuleSocketsLoadPatch(IEnumerable<CodeInstruction> instructions)
         {
+            //Load Power and Ammo Resource Container values as carryables load
+            CodeInstruction[] resourceContainersTargetSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(CarryablesSocket), "TryInsertCarryable")),
+                new CodeInstruction(OpCodes.Pop),
+            };
+
+            CodeInstruction[] resourceContainersPatchSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)16),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "LoadModuleResourceContainers"))
+            };
+
+            instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.AFTER, CheckMode.NONNULL);
+
+            resourceContainersTargetSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), "GetComponent", null, new Type[] { typeof(CarryableObject) })),
+                new CodeInstruction(OpCodes.Pop),
+            };
+
+            resourceContainersPatchSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), "GetComponent", null, new Type[] { typeof(CarryableObject) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "LoadModuleResourceContainers"))
+            };
+
+            instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.REPLACE, CheckMode.NONNULL);
+
+
+            //Fix gravity scoop loading
             CodeInstruction[] tSequence = new CodeInstruction[]
             {
                 new CodeInstruction(OpCodes.Brfalse),
@@ -45,30 +100,95 @@ namespace VoidSaving
                 new CodeInstruction(OpCodes.Stloc_S)
             };
 
-            CodeInstruction[] pSequence = new CodeInstruction[] 
-            { 
-                new CodeInstruction(OpCodes.Ldloc_S, (byte)8), 
-                new CodeInstruction(OpCodes.Ldloc_S, (byte)13), 
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "MSLPatchMethod")) 
+            CodeInstruction[] pSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)8),
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)13),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "MSLPatchMethod"))
             };
 
             instructions = PatchBySequence(instructions, tSequence, pSequence, PatchMode.AFTER, CheckMode.NONNULL);
 
-            //Run 2 times
+            //Patch/replace first two CarryableSocket properties with field read.
             return PatchCarryableSockets(PatchCarryableSockets(instructions));
+        }
+
+
+        static void SaveModuleResourceContainers(List<CarryablesSocket> Sockets, int j)
+        {
+            if (Sockets[j].Payload is ResourceContainer Container)
+            {
+                if (Container is PowerResourceContainer)
+                {
+                    SaveHandler.LatestData.PowerResourceValues.Add(Container.Amount);
+                }
+                else if (Container is AmmoContainer)
+                {
+                    SaveHandler.LatestData.AmmoResourceValues.Add(Container.Amount);
+                }
+            }
         }
 
         [HarmonyPatch(typeof(ShipLoadout), "LoadSocketData"), HarmonyTranspiler]
         static IEnumerable<CodeInstruction> ModuleSocketsSavePatch(IEnumerable<CodeInstruction> instructions)
         {
-            return PatchCarryableSockets(instructions);
+            CodeInstruction[] tSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(ResourceAssetContainer<GameObjectContainer, GameObject, GameObjectDef>), "GetAssetDefByID")),
+                new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(ResourceAssetDef<GameObject>), "Ref")),
+                new CodeInstruction(OpCodes.Newobj, AccessTools.Constructor(typeof(ShipAssetRef), new Type[] { typeof(ResourceAssetRef) })),
+                new CodeInstruction(OpCodes.Stelem_Ref),
+            };
+
+            CodeInstruction[] pSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)5),
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)6),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "SaveModuleResourceContainers"))
+            };
+
+            return PatchBySequence(PatchCarryableSockets(instructions), tSequence, pSequence, PatchMode.AFTER);
         }
 
-        //Core systems break when loading, and it isn't needed right now.
+        //Core systems break when utilizing this for loading and it isn't needed right now.
         /*[HarmonyPatch(typeof(ShipLoadout), "LoadCoreSystemData")]
         static IEnumerable<CodeInstruction> CoreSystemSocketsSavePatch(IEnumerable<CodeInstruction> instructions)
         {
             return PatchCarryableSockets(instructions);
         }*/
+
+
+        //Save Power and Ammo Resource Containers.
+        static void SLRCPatchMethod(CarryableObject carryable)
+        {
+            if (carryable is ResourceContainer Container)
+            {
+                if (Container is PowerResourceContainer)
+                {
+                    SaveHandler.LatestData.PowerResourceValues.Add(Container.Amount);
+                }
+                else if (Container is AmmoContainer)
+                {
+                    SaveHandler.LatestData.AmmoResourceValues.Add(Container.Amount);
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(ShipLoadout), "LoadAdditionalAssetData")]
+        static IEnumerable<CodeInstruction> SaveLooseResourceContainers(IEnumerable<CodeInstruction> instructions)
+        {
+            CodeInstruction[] tSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(List<GameSessionAsset>), "Add")),
+            };
+
+            CodeInstruction[] pSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_2),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "SLRCPatchMethod"))
+            };
+
+            return PatchBySequence(instructions, tSequence, pSequence, PatchMode.AFTER);
+        }
     }
 }
