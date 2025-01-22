@@ -93,6 +93,27 @@ namespace VoidSaving
         }
 
 
+        public static void Write(this BinaryWriter Writer, float[] floats)
+        {
+            Writer.Write(floats.Length);
+            foreach (float floaty in floats)
+            {
+                Writer.Write(floaty);
+            }
+        }
+
+        public static float[] ReadSingleArray(this BinaryReader Reader)
+        {
+            int count = Reader.ReadInt32();
+            float[] floats = new float[count];
+            for (int i = 0; i < count; i++)
+            {
+                floats[i] = Reader.ReadSingle();
+            }
+            return floats;
+        }
+
+
         public static void Write(this BinaryWriter Writer, JObject jobject)
         {
             //Converts JObject to string, then writes string, converting to byte[]. It's more preferable to convert the JObject directly to a byte[], but I'm not sure if that's possible
@@ -178,6 +199,34 @@ namespace VoidSaving
             }
 
             return BoosterStatuses;
+        }
+
+
+        public static void Write(this BinaryWriter Writer, WeaponBullets[] WeaponBullets)
+        {
+            Writer.Write(WeaponBullets.Length);
+            foreach (WeaponBullets WeaponBullet in WeaponBullets)
+            {
+                Writer.Write(WeaponBullet.AmmoLoaded);
+                Writer.Write(WeaponBullet.AmmoReservoir);
+            }
+        }
+
+        public static WeaponBullets[] ReadWeaponBullets(this BinaryReader reader)
+        {
+            int length = reader.ReadInt32();
+            WeaponBullets[] WeaponBullets = new WeaponBullets[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                WeaponBullets[i] = new WeaponBullets()
+                {
+                    AmmoLoaded = reader.ReadSingle(),
+                    AmmoReservoir = reader.ReadSingle(),
+                };
+            }
+
+            return WeaponBullets;
         }
     }
 }

@@ -4,6 +4,7 @@ using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Space;
 using Client.Utils;
+using Gameplay.CompositeWeapons;
 using Gameplay.Quests;
 using HarmonyLib;
 
@@ -130,31 +131,44 @@ namespace VoidSaving
 
             if (activeData.ShipPowered) { __instance.ShipsPowerSystem.PowerOn(); }
 
-            int currentValue = 0;
+            int InstalledModuleIndex = 0;
             foreach (CellModule module in __instance.CoreSystems)
             {
                 if (module != null && module.PowerDrain != null)
                 {
-                    if (activeData.ShipSystemPowerStates[currentValue])
+                    if (activeData.ShipSystemPowerStates[InstalledModuleIndex])
                     {
                         module.TurnOn();
                     }
-                    currentValue++;
+                    InstalledModuleIndex++;
                 }
             }
 
             BuildSocketController bsc = __instance.GetComponent<BuildSocketController>();
-            currentValue = 0;
+            InstalledModuleIndex = 0;
+            int WeaponBulletsModuleIndex = 0;
+            int KPDBulletsModuleIndex = 0;
+
             foreach (BuildSocket socket in bsc.Sockets)
             {
-                if (socket.InstalledModule != null && socket.InstalledModule.PowerDrain != null)
+                if (socket.InstalledModule == null) continue;
+
+
+                if (activeData.ModulePowerStates[InstalledModuleIndex]) socket.InstalledModule.TurnOn();
+
+                if (socket.InstalledModule is CompositeWeaponModule weaponModule && weaponModule.InsideElementsCollection.Magazine is BulletMagazine magazine)
                 {
-                    if (activeData.ModulePowerStates[currentValue])
-                    {
-                        socket.InstalledModule.TurnOn();
-                    }
-                    currentValue++;
+                    magazine.ammoLoaded = activeData.WeaponBullets[WeaponBulletsModuleIndex].AmmoLoaded;
+                    magazine.reservoirAmmoCount = activeData.WeaponBullets[WeaponBulletsModuleIndex].AmmoReservoir;
+                    WeaponBulletsModuleIndex++;
                 }
+                else if (socket.InstalledModule is KineticPointDefenseModule KPDModule)
+                {
+                    KPDModule.AmmoCount = KPDModule.AmmoCount;
+                    KPDBulletsModuleIndex++;
+                }
+
+                InstalledModuleIndex++;
             }
 
             Helpers.LoadBoosterStates(__instance, activeData.BoosterStates);

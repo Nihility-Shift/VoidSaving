@@ -45,6 +45,10 @@ namespace VoidSaving
 
         public BoosterStatus[] BoosterStates;
 
+        public WeaponBullets[] WeaponBullets;
+
+        public float[] KPDBullets;
+
         //Data about quest/session/sectors
 
         public int Seed;
@@ -115,5 +119,18 @@ namespace VoidSaving
         public float ChargeTimer;
 
         public float CooldownTimer;
+    }
+
+    public struct WeaponBullets
+    {
+        public WeaponBullets(float ammoLoaded, float ammoReservoir)
+        {
+            AmmoLoaded = ammoLoaded;
+            AmmoReservoir = ammoReservoir;
+        }
+
+        public float AmmoLoaded;
+
+        public float AmmoReservoir;
     }
 }

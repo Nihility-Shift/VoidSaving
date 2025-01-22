@@ -4,6 +4,7 @@ using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Space;
+using Gameplay.CompositeWeapons;
 using Gameplay.Power;
 using Gameplay.Quests;
 using System;
@@ -121,14 +122,27 @@ namespace VoidSaving
 
             BuildSocketController bsc = playerShip.GetComponent<BuildSocketController>();
             List<bool> ModulePoweredValues = new();
+            List<WeaponBullets> weaponBullets = new();
+            List<float> kPDBullets = new();
             foreach (BuildSocket socket in bsc.Sockets)
             {
-                if (socket.InstalledModule != null)
+                if (socket.InstalledModule == null) continue;
+
+
+                ModulePoweredValues.Add(socket.InstalledModule.IsPowered);
+
+                if (socket.InstalledModule is CompositeWeaponModule weaponModule && weaponModule.InsideElementsCollection.Magazine is BulletMagazine magazine)
                 {
-                    ModulePoweredValues.Add(socket.InstalledModule.IsPowered);
+                    weaponBullets.Add(new WeaponBullets(magazine.AmmoLoaded, magazine.ReservoirAmmoCount));
+                }
+                else if (socket.InstalledModule is KineticPointDefenseModule KPDModule)
+                {
+                    kPDBullets.Add(KPDModule.AmmoCount);
                 }
             }
             saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
+            saveGameData.KPDBullets = kPDBullets.ToArray();
+            saveGameData.WeaponBullets = weaponBullets.ToArray();
 
             saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
 
@@ -221,6 +235,8 @@ namespace VoidSaving
 
                         data.ShipSystemPowerStates = reader.ReadBooleanArray();
                         data.ModulePowerStates = reader.ReadBooleanArray();
+                        data.WeaponBullets = reader.ReadWeaponBullets();
+                        data.KPDBullets = reader.ReadSingleArray();
 
                         data.BoosterStates = reader.ReadBoosterStatuses();
 
@@ -296,6 +312,8 @@ namespace VoidSaving
 
                         writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);
+                        writer.Write(data.WeaponBullets);
+                        writer.Write(data.KPDBullets);
 
                         writer.Write(data.BoosterStates);
 
