@@ -47,6 +47,10 @@ namespace VoidSaving
 
         public WeaponBullets[] WeaponBullets;
 
+        public bool[] ShieldDirections;
+
+        public float[] ShieldHealths;
+
         public float[] KPDBullets;
 
         //List is best, as I have no idea how many ammo/power containers will be read and fixing later is too much work.

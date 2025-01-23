@@ -1,7 +1,9 @@
 ﻿using CG.Game.SpaceObjects.Controllers;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
+using CG.Ship.Modules.Shield;
 using CG.Ship.Repair;
+using CG.Ship.Shield;
 using CG.Space;
 using Client.Utils;
 using Gameplay.CompositeWeapons;
@@ -148,6 +150,7 @@ namespace VoidSaving
             InstalledModuleIndex = 0;
             int WeaponBulletsModuleIndex = 0;
             int KPDBulletsModuleIndex = 0;
+            int SheildModuleDirectionsIndex = 0;
 
             foreach (BuildSocket socket in bsc.Sockets)
             {
@@ -166,6 +169,12 @@ namespace VoidSaving
                 {
                     KPDModule.AmmoCount = KPDModule.AmmoCount;
                     KPDBulletsModuleIndex++;
+                }
+                else if (socket.InstalledModule is ShieldModule shieldModule)
+                {
+                    shieldModule.IsClockwise.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
+                    shieldModule.IsForward.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
+                    shieldModule.IsCounterClockwise.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
                 }
 
                 InstalledModuleIndex++;
@@ -190,6 +199,20 @@ namespace VoidSaving
             __instance.DebugTransitionToSpinningUpState();
             __instance.DebugTransitionToTravellingState();
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
+        }
+
+
+        //Loads shield hitpoints after all shields loaded.
+        [HarmonyPatch(typeof(ShieldSystem), "AddShield"), HarmonyPostfix]
+        static void LoadShieldHealthPatch(ShieldSystem __instance)
+        {
+            if(__instance._shields.Count == 4)
+            {
+                for(int i = 0; i < 4; i++)
+                {
+                    __instance._shields[i].hitPoints = SaveHandler.ActiveData.ShieldHealths[i];
+                }
+            }
         }
     }
 }

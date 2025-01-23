@@ -2,6 +2,7 @@
 using CG.Game.SpaceObjects.Controllers;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
+using CG.Ship.Modules.Shield;
 using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.CompositeWeapons;
@@ -124,6 +125,7 @@ namespace VoidSaving
             List<bool> ModulePoweredValues = new();
             List<WeaponBullets> weaponBullets = new();
             List<float> kPDBullets = new();
+            List<bool> shieldDirections = new();
             foreach (BuildSocket socket in bsc.Sockets)
             {
                 if (socket.InstalledModule == null) continue;
@@ -139,13 +141,20 @@ namespace VoidSaving
                 {
                     kPDBullets.Add(KPDModule.AmmoCount);
                 }
+                else if (socket.InstalledModule is ShieldModule shieldModule)
+                {
+                    shieldDirections.Add(shieldModule.IsClockwise.Value);
+                    shieldDirections.Add(shieldModule.IsForward.Value);
+                    shieldDirections.Add(shieldModule.IsCounterClockwise.Value);
+                }
             }
             saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
+            saveGameData.ShieldDirections = shieldDirections.ToArray();
             saveGameData.KPDBullets = kPDBullets.ToArray();
             saveGameData.WeaponBullets = weaponBullets.ToArray();
 
             saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
-
+            saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = powerSystem.IsPowered();
@@ -237,10 +246,12 @@ namespace VoidSaving
 
                         data.ShipSystemPowerStates = reader.ReadBooleanArray();
                         data.ModulePowerStates = reader.ReadBooleanArray();
+                        data.ShieldDirections = reader.ReadBooleanArray();
                         data.WeaponBullets = reader.ReadWeaponBullets();
                         data.KPDBullets = reader.ReadSingleArray();
 
                         data.BoosterStates = reader.ReadBoosterStatuses();
+                        data.ShieldHealths = reader.ReadSingleArray();
 
                         data.Seed = reader.ReadInt32();
                         data.ParametersSeed = reader.ReadInt32();
@@ -316,10 +327,12 @@ namespace VoidSaving
 
                         writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);
+                        writer.Write(data.ShieldDirections);
                         writer.Write(data.WeaponBullets);
                         writer.Write(data.KPDBullets);
 
                         writer.Write(data.BoosterStates);
+                        writer.Write(data.ShieldHealths);
 
                         writer.Write(data.Seed);
                         writer.Write(data.ParametersSeed);

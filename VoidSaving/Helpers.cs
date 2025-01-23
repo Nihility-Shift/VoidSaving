@@ -2,6 +2,7 @@
 using CG.Objects;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
+using CG.Ship.Shield;
 using CG.Space;
 using Gameplay.Quests;
 using System;
@@ -155,6 +156,17 @@ namespace VoidSaving
                 currentBoster.CooldownTimer = boosterStatuses[i].CooldownTimer;
                 currentBoster.DischargeTimer = boosterStatuses[i].DischargeTimer;
             }
+        }
+
+        public static float[] GetShipShieldHealths(AbstractPlayerControlledShip PlayerShip)
+        {
+            ShieldSystem shipShields = PlayerShip.GetComponent<ShieldSystem>();
+            float[] shieldHealths = new float[4];
+            for(int i = 0; i < 4; i++)
+            {
+                shieldHealths[i] = shipShields._shields[i].hitPoints;
+            }
+            return shieldHealths;
         }
     }
 }

@@ -174,7 +174,7 @@ namespace VoidSaving
             }
         }
 
-        [HarmonyPatch(typeof(ShipLoadout), "LoadAdditionalAssetData")]
+        [HarmonyPatch(typeof(ShipLoadout), "LoadAdditionalAssetData"), HarmonyTranspiler]
         static IEnumerable<CodeInstruction> SaveLooseResourceContainers(IEnumerable<CodeInstruction> instructions)
         {
             CodeInstruction[] tSequence = new CodeInstruction[]
