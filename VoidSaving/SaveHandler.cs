@@ -157,6 +157,7 @@ namespace VoidSaving
             saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
             saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
             saveGameData.Enhancements = Helpers.GetEnhancements(playerShip);
+            saveGameData.JumpModule = new VoidDriveModuleData(playerShip.GetComponentInChildren<VoidDriveModule>());
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = playerShip.ShipsPowerSystem.IsPowered();
@@ -259,6 +260,7 @@ namespace VoidSaving
 
                         data.BoosterStates = reader.ReadBoosterStatuses();
                         data.ShieldHealths = reader.ReadSingleArray();
+                        data.JumpModule = reader.ReadVoidDriveData();
 
                         data.Seed = reader.ReadInt32();
                         data.ParametersSeed = reader.ReadInt32();
@@ -344,6 +346,7 @@ namespace VoidSaving
 
                         writer.Write(data.BoosterStates);
                         writer.Write(data.ShieldHealths);
+                        writer.Write(data.JumpModule);
 
                         writer.Write(data.Seed);
                         writer.Write(data.ParametersSeed);

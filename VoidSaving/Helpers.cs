@@ -220,5 +220,14 @@ namespace VoidSaving
             powerSystem.NextBreakTemperature = data.NextBreakTemperature;
             powerSystem.currentTemperature = data.currentTemperature;
         }
+
+
+        public static void LoadVoidDriveModule(AbstractPlayerControlledShip playerShip, VoidDriveModuleData data)
+        {
+            VoidDriveModule drive = playerShip.GetComponentInChildren<VoidDriveModule>();
+
+            drive.engineChargedStates = data.engineChargedStates;
+            drive.JumpCharge = data.JumpCharge;
+        }
     }
 }

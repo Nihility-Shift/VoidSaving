@@ -55,6 +55,8 @@ namespace VoidSaving
 
         public CircuitBreakerData BreakerData;
 
+        public VoidDriveModuleData JumpModule;
+
         public bool[] ShieldDirections;
 
         public float[] ShieldHealths;
@@ -195,5 +197,18 @@ namespace VoidSaving
         public float currentTemperature;
 
         public float NextBreakTemperature;
+    }
+
+    public struct VoidDriveModuleData
+    {
+        public VoidDriveModuleData(VoidDriveModule module)
+        {
+            engineChargedStates = module.EngineChargedStates;
+            JumpCharge = module.JumpCharge;
+        }
+
+        public bool[] engineChargedStates;
+
+        public float JumpCharge;
     }
 }

@@ -341,5 +341,21 @@ namespace VoidSaving
 
             return data;
         }
+
+
+        public static void Write(this BinaryWriter Writer, VoidDriveModuleData VoidDriveData)
+        {
+            Writer.Write(VoidDriveData.engineChargedStates);
+            Writer.Write(VoidDriveData.JumpCharge);
+        }
+
+        public static VoidDriveModuleData ReadVoidDriveData(this BinaryReader reader)
+        {
+            VoidDriveModuleData data = new VoidDriveModuleData();
+            data.engineChargedStates = reader.ReadBooleanArray();
+            data.JumpCharge = reader.ReadSingle();
+
+            return data;
+        }
     }
 }
