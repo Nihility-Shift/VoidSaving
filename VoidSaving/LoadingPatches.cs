@@ -68,7 +68,7 @@ namespace VoidSaving
                 __instance.context.CompletedSectors = Helpers.LoadCompletedSectors(__instance, activeData.CompletedSectors);
                 __instance.context.CompletedSectorStatus = Helpers.LoadCompletedSectorStatus(activeData.CompletedSectors);
 
-
+                GameSessionTracker.Instance._statistics = activeData.SessionStats;
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
             }
             else

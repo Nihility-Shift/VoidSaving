@@ -99,6 +99,8 @@ namespace VoidSaving
         public int SideObjectiveGuaranteeInterval;
 
         public SectorData[] CompletedSectors;
+
+        public GameSessionStatistics SessionStats;
     }
 
     public struct SectorData

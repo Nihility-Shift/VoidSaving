@@ -168,6 +168,7 @@ namespace VoidSaving
             saveGameData.Seed = activeQuest.QuestParameters.Seed;
             saveGameData.JumpCounter = activeQuest.JumpCounter;
             saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
+            saveGameData.SessionStats = GameSessionTracker.Statistics;
 
             saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);
 
@@ -275,6 +276,7 @@ namespace VoidSaving
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
 
                         data.CompletedSectors = reader.ReadSectors();
+                        data.SessionStats = reader.ReadSessionStats();
 
                         BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
                     }
@@ -359,6 +361,7 @@ namespace VoidSaving
                         writer.Write(data.SectorsToUseInSolarSystem);
 
                         writer.Write(data.CompletedSectors);
+                        writer.Write(data.SessionStats);
 
                         BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
                     }

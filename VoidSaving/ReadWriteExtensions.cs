@@ -310,5 +310,36 @@ namespace VoidSaving
 
             return data;
         }
+
+
+        public static void Write(this BinaryWriter Writer, GameSessionStatistics Stats)
+        {
+            Writer.Write(Stats.TotalEnemiesKilled);
+            Writer.Write(Stats.PlayerDeaths);
+            Writer.Write(Stats.TotalDamageInflicted);
+            Writer.Write(Stats.TotalShipDamageTaken);
+            Writer.Write(Stats.TotalAlloysCollected);
+            Writer.Write(Stats.TotalBiomassCollected);
+
+            //To save and load timespan properly, store and load via total hours.
+            TimeSpan timeSpan = DateTime.Now.Subtract(Stats.QuestStartTime);
+            Writer.Write(timeSpan.TotalHours);
+        }
+
+        public static GameSessionStatistics ReadSessionStats(this BinaryReader reader)
+        {
+            GameSessionStatistics data = new GameSessionStatistics();
+            data.TotalEnemiesKilled = reader.ReadInt32();
+            data.PlayerDeaths = reader.ReadInt32();
+            data.TotalDamageInflicted = reader.ReadInt64();
+            data.TotalShipDamageTaken = reader.ReadInt64();
+            data.TotalAlloysCollected = reader.ReadInt32();
+            data.TotalBiomassCollected = reader.ReadInt32();
+
+            TimeSpan elapsedHours = TimeSpan.FromHours(reader.ReadDouble());
+            data.QuestStartTime = DateTime.Now.Subtract(elapsedHours);
+
+            return data;
+        }
     }
 }
