@@ -1,5 +1,6 @@
 ﻿using CG.Game.Scenarios;
 using CG.Ship.Modules;
+using Gameplay.Enhancements;
 using Gameplay.Quests;
 using Newtonsoft.Json.Linq;
 using System;
@@ -248,6 +249,48 @@ namespace VoidSaving
             }
 
             return WeaponBullets;
+        }
+
+
+        public static void Write(this BinaryWriter Writer, EnhancementData[] Enhancements)
+        {
+            Writer.Write(Enhancements.Length);
+            foreach (EnhancementData Enhancement in Enhancements)
+            {
+                Writer.Write((byte)Enhancement.state);
+                Writer.Write(Enhancement.ActivationTimeStart);
+                Writer.Write(Enhancement.ActivationTimeEnd);
+                Writer.Write(Enhancement.CooldownTimeStart);
+                Writer.Write(Enhancement.CooldownTimeEnd);
+                Writer.Write(Enhancement.FailureTimeStart);
+                Writer.Write(Enhancement.FailureTimeEnd);
+                Writer.Write(Enhancement.LastGrade);
+                Writer.Write(Enhancement.LastDurationMult);
+            }
+        }
+
+        public static EnhancementData[] ReadEnhancements(this BinaryReader reader)
+        {
+            int length = reader.ReadInt32();
+            EnhancementData[] Enhancements = new EnhancementData[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                Enhancements[i] = new EnhancementData()
+                {
+                    state = (EnhancementState)reader.ReadByte(),
+                    ActivationTimeStart = reader.ReadSingle(),
+                    ActivationTimeEnd = reader.ReadSingle(),
+                    CooldownTimeStart = reader.ReadSingle(),
+                    CooldownTimeEnd = reader.ReadSingle(),
+                    FailureTimeStart = reader.ReadSingle(),
+                    FailureTimeEnd = reader.ReadSingle(),
+                    LastGrade = reader.ReadSingle(),
+                    LastDurationMult = reader.ReadSingle(),
+                };
+            }
+
+            return Enhancements;
         }
     }
 }

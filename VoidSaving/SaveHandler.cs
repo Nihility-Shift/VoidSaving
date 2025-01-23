@@ -155,8 +155,9 @@ namespace VoidSaving
 
             saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
             saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
+            saveGameData.Enhancements = Helpers.GetEnhancements(playerShip);
 
-            ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
+ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = powerSystem.IsPowered();
 
             //Quest data
@@ -247,6 +248,7 @@ namespace VoidSaving
                         data.ShipSystemPowerStates = reader.ReadBooleanArray();
                         data.ModulePowerStates = reader.ReadBooleanArray();
                         data.ShieldDirections = reader.ReadBooleanArray();
+                        data.Enhancements = reader.ReadEnhancements();
                         data.WeaponBullets = reader.ReadWeaponBullets();
                         data.KPDBullets = reader.ReadSingleArray();
 
@@ -328,6 +330,7 @@ namespace VoidSaving
                         writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);
                         writer.Write(data.ShieldDirections);
+                        writer.Write(data.Enhancements);
                         writer.Write(data.WeaponBullets);
                         writer.Write(data.KPDBullets);
 

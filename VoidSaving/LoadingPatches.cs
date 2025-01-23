@@ -180,6 +180,7 @@ namespace VoidSaving
                 InstalledModuleIndex++;
             }
 
+            Helpers.LoadEnhancements(__instance, activeData.Enhancements);
             Helpers.LoadBoosterStates(__instance, activeData.BoosterStates);
 
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;

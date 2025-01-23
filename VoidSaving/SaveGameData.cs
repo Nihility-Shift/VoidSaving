@@ -1,7 +1,9 @@
 ﻿using CG.Game.Scenarios;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
+using Gameplay.Enhancements;
 using Newtonsoft.Json.Linq;
+using Photon.Pun;
 using System;
 using System.Collections.Generic;
 
@@ -45,6 +47,8 @@ namespace VoidSaving
 
         public BoosterStatus[] BoosterStates;
 
+        public EnhancementData[] Enhancements; //Engine Trims, Enhancement panels.
+
         public WeaponBullets[] WeaponBullets;
 
         public bool[] ShieldDirections;
@@ -53,7 +57,7 @@ namespace VoidSaving
 
         public float[] KPDBullets;
 
-        //List is best, as I have no idea how many ammo/power containers will be read and fixing later is too much work.
+        //List is best, as I have no idea how many ammo/power containers will be read it must be read from 2 different methods. It may be possible to change though...
         public List<float> AmmoResourceValues = new List<float>();
 
         public List<float> PowerResourceValues = new List<float>();
@@ -141,5 +145,40 @@ namespace VoidSaving
         public float AmmoLoaded;
 
         public float AmmoReservoir;
+    }
+
+    public struct EnhancementData
+    {
+        public EnhancementData(Enhancement enhancement)
+        {
+            int currentTimestamp = PhotonNetwork.ServerTimestamp;
+            state = enhancement.State;
+            ActivationTimeStart = enhancement._activationStartTime - currentTimestamp;
+            ActivationTimeEnd = enhancement._activationEndTime - currentTimestamp;
+            CooldownTimeStart = enhancement._cooldownStartTime - currentTimestamp;
+            CooldownTimeEnd = enhancement._cooldownEndTime - currentTimestamp;
+            FailureTimeStart = enhancement._failureStartTime - currentTimestamp;
+            FailureTimeEnd = enhancement._failureEndTime - currentTimestamp;
+            LastGrade = enhancement._lastActivationGrade;
+            LastDurationMult = enhancement._lastDurationMultiplier;
+        }
+
+        public EnhancementState state;
+
+        public float ActivationTimeEnd;
+
+        public float ActivationTimeStart;
+
+        public float CooldownTimeEnd;
+
+        public float CooldownTimeStart;
+
+        public float FailureTimeEnd;
+
+        public float FailureTimeStart;
+
+        public float LastGrade;
+
+        public float LastDurationMult;
     }
 }

@@ -4,7 +4,9 @@ using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
+using Gameplay.Enhancements;
 using Gameplay.Quests;
+using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -167,6 +169,34 @@ namespace VoidSaving
                 shieldHealths[i] = shipShields._shields[i].hitPoints;
             }
             return shieldHealths;
+        }
+
+        public static EnhancementData[] GetEnhancements(AbstractPlayerControlledShip PlayerShip)
+        {
+            Enhancement[] DetectedEhancements = PlayerShip.GetComponentsInChildren<Enhancement>();
+            EnhancementData[] Trims = new EnhancementData[DetectedEhancements.Length];
+            for (int i = 0; i < DetectedEhancements.Length; i++)
+            {
+                Trims[i] = new EnhancementData(DetectedEhancements[i]);
+            }
+            return Trims;
+        }
+
+        public static void LoadEnhancements(AbstractPlayerControlledShip PlayerShip, EnhancementData[] Trims)
+        {
+            Enhancement[] DetectedEhancements = PlayerShip.GetComponentsInChildren<Enhancement>();
+            for (int i = 0; i < DetectedEhancements.Length; i++)
+            {
+                Enhancement enhancement = DetectedEhancements[i];
+                EnhancementData data = Trims[i];
+                enhancement.SetState(data.state, data.LastGrade, data.LastDurationMult, false);
+                enhancement._activationStartTime = PhotonNetwork.ServerTimestamp + (int)data.ActivationTimeStart;
+                enhancement._activationEndTime = PhotonNetwork.ServerTimestamp + (int)data.ActivationTimeEnd;
+                enhancement._cooldownStartTime = PhotonNetwork.ServerTimestamp + (int)data.CooldownTimeStart;
+                enhancement._cooldownEndTime = PhotonNetwork.ServerTimestamp + (int)data.CooldownTimeEnd;
+                enhancement._failureStartTime = PhotonNetwork.ServerTimestamp + (int)data.FailureTimeStart;
+                enhancement._failureEndTime = PhotonNetwork.ServerTimestamp + (int)data.FailureTimeEnd;
+            }
         }
     }
 }
