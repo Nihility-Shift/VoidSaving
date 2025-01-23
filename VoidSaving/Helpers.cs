@@ -5,12 +5,14 @@ using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
 using Gameplay.Enhancements;
+using Gameplay.Power;
 using Gameplay.Quests;
 using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UI.Fabricator;
+using UnityEngine.UIElements;
 
 namespace VoidSaving
 {
@@ -197,6 +199,26 @@ namespace VoidSaving
                 enhancement._failureStartTime = PhotonNetwork.ServerTimestamp + (int)data.FailureTimeStart;
                 enhancement._failureEndTime = PhotonNetwork.ServerTimestamp + (int)data.FailureTimeEnd;
             }
+        }
+
+
+        public static CircuitBreakerData GetBreakerData(ProtectedPowerSystem powerSystem)
+        {
+            CircuitBreakerData data = new CircuitBreakerData();
+            data.breakers = powerSystem.Breakers.Select(x => x.IsOn.Value).ToArray();
+            data.currentTemperature = powerSystem.currentTemperature;
+            data.NextBreakTemperature = powerSystem.NextBreakTemperature;
+            return data;
+        }
+
+        public static void LoadBreakers(ProtectedPowerSystem powerSystem, CircuitBreakerData data)
+        {
+            for (int i = 0; i < data.breakers.Length; i++)
+            {
+                powerSystem.Breakers[i].IsOn.ForceChange(data.breakers[i]);
+            }
+            powerSystem.NextBreakTemperature = data.NextBreakTemperature;
+            powerSystem.currentTemperature = data.currentTemperature;
         }
     }
 }

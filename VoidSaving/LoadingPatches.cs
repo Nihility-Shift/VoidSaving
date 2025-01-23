@@ -7,6 +7,7 @@ using CG.Ship.Shield;
 using CG.Space;
 using Client.Utils;
 using Gameplay.CompositeWeapons;
+using Gameplay.Power;
 using Gameplay.Quests;
 using HarmonyLib;
 
@@ -131,7 +132,9 @@ namespace VoidSaving
             Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
             Helpers.AddRelicsToShip(__instance, activeData.Relics);
 
-            if (activeData.ShipPowered) { __instance.ShipsPowerSystem.PowerOn(); }
+            ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)__instance.ShipsPowerSystem;
+            if (activeData.ShipPowered) { powerSystem.PowerOn(); }
+            Helpers.LoadBreakers(powerSystem, activeData.BreakerData);
 
             int InstalledModuleIndex = 0;
             foreach (CellModule module in __instance.CoreSystems)

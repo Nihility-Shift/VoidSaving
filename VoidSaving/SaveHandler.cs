@@ -157,8 +157,9 @@ namespace VoidSaving
             saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
             saveGameData.Enhancements = Helpers.GetEnhancements(playerShip);
 
-ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
-            saveGameData.ShipPowered = powerSystem.IsPowered();
+            ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
+            saveGameData.ShipPowered = playerShip.ShipsPowerSystem.IsPowered();
+            saveGameData.BreakerData = Helpers.GetBreakerData(powerSystem);
 
             //Quest data
             EndlessQuest activeQuest = session.ActiveQuest as EndlessQuest;
@@ -244,6 +245,7 @@ ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSy
                         data.Breaches = Array.ConvertAll(reader.ReadInt32Array(), value => (BreachCondition)value);
 
                         data.ShipPowered = reader.ReadBoolean();
+                        data.BreakerData = reader.ReadBreakers();
 
                         data.ShipSystemPowerStates = reader.ReadBooleanArray();
                         data.ModulePowerStates = reader.ReadBooleanArray();
@@ -326,6 +328,7 @@ ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSy
                         writer.Write(Array.ConvertAll(data.Breaches, value => (int)value));
 
                         writer.Write(data.ShipPowered);
+                        writer.Write(data.BreakerData);
 
                         writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);

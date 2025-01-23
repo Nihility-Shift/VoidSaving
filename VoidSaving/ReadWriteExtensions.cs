@@ -292,5 +292,23 @@ namespace VoidSaving
 
             return Enhancements;
         }
+        
+
+        public static void Write(this BinaryWriter Writer, CircuitBreakerData Breakers)
+        {
+            Writer.Write(Breakers.breakers);
+            Writer.Write(Breakers.NextBreakTemperature);
+            Writer.Write(Breakers.currentTemperature);
+        }
+
+        public static CircuitBreakerData ReadBreakers(this BinaryReader reader)
+        {
+            CircuitBreakerData data = new CircuitBreakerData();
+            data.breakers = reader.ReadBooleanArray();
+            data.NextBreakTemperature = reader.ReadSingle();
+            data.currentTemperature = reader.ReadSingle();
+
+            return data;
+        }
     }
 }

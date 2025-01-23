@@ -51,6 +51,8 @@ namespace VoidSaving
 
         public WeaponBullets[] WeaponBullets;
 
+        public CircuitBreakerData BreakerData;
+
         public bool[] ShieldDirections;
 
         public float[] ShieldHealths;
@@ -180,5 +182,14 @@ namespace VoidSaving
         public float LastGrade;
 
         public float LastDurationMult;
+    }
+
+    public struct CircuitBreakerData
+    {
+        public bool[] breakers;
+
+        public float currentTemperature;
+
+        public float NextBreakTemperature;
     }
 }
