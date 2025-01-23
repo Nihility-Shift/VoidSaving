@@ -131,6 +131,7 @@ namespace VoidSaving
             Helpers.ApplyBreachStatesToBreaches(HDC.breaches, activeData.Breaches);
             Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
             Helpers.AddRelicsToShip(__instance, activeData.Relics);
+            __instance.GetComponent<FabricatorModule>().CurrentTier = activeData.FabricatorTier;
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)__instance.ShipsPowerSystem;
             if (activeData.ShipPowered) { powerSystem.PowerOn(); }

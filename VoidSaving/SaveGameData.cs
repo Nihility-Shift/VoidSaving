@@ -27,6 +27,8 @@ namespace VoidSaving
 
         public GUIDUnion[] UnlockedBPs;
 
+        public int FabricatorTier;
+
         public float ShipHealth;
 
         public float RepairableShipHealth;

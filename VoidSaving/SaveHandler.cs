@@ -109,6 +109,7 @@ namespace VoidSaving
             saveGameData.ShipLoadout = new ShipLoadout(playerShip.GetComponent<PlayerShip>()).AsJObject();
             saveGameData.Relics = Helpers.RelicGUIDsFromShip(playerShip);
             saveGameData.UnlockedBPs = Helpers.UnlockedBPGUIDsFromShip(playerShip);
+            saveGameData.FabricatorTier = playerShip.GetComponent<FabricatorModule>().CurrentTier;
 
             HullDamageController HDC = playerShip.GetComponentInChildren<HullDamageController>();
             saveGameData.RepairableShipHealth = HDC.State.repairableHp;
@@ -240,6 +241,7 @@ namespace VoidSaving
                         data.PowerResourceValues = reader.ReadSingleList();
                         data.Relics = reader.ReadGUIDUnionArray();
                         data.UnlockedBPs = reader.ReadGUIDUnionArray();
+                        data.FabricatorTier = reader.ReadByte();
 
                         data.RepairableShipHealth = reader.ReadSingle();
                         data.Breaches = Array.ConvertAll(reader.ReadInt32Array(), value => (BreachCondition)value);
@@ -323,6 +325,7 @@ namespace VoidSaving
                         writer.Write(data.PowerResourceValues);
                         writer.Write(data.Relics);
                         writer.Write(data.UnlockedBPs);
+                        writer.Write((byte)data.FabricatorTier);
 
                         writer.Write(data.RepairableShipHealth);
                         writer.Write(Array.ConvertAll(data.Breaches, value => (int)value));
