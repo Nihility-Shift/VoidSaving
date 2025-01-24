@@ -183,17 +183,17 @@ namespace VoidSaving
 
         public EnhancementState state;
 
-        public float ActivationTimeEnd;
+        public int ActivationTimeEnd;
 
-        public float ActivationTimeStart;
+        public int ActivationTimeStart;
 
-        public float CooldownTimeEnd;
+        public int CooldownTimeEnd;
 
-        public float CooldownTimeStart;
+        public int CooldownTimeStart;
 
-        public float FailureTimeEnd;
+        public int FailureTimeEnd;
 
-        public float FailureTimeStart;
+        public int FailureTimeStart;
 
         public float LastGrade;
 

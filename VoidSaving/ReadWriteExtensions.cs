@@ -312,12 +312,12 @@ namespace VoidSaving
                 Enhancements[i] = new EnhancementData()
                 {
                     state = (EnhancementState)reader.ReadByte(),
-                    ActivationTimeStart = reader.ReadSingle(),
-                    ActivationTimeEnd = reader.ReadSingle(),
-                    CooldownTimeStart = reader.ReadSingle(),
-                    CooldownTimeEnd = reader.ReadSingle(),
-                    FailureTimeStart = reader.ReadSingle(),
-                    FailureTimeEnd = reader.ReadSingle(),
+                    ActivationTimeStart = reader.ReadInt32(),
+                    ActivationTimeEnd = reader.ReadInt32(),
+                    CooldownTimeStart = reader.ReadInt32(),
+                    CooldownTimeEnd = reader.ReadInt32(),
+                    FailureTimeStart = reader.ReadInt32(),
+                    FailureTimeEnd = reader.ReadInt32(),
                     LastGrade = reader.ReadSingle(),
                     LastDurationMult = reader.ReadSingle(),
                 };
