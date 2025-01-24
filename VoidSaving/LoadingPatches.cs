@@ -2,7 +2,6 @@
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
-using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
 using Client.Utils;
@@ -124,6 +123,8 @@ namespace VoidSaving
         static void PostShipLoadPatch(AbstractPlayerControlledShip __instance)
         {
             if (!SaveHandler.LoadSavedData) return;
+
+
             SaveGameData activeData = SaveHandler.ActiveData;
 
             __instance.hitPoints = activeData.ShipHealth;
@@ -218,6 +219,9 @@ namespace VoidSaving
         [HarmonyPatch(typeof(ShieldSystem), "AddShield"), HarmonyPostfix]
         static void LoadShieldHealthPatch(ShieldSystem __instance)
         {
+            if (!SaveHandler.LoadSavedData) return;
+
+
             if(__instance._shields.Count == 4)
             {
                 for(int i = 0; i < 4; i++)
