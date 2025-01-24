@@ -90,12 +90,12 @@ namespace VoidSaving
         }
 
         //Sets seed at earliest point
-        [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
-        static void QuestLoadPrefix(QuestParameters questParameters)
+        [HarmonyPatch(typeof(GameSession), "LoadQuest"), HarmonyPrefix]
+        static void QuestLoadPrefix(GameSession __instance)
         {
-            if (!SaveHandler.LoadSavedData) return;
+            if (!SaveHandler.LoadSavedData || __instance.SessionQuestParameters == null) return;
 
-            questParameters.Seed = SaveHandler.ActiveData.Seed;
+            __instance.SessionQuestParameters.Seed = SaveHandler.ActiveData.Seed;
         }
 
         //Sets jump and interdiction counters prior to first usage
