@@ -157,7 +157,7 @@ namespace VoidSaving
                     else if (socket.InstalledModule is AutoMechanicModule autoMechanicModule)
                     {
                         AutoMechanicSwitches.Add(autoMechanicModule.TriSwitch.Value);
-                }
+                    }
                     else if (socket.InstalledModule is LifeSupportModule lifeSupportModule)
                     {
                         LifeSupportSwitches.Add(lifeSupportModule.TemperatureSwitch.Value);
@@ -207,6 +207,7 @@ namespace VoidSaving
             VoidJumpStart = 1,
             AbstractPlayerShipStart = 2,
             QuestData = 4,
+            ShieldHealth = 8;
         }
 
         static LoadingStage CompletedStages;
@@ -216,7 +217,7 @@ namespace VoidSaving
             CompletedStages |= stage;
             BepinPlugin.Log.LogInfo("Completed Loading Stage: " + stage);
             
-            if (CompletedStages == (LoadingStage.VoidJumpStart | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData))
+            if (CompletedStages == (LoadingStage.VoidJumpStart | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData | LoadingStage.ShieldHealth))
             {
                 BepinPlugin.Log.LogInfo("Finished all loading stages");
                 LatestData = ActiveData;

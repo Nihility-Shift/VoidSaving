@@ -237,6 +237,7 @@ namespace VoidSaving
                 {
                     __instance._shields[i].hitPoints = SaveHandler.ActiveData.ShieldHealths[i];
                 }
+                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.ShieldHealth);
             }
         }
     }
