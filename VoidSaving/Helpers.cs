@@ -16,8 +16,6 @@ using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UI.Fabricator;
-using UnityEngine.UIElements;
 
 namespace VoidSaving
 {
@@ -37,7 +35,15 @@ namespace VoidSaving
 
         public static GUIDUnion[] UnlockedBPGUIDsFromShip(AbstractPlayerControlledShip playerShip)
         {
-            return playerShip.GetComponentInChildren<FabricatorTerminal>().Data.CraftingData.SessionUnlockedItems.ToArray() ?? null;
+            return playerShip.GetComponentInChildren<FabricatorModule>().SessionBasedUnlockPool.ToArray();
+        }
+
+        public static void AddBlueprintsToFabricator(AbstractPlayerControlledShip playerShip, GUIDUnion[] BPGUIDs)
+        {
+            foreach (GUIDUnion UnlockedItem in BPGUIDs)
+            {
+                playerShip.GetComponentInChildren<FabricatorModule>().TryAddItemToSharedUnlockPool(UnlockedItem, false);
+            }
         }
 
         public static void AddRelicsToShip(AbstractPlayerControlledShip playerShip, GUIDUnion[] relicIDs)
@@ -56,14 +62,6 @@ namespace VoidSaving
                 {
                     BepinPlugin.Log.LogError($"Failed to spawn relic {relicIDs[i]} in controller!\n" + e);
                 }
-            }
-        }
-
-        public static void AddBlueprintsToFabricator(AbstractPlayerControlledShip playerShip, GUIDUnion[] BPGUIDs)
-        {
-            foreach (GUIDUnion UnlockedItem in BPGUIDs)
-            {
-                playerShip.GetComponentInChildren<FabricatorModule>().TryAddItemToSharedUnlockPool(UnlockedItem, false);
             }
         }
 
