@@ -1,4 +1,4 @@
-using CG.Game.Scenarios;
+﻿using CG.Game.Scenarios;
 using CG.Ship.Modules;
 using Gameplay.Atmosphere;
 using Gameplay.Enhancements;
@@ -64,6 +64,10 @@ namespace VoidSaving
         public bool[] DoorStates;
 
         public bool[] AirlockSafeties;
+
+        public byte[] LifeSupportModeSwitches;
+
+        public byte[] AutoMechanicSwitches;
 
         public bool[] ShieldDirections;
 

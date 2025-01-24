@@ -131,6 +131,8 @@ namespace VoidSaving
                 List<WeaponBullets> weaponBullets = new();
                 List<float> kPDBullets = new();
                 List<bool> shieldDirections = new();
+                List<byte> LifeSupportSwitches = new();
+                List<byte> AutoMechanicSwitches = new();
                 foreach (BuildSocket socket in bsc.Sockets)
                 {
                     if (socket.InstalledModule == null) continue;
@@ -152,11 +154,21 @@ namespace VoidSaving
                         shieldDirections.Add(shieldModule.IsForward.Value);
                         shieldDirections.Add(shieldModule.IsCounterClockwise.Value);
                     }
+                    else if (socket.InstalledModule is AutoMechanicModule autoMechanicModule)
+                    {
+                        AutoMechanicSwitches.Add(autoMechanicModule.TriSwitch.Value);
+                }
+                    else if (socket.InstalledModule is LifeSupportModule lifeSupportModule)
+                    {
+                        LifeSupportSwitches.Add(lifeSupportModule.TemperatureSwitch.Value);
+                    }
                 }
                 saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
                 saveGameData.ShieldDirections = shieldDirections.ToArray();
                 saveGameData.KPDBullets = kPDBullets.ToArray();
                 saveGameData.WeaponBullets = weaponBullets.ToArray();
+                saveGameData.AutoMechanicSwitches = AutoMechanicSwitches.ToArray();
+                saveGameData.LifeSupportModeSwitches = LifeSupportSwitches.ToArray();
 
                 saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
                 saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
@@ -270,6 +282,8 @@ namespace VoidSaving
                         data.Enhancements = reader.ReadEnhancements();
                         data.WeaponBullets = reader.ReadWeaponBullets();
                         data.KPDBullets = reader.ReadSingleArray();
+                        data.LifeSupportModeSwitches = reader.ReadByteArray();
+                        data.AutoMechanicSwitches = reader.ReadByteArray();
 
                         data.BoosterStates = reader.ReadBoosterStatuses();
                         data.ShieldHealths = reader.ReadSingleArray();
@@ -360,6 +374,8 @@ namespace VoidSaving
                         writer.Write(data.Enhancements);
                         writer.Write(data.WeaponBullets);
                         writer.Write(data.KPDBullets);
+                        writer.WriteByteArray(data.LifeSupportModeSwitches);
+                        writer.WriteByteArray(data.AutoMechanicSwitches);
 
                         writer.Write(data.BoosterStates);
                         writer.Write(data.ShieldHealths);

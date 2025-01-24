@@ -159,6 +159,8 @@ namespace VoidSaving
             int WeaponBulletsModuleIndex = 0;
             int KPDBulletsModuleIndex = 0;
             int SheildModuleDirectionsIndex = 0;
+            int AutoMechanicSwitchIndex = 0;
+            int lifeSupportSwitchIndex = 0;
 
             foreach (BuildSocket socket in bsc.Sockets)
             {
@@ -182,6 +184,14 @@ namespace VoidSaving
                     shieldModule.IsClockwise.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
                     shieldModule.IsForward.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
                     shieldModule.IsCounterClockwise.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
+                }
+                else if (socket.InstalledModule is AutoMechanicModule autoMechanicModule)
+                {
+                    autoMechanicModule.TriSwitch.ForceChange(activeData.AutoMechanicSwitches[AutoMechanicSwitchIndex++]);
+                }
+                else if (socket.InstalledModule is LifeSupportModule lifeSupportModule)
+                {
+                    lifeSupportModule.TemperatureSwitch.ForceChange(activeData.LifeSupportModeSwitches[lifeSupportSwitchIndex++]);
                 }
 
                 InstalledModuleIndex++;
