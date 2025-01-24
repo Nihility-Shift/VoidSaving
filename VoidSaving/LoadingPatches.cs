@@ -10,6 +10,7 @@ using Gameplay.Defects;
 using Gameplay.Power;
 using Gameplay.Quests;
 using HarmonyLib;
+using ToolClasses;
 
 namespace VoidSaving
 {
@@ -87,6 +88,15 @@ namespace VoidSaving
 
                 SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
             }
+        }
+
+        [HarmonyPatch(typeof(HubQuestManager), "StartQuest"), HarmonyPrefix]
+        static void LoadShipGUID(HubQuestManager __instance)
+        {
+            if (!SaveHandler.LoadSavedData) return;
+
+            __instance.SelectedShipGuid = SaveHandler.ActiveData.ShipLoadoutGUID;
+            PunSingleton<PhotonService>.Instance.SetCurrentRoomShip(__instance.SelectedShipGuid);
         }
 
         //Sets seed at earliest point
