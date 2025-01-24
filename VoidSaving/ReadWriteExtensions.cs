@@ -1,8 +1,10 @@
 ﻿using CG.Game.Scenarios;
 using CG.Ship.Modules;
+using Gameplay.Atmosphere;
 using Gameplay.Enhancements;
 using Gameplay.Quests;
 using Newtonsoft.Json.Linq;
+using PlayFab.AuthenticationModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -354,6 +356,36 @@ namespace VoidSaving
             VoidDriveModuleData data = new VoidDriveModuleData();
             data.engineChargedStates = reader.ReadBooleanArray();
             data.JumpCharge = reader.ReadSingle();
+
+            return data;
+        }
+
+
+        public static void Write(this BinaryWriter Writer, AtmosphereValues[] Values)
+        {
+            Writer.Write(Values.Length);
+            for (int i = 0; i < Values.Length; i++)
+            {
+                AtmosphereValues value = Values[i];
+                Writer.Write(value.Pressure);
+                Writer.Write(value.Oxygen);
+                Writer.Write(value.Temperature);
+            }
+        }
+
+        public static AtmosphereValues[] ReadAtmosphereValues(this BinaryReader reader)
+        {
+            int count = reader.ReadInt32();
+            AtmosphereValues[] data = new AtmosphereValues[count];
+            for (int i = 0; i < count; i++)
+            {
+                AtmosphereValues value = new AtmosphereValues();
+                value.Pressure = reader.ReadSingle();
+                value.Oxygen = reader.ReadSingle();
+                value.Temperature = reader.ReadSingle();
+                value.AtmosphericForce = default(AtmosphericForceProbe);
+                data[i] = value;
+            }
 
             return data;
         }

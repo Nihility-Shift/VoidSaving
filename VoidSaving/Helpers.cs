@@ -4,6 +4,7 @@ using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
+using Gameplay.Atmosphere;
 using Gameplay.Enhancements;
 using Gameplay.Power;
 using Gameplay.Quests;
@@ -228,6 +229,22 @@ namespace VoidSaving
 
             drive.engineChargedStates = data.engineChargedStates;
             drive.JumpCharge = data.JumpCharge;
+        }
+
+
+        public static AtmosphereValues[] GetAtmosphereValues(AbstractPlayerControlledShip playerShip)
+        {
+            Atmosphere atmosphere = playerShip.GetComponentInChildren<Atmosphere>();
+            return atmosphere.Atmospheres.elements.ToArray();
+        }
+
+        public static void LoadAtmosphereValues(AbstractPlayerControlledShip playerShip, AtmosphereValues[] data)
+        {
+            Atmosphere atmosphere = playerShip.GetComponentInChildren<Atmosphere>();
+            for (int i = 0; i < data.Count(); i++)
+            {
+                atmosphere.RoomAtmospheres.SetElementAt(i, data[i]);
+            }
         }
     }
 }

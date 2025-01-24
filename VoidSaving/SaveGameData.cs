@@ -1,6 +1,7 @@
 ﻿using CG.Game.Scenarios;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
+using Gameplay.Atmosphere;
 using Gameplay.Enhancements;
 using Newtonsoft.Json.Linq;
 using Photon.Pun;
@@ -56,6 +57,8 @@ namespace VoidSaving
         public CircuitBreakerData BreakerData;
 
         public VoidDriveModuleData JumpModule;
+
+        public AtmosphereValues[] AtmosphereValues;
 
         public bool[] ShieldDirections;
 
