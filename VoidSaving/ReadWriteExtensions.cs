@@ -54,6 +54,18 @@ namespace VoidSaving
         }
 
 
+        public static void WriteByteArray(this BinaryWriter Writer, byte[] bytes)
+        {
+            Writer.Write(bytes.Length);
+            Writer.Write(bytes);
+        }
+
+        public static byte[] ReadByteArray(this BinaryReader Reader)
+        {
+            return Reader.ReadBytes(Reader.ReadInt32());
+        }
+
+
         public static void Write(this BinaryWriter Writer, int[] ints)
         {
             Writer.Write(ints.Length);

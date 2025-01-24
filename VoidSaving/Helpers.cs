@@ -1,11 +1,14 @@
-﻿using CG.Game.Scenarios;
+﻿using CG.Client.Ship;
+using CG.Game.Scenarios;
 using CG.Objects;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
+using Client.Utils;
 using Gameplay.Atmosphere;
+using Gameplay.Defects;
 using Gameplay.Enhancements;
 using Gameplay.Power;
 using Gameplay.Quests;
@@ -20,11 +23,6 @@ namespace VoidSaving
 {
     internal class Helpers
     {
-        public static BreachCondition[] BreachesAsConditionsArray(List<HullBreach> breaches)
-        {
-            return breaches.Select(breach => breach.State.condition).ToArray();
-        }
-
         public static GUIDUnion[] RelicGUIDsFromShip(AbstractPlayerControlledShip playerShip)
         {
             RelicSocketController[] RSCs = playerShip.GetComponentsInChildren<RelicSocketController>();
@@ -58,15 +56,6 @@ namespace VoidSaving
                 {
                     BepinPlugin.Log.LogError($"Failed to spawn relic {relicIDs[i]} in controller!\n" + e);
                 }
-            }
-        }
-
-        public static void ApplyBreachStatesToBreaches(List<HullBreach> breaches, BreachCondition[] breachConditions)
-        {
-            int breachCount = breaches.Count;
-            for (int i = 0; i < breachCount; i++)
-            {
-                breaches[i].SetCondition(breachConditions[i]);
             }
         }
 
@@ -260,6 +249,73 @@ namespace VoidSaving
             for (int i = 0; i < states.Length; i++)
             {
                 doors[i].IsOpen = states[i];
+            }
+        }
+
+
+        public static bool[] GetAirlockSafeties(AbstractPlayerControlledShip playerShip)
+        {
+            Airlock[] airlocks = playerShip.GetComponentsInChildren<Airlock>();
+            bool[] states = new bool[airlocks.Length];
+            for (int i = 0; i < airlocks.Length; i++)
+            {
+                states[i] = airlocks[i].IsSafetyEnabled;
+            }
+            return states;
+        }
+
+        public static void LoadAirlockSafeties(AbstractPlayerControlledShip playerShip, bool[] states)
+        {
+            Airlock[] airlocks = playerShip.GetComponentsInChildren<Airlock>();
+            for (int i = 0; i < states.Length; i++)
+            {
+                airlocks[i].IsSafetyEnabled = states[i];
+            }
+        }
+
+
+        public static byte[] GetBreachStates(HullDamageController damageController)
+        {
+            return damageController.Breaches.Select(breach => (byte)breach.State.condition).ToArray();
+        }
+
+        public static void LoadBreachStates(HullDamageController damageController, byte[] breachConditions)
+        {
+            int breachCount = breachConditions.Length;
+            for (int i = 0; i < breachCount; i++)
+            {
+                damageController.breaches[i].SetCondition((BreachCondition)breachConditions[i]);
+            }
+        }
+
+
+        public static byte[] GetDefectStates(PlayerShipDefectDamageController damageController)
+        {
+            List<byte> states = new List<byte>();
+            foreach (DefectSystem system in damageController._defectSystems)
+            {
+                foreach(Defect defect in system.AvailableDefects)
+                {
+                    states.Add((byte)defect.activeStageIndex);
+                }
+            }
+            return states.ToArray();
+        }
+
+        public static void LoadDefectStates(PlayerShipDefectDamageController damageController, byte[] states)
+        {
+            int length = states.Length;
+            int currentDefectIndex = 0;
+            foreach (DefectSystem defectSystem in damageController._defectSystems)
+            {
+                foreach (Defect defect in defectSystem.AvailableDefects)
+                {
+                    defect.SetDefectStage(states[currentDefectIndex++]);
+                    if (currentDefectIndex == length)
+                    {
+                        return;
+                    }
+                }
             }
         }
     }

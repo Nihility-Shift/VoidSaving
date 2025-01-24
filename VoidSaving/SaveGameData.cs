@@ -1,4 +1,5 @@
-﻿using CG.Game.Scenarios;
+﻿using CG.Client.Ship;
+using CG.Game.Scenarios;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
 using Gameplay.Atmosphere;
@@ -34,7 +35,9 @@ namespace VoidSaving
 
         public float RepairableShipHealth;
 
-        public BreachCondition[] Breaches;
+        public byte[] Breaches;
+
+        public byte[] Defects;
 
 
         //Contains ShipType, Modules, loose carryables.
@@ -61,6 +64,8 @@ namespace VoidSaving
         public AtmosphereValues[] AtmosphereValues;
 
         public bool[] DoorStates;
+
+        public bool[] AirlockSafeties;
 
         public bool[] ShieldDirections;
 

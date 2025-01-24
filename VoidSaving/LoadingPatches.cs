@@ -7,6 +7,7 @@ using CG.Ship.Shield;
 using CG.Space;
 using Client.Utils;
 using Gameplay.CompositeWeapons;
+using Gameplay.Defects;
 using Gameplay.Power;
 using Gameplay.Quests;
 using HarmonyLib;
@@ -126,9 +127,11 @@ namespace VoidSaving
             SaveGameData activeData = SaveHandler.ActiveData;
 
             __instance.hitPoints = activeData.ShipHealth;
-            HullDamageController HDC = __instance.GetComponentInChildren<HullDamageController>();
-            HDC.State.repairableHp = activeData.RepairableShipHealth;
-            Helpers.ApplyBreachStatesToBreaches(HDC.breaches, activeData.Breaches);
+            PlayerShipDefectDamageController PSDDC = __instance.GetComponent<PlayerShipDefectDamageController>();
+            PSDDC._hullDamageController.State.repairableHp = activeData.RepairableShipHealth;
+            Helpers.LoadBreachStates(PSDDC._hullDamageController, activeData.Breaches);
+            Helpers.LoadDefectStates(PSDDC, activeData.Defects);
+
             Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
             Helpers.AddRelicsToShip(__instance, activeData.Relics);
             __instance.GetComponent<FabricatorModule>().CurrentTier = activeData.FabricatorTier;
@@ -189,6 +192,7 @@ namespace VoidSaving
             Helpers.LoadVoidDriveModule(__instance, activeData.JumpModule);
             Helpers.LoadAtmosphereValues(__instance, activeData.AtmosphereValues);
             Helpers.LoadDoorStates(__instance, activeData.DoorStates);
+            Helpers.LoadAirlockSafeties(__instance, activeData.AirlockSafeties);
 
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
             GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;

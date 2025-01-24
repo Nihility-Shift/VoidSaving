@@ -6,6 +6,7 @@ using CG.Ship.Modules.Shield;
 using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.CompositeWeapons;
+using Gameplay.Defects;
 using Gameplay.Power;
 using Gameplay.Quests;
 using System;
@@ -111,9 +112,10 @@ namespace VoidSaving
             saveGameData.UnlockedBPs = Helpers.UnlockedBPGUIDsFromShip(playerShip);
             saveGameData.FabricatorTier = playerShip.GetComponent<FabricatorModule>().CurrentTier;
 
-            HullDamageController HDC = playerShip.GetComponentInChildren<HullDamageController>();
-            saveGameData.RepairableShipHealth = HDC.State.repairableHp;
-            saveGameData.Breaches = Helpers.BreachesAsConditionsArray(HDC.breaches);
+            PlayerShipDefectDamageController PSDDC = playerShip.GetComponent<PlayerShipDefectDamageController>();
+            saveGameData.RepairableShipHealth = PSDDC._hullDamageController.State.repairableHp;
+            saveGameData.Breaches = Helpers.GetBreachStates(PSDDC._hullDamageController);
+            saveGameData.Defects = Helpers.GetDefectStates(PSDDC);
 
             List<bool> ShipSystemPoweredValues = new();
             foreach (CellModule module in playerShip.CoreSystems)
@@ -160,6 +162,7 @@ namespace VoidSaving
             saveGameData.JumpModule = new VoidDriveModuleData(playerShip.GetComponentInChildren<VoidDriveModule>());
             saveGameData.AtmosphereValues = Helpers.GetAtmosphereValues(playerShip);
             saveGameData.DoorStates = Helpers.GetDoorStates(playerShip);
+            saveGameData.AirlockSafeties = Helpers.GetAirlockSafeties(playerShip);
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = playerShip.ShipsPowerSystem.IsPowered();
@@ -248,7 +251,8 @@ namespace VoidSaving
                         data.FabricatorTier = reader.ReadByte();
 
                         data.RepairableShipHealth = reader.ReadSingle();
-                        data.Breaches = Array.ConvertAll(reader.ReadInt32Array(), value => (BreachCondition)value);
+                        data.Breaches = reader.ReadByteArray();
+                        data.Defects = reader.ReadByteArray();
 
                         data.ShipPowered = reader.ReadBoolean();
                         data.BreakerData = reader.ReadBreakers();
@@ -263,6 +267,9 @@ namespace VoidSaving
                         data.BoosterStates = reader.ReadBoosterStatuses();
                         data.ShieldHealths = reader.ReadSingleArray();
                         data.JumpModule = reader.ReadVoidDriveData();
+                        data.AtmosphereValues = reader.ReadAtmosphereValues();
+                        data.DoorStates = reader.ReadBooleanArray();
+                        data.AirlockSafeties = reader.ReadBooleanArray();
 
                         data.Seed = reader.ReadInt32();
                         data.ParametersSeed = reader.ReadInt32();
@@ -334,7 +341,8 @@ namespace VoidSaving
                         writer.Write((byte)data.FabricatorTier);
 
                         writer.Write(data.RepairableShipHealth);
-                        writer.Write(Array.ConvertAll(data.Breaches, value => (int)value));
+                        writer.WriteByteArray(data.Breaches);
+                        writer.WriteByteArray(data.Defects);
 
                         writer.Write(data.ShipPowered);
                         writer.Write(data.BreakerData);
@@ -349,6 +357,9 @@ namespace VoidSaving
                         writer.Write(data.BoosterStates);
                         writer.Write(data.ShieldHealths);
                         writer.Write(data.JumpModule);
+                        writer.Write(data.AtmosphereValues);
+                        writer.Write(data.DoorStates);
+                        writer.Write(data.AirlockSafeties);
 
                         writer.Write(data.Seed);
                         writer.Write(data.ParametersSeed);
