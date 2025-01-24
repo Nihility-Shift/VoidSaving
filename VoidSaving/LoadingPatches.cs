@@ -175,8 +175,7 @@ namespace VoidSaving
                 }
                 else if (socket.InstalledModule is KineticPointDefenseModule KPDModule)
                 {
-                    KPDModule.AmmoCount = KPDModule.AmmoCount;
-                    KPDBulletsModuleIndex++;
+                    KPDModule.AmmoCount = activeData.KPDBullets[KPDBulletsModuleIndex++];
                 }
                 else if (socket.InstalledModule is ShieldModule shieldModule)
                 {
