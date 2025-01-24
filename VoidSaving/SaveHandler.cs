@@ -98,6 +98,8 @@ namespace VoidSaving
         internal static SaveGameData GetSessionSaveGameData()
         {
             SaveGameData saveGameData = LatestData;
+            try
+            {
             GameSession session = GameSessionManager.Instance.activeGameSession;
             AbstractPlayerControlledShip playerShip = ClientGame.Current.PlayerShip;
 
@@ -177,7 +179,12 @@ namespace VoidSaving
             saveGameData.SessionStats = GameSessionTracker.Statistics;
 
             saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);
-
+            }
+            catch (Exception e)
+            {
+                BepinPlugin.Log.LogError("Failed to save data\n" + e);
+                Messaging.Notification("Failed to save data.");
+            }
             return saveGameData;
         }
 
