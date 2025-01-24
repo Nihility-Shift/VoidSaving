@@ -100,85 +100,85 @@ namespace VoidSaving
             SaveGameData saveGameData = LatestData;
             try
             {
-            GameSession session = GameSessionManager.Instance.activeGameSession;
-            AbstractPlayerControlledShip playerShip = ClientGame.Current.PlayerShip;
+                GameSession session = GameSessionManager.Instance.activeGameSession;
+                AbstractPlayerControlledShip playerShip = ClientGame.Current.PlayerShip;
 
-            //Ship data
-            saveGameData.Alloy = GameSessionSuppliesManager.Instance.AlloyAmount;
-            saveGameData.Biomass = GameSessionSuppliesManager.Instance.BiomassAmount;
-            saveGameData.ShipHealth = playerShip.HitPoints;
+                //Ship data
+                saveGameData.Alloy = GameSessionSuppliesManager.Instance.AlloyAmount;
+                saveGameData.Biomass = GameSessionSuppliesManager.Instance.BiomassAmount;
+                saveGameData.ShipHealth = playerShip.HitPoints;
 
-            saveGameData.ShipLoadoutGUID = GameSessionManager.Instance.PreviousSessionShipLoadout;
-            saveGameData.ShipLoadout = new ShipLoadout(playerShip.GetComponent<PlayerShip>()).AsJObject();
-            saveGameData.Relics = Helpers.RelicGUIDsFromShip(playerShip);
-            saveGameData.UnlockedBPs = Helpers.UnlockedBPGUIDsFromShip(playerShip);
+                saveGameData.ShipLoadoutGUID = GameSessionManager.Instance.PreviousSessionShipLoadout;
+                saveGameData.ShipLoadout = new ShipLoadout(playerShip.GetComponent<PlayerShip>()).AsJObject();
+                saveGameData.Relics = Helpers.RelicGUIDsFromShip(playerShip);
+                saveGameData.UnlockedBPs = Helpers.UnlockedBPGUIDsFromShip(playerShip);
                 saveGameData.FabricatorTier = playerShip.GetComponentInChildren<FabricatorModule>().CurrentTier;
 
-            PlayerShipDefectDamageController PSDDC = playerShip.GetComponent<PlayerShipDefectDamageController>();
-            saveGameData.RepairableShipHealth = PSDDC._hullDamageController.State.repairableHp;
-            saveGameData.Breaches = Helpers.GetBreachStates(PSDDC._hullDamageController);
-            saveGameData.Defects = Helpers.GetDefectStates(PSDDC);
+                PlayerShipDefectDamageController PSDDC = playerShip.GetComponent<PlayerShipDefectDamageController>();
+                saveGameData.RepairableShipHealth = PSDDC._hullDamageController.State.repairableHp;
+                saveGameData.Breaches = Helpers.GetBreachStates(PSDDC._hullDamageController);
+                saveGameData.Defects = Helpers.GetDefectStates(PSDDC);
 
-            List<bool> ShipSystemPoweredValues = new();
-            foreach (CellModule module in playerShip.CoreSystems)
-            {
-                ShipSystemPoweredValues.Add(module.IsPowered);
-            }
-            saveGameData.ShipSystemPowerStates = ShipSystemPoweredValues.ToArray();
-
-            BuildSocketController bsc = playerShip.GetComponent<BuildSocketController>();
-            List<bool> ModulePoweredValues = new();
-            List<WeaponBullets> weaponBullets = new();
-            List<float> kPDBullets = new();
-            List<bool> shieldDirections = new();
-            foreach (BuildSocket socket in bsc.Sockets)
-            {
-                if (socket.InstalledModule == null) continue;
-
-
-                ModulePoweredValues.Add(socket.InstalledModule.IsPowered);
-
-                if (socket.InstalledModule is CompositeWeaponModule weaponModule && weaponModule.InsideElementsCollection.Magazine is BulletMagazine magazine)
+                List<bool> ShipSystemPoweredValues = new();
+                foreach (CellModule module in playerShip.CoreSystems)
                 {
-                    weaponBullets.Add(new WeaponBullets(magazine.AmmoLoaded, magazine.ReservoirAmmoCount));
+                    ShipSystemPoweredValues.Add(module.IsPowered);
                 }
-                else if (socket.InstalledModule is KineticPointDefenseModule KPDModule)
+                saveGameData.ShipSystemPowerStates = ShipSystemPoweredValues.ToArray();
+
+                BuildSocketController bsc = playerShip.GetComponent<BuildSocketController>();
+                List<bool> ModulePoweredValues = new();
+                List<WeaponBullets> weaponBullets = new();
+                List<float> kPDBullets = new();
+                List<bool> shieldDirections = new();
+                foreach (BuildSocket socket in bsc.Sockets)
                 {
-                    kPDBullets.Add(KPDModule.AmmoCount);
+                    if (socket.InstalledModule == null) continue;
+
+
+                    ModulePoweredValues.Add(socket.InstalledModule.IsPowered);
+
+                    if (socket.InstalledModule is CompositeWeaponModule weaponModule && weaponModule.InsideElementsCollection.Magazine is BulletMagazine magazine)
+                    {
+                        weaponBullets.Add(new WeaponBullets(magazine.AmmoLoaded, magazine.ReservoirAmmoCount));
+                    }
+                    else if (socket.InstalledModule is KineticPointDefenseModule KPDModule)
+                    {
+                        kPDBullets.Add(KPDModule.AmmoCount);
+                    }
+                    else if (socket.InstalledModule is ShieldModule shieldModule)
+                    {
+                        shieldDirections.Add(shieldModule.IsClockwise.Value);
+                        shieldDirections.Add(shieldModule.IsForward.Value);
+                        shieldDirections.Add(shieldModule.IsCounterClockwise.Value);
+                    }
                 }
-                else if (socket.InstalledModule is ShieldModule shieldModule)
-                {
-                    shieldDirections.Add(shieldModule.IsClockwise.Value);
-                    shieldDirections.Add(shieldModule.IsForward.Value);
-                    shieldDirections.Add(shieldModule.IsCounterClockwise.Value);
-                }
-            }
-            saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
-            saveGameData.ShieldDirections = shieldDirections.ToArray();
-            saveGameData.KPDBullets = kPDBullets.ToArray();
-            saveGameData.WeaponBullets = weaponBullets.ToArray();
+                saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
+                saveGameData.ShieldDirections = shieldDirections.ToArray();
+                saveGameData.KPDBullets = kPDBullets.ToArray();
+                saveGameData.WeaponBullets = weaponBullets.ToArray();
 
-            saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
-            saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
-            saveGameData.Enhancements = Helpers.GetEnhancements(playerShip);
-            saveGameData.JumpModule = new VoidDriveModuleData(playerShip.GetComponentInChildren<VoidDriveModule>());
-            saveGameData.AtmosphereValues = Helpers.GetAtmosphereValues(playerShip);
-            saveGameData.DoorStates = Helpers.GetDoorStates(playerShip);
-            saveGameData.AirlockSafeties = Helpers.GetAirlockSafeties(playerShip);
+                saveGameData.BoosterStates = Helpers.GetBoosterStates(playerShip);
+                saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
+                saveGameData.Enhancements = Helpers.GetEnhancements(playerShip);
+                saveGameData.JumpModule = new VoidDriveModuleData(playerShip.GetComponentInChildren<VoidDriveModule>());
+                saveGameData.AtmosphereValues = Helpers.GetAtmosphereValues(playerShip);
+                saveGameData.DoorStates = Helpers.GetDoorStates(playerShip);
+                saveGameData.AirlockSafeties = Helpers.GetAirlockSafeties(playerShip);
 
-            ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
-            saveGameData.ShipPowered = playerShip.ShipsPowerSystem.IsPowered();
-            saveGameData.BreakerData = Helpers.GetBreakerData(powerSystem);
+                ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
+                saveGameData.ShipPowered = playerShip.ShipsPowerSystem.IsPowered();
+                saveGameData.BreakerData = Helpers.GetBreakerData(powerSystem);
 
-            //Quest data
-            EndlessQuest activeQuest = session.ActiveQuest as EndlessQuest;
+                //Quest data
+                EndlessQuest activeQuest = session.ActiveQuest as EndlessQuest;
 
-            saveGameData.Seed = activeQuest.QuestParameters.Seed;
-            saveGameData.JumpCounter = activeQuest.JumpCounter;
-            saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
-            saveGameData.SessionStats = GameSessionTracker.Statistics;
+                saveGameData.Seed = activeQuest.QuestParameters.Seed;
+                saveGameData.JumpCounter = activeQuest.JumpCounter;
+                saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
+                saveGameData.SessionStats = GameSessionTracker.Statistics;
 
-            saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);
+                saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);
             }
             catch (Exception e)
             {
@@ -259,7 +259,7 @@ namespace VoidSaving
 
                         data.RepairableShipHealth = reader.ReadSingle();
                         data.Breaches = reader.ReadByteArray();
-                        data.Defects = reader.ReadByteArray();
+                        data.Defects = reader.ReadSByteArray();
 
                         data.ShipPowered = reader.ReadBoolean();
                         data.BreakerData = reader.ReadBreakers();
@@ -349,7 +349,7 @@ namespace VoidSaving
 
                         writer.Write(data.RepairableShipHealth);
                         writer.WriteByteArray(data.Breaches);
-                        writer.WriteByteArray(data.Defects);
+                        writer.WriteSByteArray(data.Defects);
 
                         writer.Write(data.ShipPowered);
                         writer.Write(data.BreakerData);

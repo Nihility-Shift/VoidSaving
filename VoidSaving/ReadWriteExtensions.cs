@@ -2,13 +2,10 @@
 using CG.Ship.Modules;
 using Gameplay.Atmosphere;
 using Gameplay.Enhancements;
-using Gameplay.Quests;
 using Newtonsoft.Json.Linq;
-using PlayFab.AuthenticationModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace VoidSaving
 {
@@ -63,6 +60,28 @@ namespace VoidSaving
         public static byte[] ReadByteArray(this BinaryReader Reader)
         {
             return Reader.ReadBytes(Reader.ReadInt32());
+        }
+
+
+        public static void WriteSByteArray(this BinaryWriter Writer, sbyte[] bytes)
+        {
+            int length = bytes.Length;
+            Writer.Write(bytes.Length);
+            for (int i = 0; i < length; i++)
+            {
+                Writer.Write(bytes[i]);
+            }
+        }
+
+        public static sbyte[] ReadSByteArray(this BinaryReader Reader)
+        {
+            int length = Reader.ReadInt32();
+            sbyte[] bytes = new sbyte[length];
+            for (int i = 0; i < length; i++)
+            {
+                bytes[i] = Reader.ReadSByte();
+            }
+            return bytes;
         }
 
 

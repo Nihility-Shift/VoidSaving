@@ -289,14 +289,14 @@ namespace VoidSaving
         }
 
 
-        public static byte[] GetDefectStates(PlayerShipDefectDamageController damageController)
+        public static sbyte[] GetDefectStates(PlayerShipDefectDamageController damageController)
         {
-            List<byte> states = new List<byte>();
+            List<sbyte> states = new List<sbyte>();
             foreach (DefectSystem system in damageController._defectSystems)
             {
                 foreach(Defect defect in system.AvailableDefects)
                 {
-                    states.Add((byte)defect.activeStageIndex);
+                    states.Add((sbyte)defect.activeStageIndex);
                 }
             }
             return states.ToArray();

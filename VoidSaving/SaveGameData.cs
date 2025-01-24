@@ -1,7 +1,5 @@
-﻿using CG.Client.Ship;
 using CG.Game.Scenarios;
 using CG.Ship.Modules;
-using CG.Ship.Repair;
 using Gameplay.Atmosphere;
 using Gameplay.Enhancements;
 using Newtonsoft.Json.Linq;
@@ -37,7 +35,7 @@ namespace VoidSaving
 
         public byte[] Breaches;
 
-        public byte[] Defects;
+        public sbyte[] Defects;
 
 
         //Contains ShipType, Modules, loose carryables.
