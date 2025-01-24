@@ -300,7 +300,7 @@ namespace VoidSaving
             return states.ToArray();
         }
 
-        public static void LoadDefectStates(PlayerShipDefectDamageController damageController, byte[] states)
+        public static void LoadDefectStates(PlayerShipDefectDamageController damageController, sbyte[] states)
         {
             int length = states.Length;
             int currentDefectIndex = 0;

@@ -207,7 +207,7 @@ namespace VoidSaving
             VoidJumpStart = 1,
             AbstractPlayerShipStart = 2,
             QuestData = 4,
-            ShieldHealth = 8;
+            ShieldHealth = 8,
         }
 
         static LoadingStage CompletedStages;
