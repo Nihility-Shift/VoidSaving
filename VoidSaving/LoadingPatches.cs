@@ -188,6 +188,7 @@ namespace VoidSaving
             Helpers.LoadBoosterStates(__instance, activeData.BoosterStates);
             Helpers.LoadVoidDriveModule(__instance, activeData.JumpModule);
             Helpers.LoadAtmosphereValues(__instance, activeData.AtmosphereValues);
+            Helpers.LoadDoorStates(__instance, activeData.DoorStates);
 
             GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
             GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;

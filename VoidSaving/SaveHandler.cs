@@ -159,6 +159,7 @@ namespace VoidSaving
             saveGameData.Enhancements = Helpers.GetEnhancements(playerShip);
             saveGameData.JumpModule = new VoidDriveModuleData(playerShip.GetComponentInChildren<VoidDriveModule>());
             saveGameData.AtmosphereValues = Helpers.GetAtmosphereValues(playerShip);
+            saveGameData.DoorStates = Helpers.GetDoorStates(playerShip);
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)playerShip.ShipsPowerSystem;
             saveGameData.ShipPowered = playerShip.ShipsPowerSystem.IsPowered();

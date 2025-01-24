@@ -1,5 +1,6 @@
 ﻿using CG.Game.Scenarios;
 using CG.Objects;
+using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Repair;
 using CG.Ship.Shield;
@@ -244,6 +245,21 @@ namespace VoidSaving
             for (int i = 0; i < data.Count(); i++)
             {
                 atmosphere.RoomAtmospheres.SetElementAt(i, data[i]);
+            }
+        }
+
+
+        public static bool[] GetDoorStates(AbstractPlayerControlledShip playerShip)
+        {
+            return playerShip.GetComponentsInChildren<AbstractDoor>().Select(door => door.isOpen).ToArray();
+        }
+
+        public static void LoadDoorStates(AbstractPlayerControlledShip playerShip, bool[] states)
+        {
+            AbstractDoor[] doors = playerShip.GetComponentsInChildren<AbstractDoor>();
+            for (int i = 0; i < states.Length; i++)
+            {
+                doors[i].IsOpen = states[i];
             }
         }
     }

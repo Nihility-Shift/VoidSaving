@@ -60,6 +60,8 @@ namespace VoidSaving
 
         public AtmosphereValues[] AtmosphereValues;
 
+        public bool[] DoorStates;
+
         public bool[] ShieldDirections;
 
         public float[] ShieldHealths;
