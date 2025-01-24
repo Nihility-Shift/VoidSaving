@@ -119,12 +119,6 @@ namespace VoidSaving
 
     public struct SectorData
     {
-        public GUIDUnion ObjectiveGUID;
-
-        public DifficultyModifier Difficulty;
-
-        public ObjectiveState State;
-
         public SectorData(GUIDUnion objectiveGUID, DifficultyModifier difficulty, ObjectiveState state)
         {
             ObjectiveGUID = objectiveGUID;
@@ -132,7 +126,11 @@ namespace VoidSaving
             State = state;
         }
 
-        public SectorData() { }
+        public GUIDUnion ObjectiveGUID;
+
+        public DifficultyModifier Difficulty;
+
+        public ObjectiveState State;
     }
 
     public struct BoosterStatus

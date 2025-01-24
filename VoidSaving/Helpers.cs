@@ -65,6 +65,20 @@ namespace VoidSaving
             }
         }
 
+
+        public static SectorData[] GetCompletedSectorDatas(List<GameSessionSector> sectors)
+        {
+            SectorData[] sectorDatas = new SectorData[sectors.Count - 1];
+            for (int i = 1; i < sectors.Count; i++) //start at 1 to ignore starting sector
+            {
+                GameSessionSector sector = sectors[i];
+
+                sectorDatas[i] = new SectorData(sector.SectorObjective?.Objective.Asset.assetGuid ?? default, sector.Difficulty.DifficultyModifier, sector.ObjectiveState);
+            }
+
+            return sectorDatas;
+        }
+
         public static List<GameSessionSector> LoadCompletedSectors(EndlessQuest endlessQuest, SectorData[] sectorDatas)
         {
             List<GameSessionSector> CompletedSectors = new List<GameSessionSector>();
@@ -81,19 +95,6 @@ namespace VoidSaving
                 CompletedSectors.Add(sector);
             }
             return CompletedSectors;
-        }
-
-        public static SectorData[] GetCompletedSectorDatas(List<GameSessionSector> sectors)
-        {
-            SectorData[] sectorDatas = new SectorData[sectors.Count];
-            for (int i = 0; i < sectors.Count; i++)
-            {
-                GameSessionSector sector = sectors[i];
-
-                sectorDatas[i] = new SectorData(sector.SectorObjective.Objective.Asset.assetGuid, sector.Difficulty.DifficultyModifier, sector.ObjectiveState);
-            }
-
-            return sectorDatas;
         }
 
         public static List<SectorCompletionInfo> LoadCompletedSectorStatus(SectorData[] sectorDatas)
