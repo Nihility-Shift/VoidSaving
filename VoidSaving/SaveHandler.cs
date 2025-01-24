@@ -3,7 +3,6 @@ using CG.Game.SpaceObjects.Controllers;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
-using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.CompositeWeapons;
 using Gameplay.Defects;
@@ -13,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VoidManager.Utilities;
 
 namespace VoidSaving
 {
@@ -112,7 +112,7 @@ namespace VoidSaving
             saveGameData.ShipLoadout = new ShipLoadout(playerShip.GetComponent<PlayerShip>()).AsJObject();
             saveGameData.Relics = Helpers.RelicGUIDsFromShip(playerShip);
             saveGameData.UnlockedBPs = Helpers.UnlockedBPGUIDsFromShip(playerShip);
-            saveGameData.FabricatorTier = playerShip.GetComponent<FabricatorModule>().CurrentTier;
+                saveGameData.FabricatorTier = playerShip.GetComponentInChildren<FabricatorModule>().CurrentTier;
 
             PlayerShipDefectDamageController PSDDC = playerShip.GetComponent<PlayerShipDefectDamageController>();
             saveGameData.RepairableShipHealth = PSDDC._hullDamageController.State.repairableHp;
