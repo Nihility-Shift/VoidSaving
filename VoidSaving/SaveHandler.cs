@@ -195,7 +195,7 @@ namespace VoidSaving
             catch (Exception e)
             {
                 BepinPlugin.Log.LogError("Failed to save data\n" + e);
-                Messaging.Notification("Failed to save data.");
+                Messaging.Notification("<color=red>Failed to save data.</color>");
             }
             return saveGameData;
         }
