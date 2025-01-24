@@ -3,6 +3,7 @@ using CG.Game.SpaceObjects.Controllers;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
+using CG.Ship.Repair;
 using CG.Space;
 using Gameplay.CompositeWeapons;
 using Gameplay.Defects;
@@ -113,11 +114,10 @@ namespace VoidSaving
                 saveGameData.Relics = Helpers.RelicGUIDsFromShip(playerShip);
                 saveGameData.UnlockedBPs = Helpers.UnlockedBPGUIDsFromShip(playerShip);
                 saveGameData.FabricatorTier = playerShip.GetComponentInChildren<FabricatorModule>().CurrentTier;
-
-                PlayerShipDefectDamageController PSDDC = playerShip.GetComponent<PlayerShipDefectDamageController>();
-                saveGameData.RepairableShipHealth = PSDDC._hullDamageController.State.repairableHp;
-                saveGameData.Breaches = Helpers.GetBreachStates(PSDDC._hullDamageController);
-                saveGameData.Defects = Helpers.GetDefectStates(PSDDC);
+                HullDamageController HDC = playerShip.GetComponentInChildren<HullDamageController>();
+                saveGameData.RepairableShipHealth = HDC.State.repairableHp;
+                saveGameData.Breaches = Helpers.GetBreachStates(HDC);
+                saveGameData.Defects = Helpers.GetDefectStates(playerShip.GetComponent<PlayerShipDefectDamageController>());
 
                 List<bool> ShipSystemPoweredValues = new();
                 foreach (CellModule module in playerShip.CoreSystems)

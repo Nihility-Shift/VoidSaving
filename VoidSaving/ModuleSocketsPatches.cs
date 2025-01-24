@@ -70,7 +70,7 @@ namespace VoidSaving
             CodeInstruction[] resourceContainersPatchSequence = new CodeInstruction[]
             {
                 new CodeInstruction(OpCodes.Ldloc_S, (byte)16),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "LoadModuleResourceContainers"))
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "LoadResourceContainers"))
             };
 
             instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.AFTER, CheckMode.NONNULL);
@@ -84,7 +84,7 @@ namespace VoidSaving
             resourceContainersPatchSequence = new CodeInstruction[]
             {
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), "GetComponent", null, new Type[] { typeof(CarryableObject) })),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "LoadModuleResourceContainers"))
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "LoadResourceContainers"))
             };
 
             instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.REPLACE, CheckMode.NONNULL);
@@ -134,7 +134,13 @@ namespace VoidSaving
         {
             CodeInstruction[] tSequence = new CodeInstruction[]
             {
-                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(ResourceAssetContainer<GameObjectContainer, GameObject, GameObjectDef>), "GetAssetDefByID")),
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Ldc_I4_1),
+                new CodeInstruction(OpCodes.Callvirt),
                 new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(ResourceAssetDef<GameObject>), "Ref")),
                 new CodeInstruction(OpCodes.Newobj, AccessTools.Constructor(typeof(ShipAssetRef), new Type[] { typeof(ResourceAssetRef) })),
                 new CodeInstruction(OpCodes.Stelem_Ref),
@@ -147,7 +153,7 @@ namespace VoidSaving
                 new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "SaveModuleResourceContainers"))
             };
 
-            return PatchBySequence(PatchCarryableSockets(instructions), tSequence, pSequence, PatchMode.AFTER);
+            return PatchBySequence(PatchCarryableSockets(instructions), tSequence, pSequence, PatchMode.AFTER, CheckMode.NONNULL);
         }
 
         //Core systems break when utilizing this for loading and it isn't needed right now.

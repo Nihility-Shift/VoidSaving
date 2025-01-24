@@ -2,6 +2,7 @@
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
+using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
 using Client.Utils;
@@ -138,14 +139,14 @@ namespace VoidSaving
             SaveGameData activeData = SaveHandler.ActiveData;
 
             __instance.hitPoints = activeData.ShipHealth;
-            PlayerShipDefectDamageController PSDDC = __instance.GetComponent<PlayerShipDefectDamageController>();
-            PSDDC._hullDamageController.State.repairableHp = activeData.RepairableShipHealth;
-            Helpers.LoadBreachStates(PSDDC._hullDamageController, activeData.Breaches);
-            Helpers.LoadDefectStates(PSDDC, activeData.Defects);
+            HullDamageController HDC = __instance.GetComponentInChildren<HullDamageController>();
+            HDC.State.repairableHp = activeData.RepairableShipHealth;
+            Helpers.LoadBreachStates(HDC, activeData.Breaches);
+            Helpers.LoadDefectStates(__instance.GetComponent<PlayerShipDefectDamageController>(), activeData.Defects);
 
             Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
             Helpers.AddRelicsToShip(__instance, activeData.Relics);
-            __instance.GetComponent<FabricatorModule>().CurrentTier = activeData.FabricatorTier;
+            __instance.GetComponentInChildren<FabricatorModule>().CurrentTier = activeData.FabricatorTier;
 
             ProtectedPowerSystem powerSystem = (ProtectedPowerSystem)__instance.ShipsPowerSystem;
             if (activeData.ShipPowered) { powerSystem.PowerOn(); }
