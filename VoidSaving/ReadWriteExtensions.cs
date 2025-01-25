@@ -299,6 +299,7 @@ namespace VoidSaving
                 Writer.Write(Enhancement.FailureTimeEnd);
                 Writer.Write(Enhancement.LastGrade);
                 Writer.Write(Enhancement.LastDurationMult);
+                Writer.Write(Enhancement.ParentModuleID);
             }
         }
 
@@ -320,6 +321,7 @@ namespace VoidSaving
                     FailureTimeEnd = reader.ReadInt32(),
                     LastGrade = reader.ReadSingle(),
                     LastDurationMult = reader.ReadSingle(),
+                    ParentModuleID = reader.ReadInt16(),
                 };
             }
 

@@ -167,7 +167,7 @@ namespace VoidSaving
 
     public struct EnhancementData
     {
-        public EnhancementData(Enhancement enhancement)
+        public EnhancementData(Enhancement enhancement, int moduleID)
         {
             int currentTimestamp = PhotonNetwork.ServerTimestamp;
             state = enhancement.State;
@@ -179,6 +179,7 @@ namespace VoidSaving
             FailureTimeEnd = enhancement._failureEndTime - currentTimestamp;
             LastGrade = enhancement._lastActivationGrade;
             LastDurationMult = enhancement._lastDurationMultiplier;
+            ParentModuleID = (short)moduleID;
         }
 
         public EnhancementState state;
@@ -194,6 +195,8 @@ namespace VoidSaving
         public int FailureTimeEnd;
 
         public int FailureTimeStart;
+
+        public short ParentModuleID;
 
         public float LastGrade;
 

@@ -1,5 +1,6 @@
 ﻿using CG.Client.Ship;
 using CG.Game.Scenarios;
+using CG.Game.SpaceObjects.Controllers;
 using CG.Objects;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
@@ -156,7 +157,7 @@ namespace VoidSaving
         {
             ShieldSystem shipShields = PlayerShip.GetComponent<ShieldSystem>();
             float[] shieldHealths = new float[4];
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 shieldHealths[i] = shipShields._shields[i].hitPoints;
             }
@@ -165,29 +166,107 @@ namespace VoidSaving
 
         public static EnhancementData[] GetEnhancements(AbstractPlayerControlledShip PlayerShip)
         {
+            //Enhancements do not naturatlly load in the same order, and the best way I came up with to determine the same enhnacement is by basing on the parent module buildsocket index.
+            //The build socket index isn't easily accessible, and so this method gathers that index for saving within the enhancement data.
+
+            //Gather modules w/indexes
+            BuildSocketController BSC = PlayerShip.GetComponent<BuildSocketController>();
+            Dictionary<CellModule, int> ModuleIndexes = new();
+            foreach (BuildSocket socket in BSC.Sockets)
+            {
+                if (socket.InstalledModule != null)
+                {
+                    ModuleIndexes.Add(socket.InstalledModule, socket.Index);
+                }
+            }
+
+            //Convert detected enhancments to enhancement data w/detected indexes. If parent module is not found in gathered modules, module is asumed part of ship systems.
             Enhancement[] DetectedEhancements = PlayerShip.GetComponentsInChildren<Enhancement>();
-            EnhancementData[] Trims = new EnhancementData[DetectedEhancements.Length];
+            EnhancementData[] EnhancementDatas = new EnhancementData[DetectedEhancements.Length];
             for (int i = 0; i < DetectedEhancements.Length; i++)
             {
-                Trims[i] = new EnhancementData(DetectedEhancements[i]);
+                CellModule module = DetectedEhancements[i].GetComponentInParent<CellModule>();
+                if (module != null && ModuleIndexes.TryGetValue(module, out int index))
+                {
+                    EnhancementDatas[i] = new EnhancementData(DetectedEhancements[i], index);
             }
-            return Trims;
+                else
+                {
+                    EnhancementDatas[i] = new EnhancementData(DetectedEhancements[i], -1);
+        }
+            }
+            return EnhancementDatas;
         }
 
-        public static void LoadEnhancements(AbstractPlayerControlledShip PlayerShip, EnhancementData[] Trims)
+        public static void LoadEnhancements(AbstractPlayerControlledShip PlayerShip, EnhancementData[] datas)
         {
+            //Gather modules w/indexes
+            BuildSocketController BSC = PlayerShip.GetComponent<BuildSocketController>();
+            Dictionary<CellModule, int> ModuleIndexes = new();
+            foreach (BuildSocket socket in BSC.Sockets)
+            {
+                if (socket.InstalledModule != null)
+                {
+                    ModuleIndexes.Add(socket.InstalledModule, socket.Index);
+                }
+            }
+
+            //Add detected enhancements with indexes to list.
+            Dictionary<Enhancement, int> EnhancementIndexes = new();
             Enhancement[] DetectedEhancements = PlayerShip.GetComponentsInChildren<Enhancement>();
             for (int i = 0; i < DetectedEhancements.Length; i++)
             {
-                Enhancement enhancement = DetectedEhancements[i];
-                EnhancementData data = Trims[i];
+                CellModule module = DetectedEhancements[i].GetComponentInParent<CellModule>();
+                if (module != null && ModuleIndexes.TryGetValue(module, out int index))
+                {
+                    EnhancementIndexes.Add(DetectedEhancements[i], index);
+                }
+                else
+                {
+                    EnhancementIndexes.Add(DetectedEhancements[i], -1);
+                }
+            }
+
+            //Load input datas
+            foreach (EnhancementData data in datas)
+            {
+                //Find an enhancement with the same module index.
+                Enhancement enhancement = null;
+                foreach (KeyValuePair<Enhancement, int> enhance in EnhancementIndexes)
+                {
+                    if (data.ParentModuleID == enhance.Value)
+                    {
+                        enhancement = enhance.Key;
+                        break;
+                    }
+                }
+                if (enhancement == null)
+                {
+                    BepinPlugin.Log.LogWarning($"Failed to find enhancement for data of module index {data.ParentModuleID}");
+                    continue;
+                }
+                else
+                {
+                    EnhancementIndexes.Remove(enhancement);
+                }
+
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
+                    BepinPlugin.Log.LogInfo($"Loading Enhancement: {enhancement.contextInfo.HeaderText} of moduleIndex {data.ParentModuleID} with data: {data.state} Grade: {data.LastGrade} Duration: {data.LastDurationMult}x");
+
+                try
+                {
                 enhancement.SetState(data.state, data.LastGrade, data.LastDurationMult, false);
-                enhancement._activationStartTime = PhotonNetwork.ServerTimestamp + (int)data.ActivationTimeStart;
-                enhancement._activationEndTime = PhotonNetwork.ServerTimestamp + (int)data.ActivationTimeEnd;
-                enhancement._cooldownStartTime = PhotonNetwork.ServerTimestamp + (int)data.CooldownTimeStart;
-                enhancement._cooldownEndTime = PhotonNetwork.ServerTimestamp + (int)data.CooldownTimeEnd;
-                enhancement._failureStartTime = PhotonNetwork.ServerTimestamp + (int)data.FailureTimeStart;
-                enhancement._failureEndTime = PhotonNetwork.ServerTimestamp + (int)data.FailureTimeEnd;
+                    enhancement._activationStartTime = PhotonNetwork.ServerTimestamp + data.ActivationTimeStart;
+                    enhancement._activationEndTime = PhotonNetwork.ServerTimestamp + data.ActivationTimeEnd;
+                    enhancement._cooldownStartTime = PhotonNetwork.ServerTimestamp + data.CooldownTimeStart;
+                    enhancement._cooldownEndTime = PhotonNetwork.ServerTimestamp + data.CooldownTimeEnd;
+                    enhancement._failureStartTime = PhotonNetwork.ServerTimestamp + data.FailureTimeStart;
+                    enhancement._failureEndTime = PhotonNetwork.ServerTimestamp + data.FailureTimeEnd;
+                }
+                catch (Exception ex)
+                {
+                    BepinPlugin.Log.LogError(ex);
+                }
             }
         }
 
@@ -293,7 +372,7 @@ namespace VoidSaving
             List<sbyte> states = new List<sbyte>();
             foreach (DefectSystem system in damageController._defectSystems)
             {
-                foreach(Defect defect in system.AvailableDefects)
+                foreach (Defect defect in system.AvailableDefects)
                 {
                     states.Add((sbyte)defect.activeStageIndex);
                 }
