@@ -163,7 +163,7 @@ namespace VoidSaving
             List<float> floats = new List<float>(count);
             for (int i = 0; i < count; i++)
             {
-                floats[i] = Reader.ReadSingle();
+                floats.Add(Reader.ReadSingle());
             }
             return floats;
         }
