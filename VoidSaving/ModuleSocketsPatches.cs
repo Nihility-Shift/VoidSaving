@@ -1,5 +1,5 @@
 ﻿using CG.Game;
-﻿using CG.Objects;
+using CG.Objects;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Object;
@@ -79,7 +79,32 @@ namespace VoidSaving
 
             instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.AFTER, CheckMode.NONNULL);
 
-            //Targetting additionall assets. Only carryable object getter which doesn't utilize the return value (devs probably forgot to delete the line, as it does nothing.)
+            //Targetting core system payload objects
+            resourceContainersTargetSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Call),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Stloc_S),
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(CarryablesSocket), "TryInsertCarryable")),
+                new CodeInstruction(OpCodes.Pop),
+            };
+
+            resourceContainersPatchSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)22),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "LoadResourceContainers"))
+            };
+
+            instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.AFTER, CheckMode.NONNULL);
+
+            //Targetting additional assets. Only carryable object getter which doesn't utilize the return value (devs probably forgot to delete the line, as it does nothing.)
             resourceContainersTargetSequence = new CodeInstruction[]
             {
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), "GetComponent", null, new Type[] { typeof(CarryableObject) })),
@@ -93,6 +118,7 @@ namespace VoidSaving
             };
 
             instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.REPLACE, CheckMode.NONNULL);
+
 
 
             //Fix gravity scoop loading
@@ -119,6 +145,7 @@ namespace VoidSaving
         }
 
 
+        //collects battery and ammo can data.
         static void SaveModuleResourceContainers(List<CarryablesSocket> Sockets, int j)
         {
             if (Sockets[j].Payload is ResourceContainer Container)
@@ -134,6 +161,7 @@ namespace VoidSaving
             }
         }
 
+        // Collects list and current index for processing payloads
         [HarmonyPatch(typeof(ShipLoadout), "LoadSocketData"), HarmonyTranspiler]
         static IEnumerable<CodeInstruction> ModuleSocketsSavePatch(IEnumerable<CodeInstruction> instructions)
         {
@@ -161,12 +189,33 @@ namespace VoidSaving
             return PatchBySequence(PatchCarryableSockets(instructions), tSequence, pSequence, PatchMode.AFTER, CheckMode.NONNULL);
         }
 
-        //Core systems break when utilizing this for loading and it isn't needed right now.
-        /*[HarmonyPatch(typeof(ShipLoadout), "LoadCoreSystemData")]
+        // PatchCarryableSockets does not work here, and when I attempted using it broke things.
+        // Collects list and current index for processing payloads
+        [HarmonyPatch(typeof(ShipLoadout), "LoadCoreSystemData"), HarmonyTranspiler]
         static IEnumerable<CodeInstruction> CoreSystemSocketsSavePatch(IEnumerable<CodeInstruction> instructions)
         {
-            return PatchCarryableSockets(instructions);
-        }*/
+            CodeInstruction[] tSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Ldloc_S),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Ldc_I4_1),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(ResourceAssetDef<GameObject>), "Ref")),
+                new CodeInstruction(OpCodes.Newobj, AccessTools.Constructor(typeof(ShipAssetRef), new Type[] { typeof(ResourceAssetRef) })),
+                new CodeInstruction(OpCodes.Stloc_S),
+            };
+
+            CodeInstruction[] pSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)5),
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)6),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "SaveModuleResourceContainers"))
+            };
+            return PatchBySequence(instructions, tSequence, pSequence, PatchMode.AFTER, CheckMode.NONNULL);
+        }
 
 
         //Save Power and Ammo Resource Containers.
