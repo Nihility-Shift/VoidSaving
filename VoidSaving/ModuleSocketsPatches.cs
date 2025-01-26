@@ -30,10 +30,10 @@ namespace VoidSaving
         //Add Carryables Sockets list for Gravity scoops
         static void MSLPatchMethod(CellModule module, List<CarryablesSocket> sockets)
         {
-            if (sockets.Count == 0 && module is GravityScoopModule GSModule)
+            if (sockets.Count == 0 && module is GravityScoopModule or ChargeStationModule)
             {
-                BepinPlugin.Log.LogInfo($"Attempting to patch GravScoop. {GSModule.CarryablesSockets.Count} sockets found.");
-                sockets.AddRange(GSModule.CarryablesSockets);
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Attempting to patch GravScoop or batteryCharger. {module.CarryablesSockets.Count} sockets found.");
+                sockets.AddRange(module.CarryablesSockets);
             }
         }
 
@@ -75,6 +75,7 @@ namespace VoidSaving
 
             instructions = PatchBySequence(instructions, resourceContainersTargetSequence, resourceContainersPatchSequence, PatchMode.AFTER, CheckMode.NONNULL);
 
+            //Targetting additionall assets. Only carryable object getter which doesn't utilize the return value (devs probably forgot to delete the line, as it does nothing.)
             resourceContainersTargetSequence = new CodeInstruction[]
             {
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), "GetComponent", null, new Type[] { typeof(CarryableObject) })),
