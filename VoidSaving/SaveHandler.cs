@@ -264,6 +264,7 @@ namespace VoidSaving
                         data.Alloy = reader.ReadInt32();
                         data.Biomass = reader.ReadInt32();
                         data.ShipHealth = reader.ReadSingle();
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         data.ShipLoadoutGUID = reader.ReadGUIDUnion();
                         data.ShipLoadout = reader.ReadJObject();
@@ -272,6 +273,7 @@ namespace VoidSaving
                         data.Relics = reader.ReadGUIDUnionArray();
                         data.UnlockedBPs = reader.ReadGUIDUnionArray();
                         data.FabricatorTier = reader.ReadByte();
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.RepairableShipHealth = reader.ReadSingle();
                         data.Breaches = reader.ReadByteArray();
@@ -288,6 +290,7 @@ namespace VoidSaving
                         data.KPDBullets = reader.ReadSingleArray();
                         data.LifeSupportModeSwitches = reader.ReadByteArray();
                         data.AutoMechanicSwitches = reader.ReadByteArray();
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.BoosterStates = reader.ReadBoosterStatuses();
                         data.ShieldHealths = reader.ReadSingleArray();
@@ -295,6 +298,7 @@ namespace VoidSaving
                         data.AtmosphereValues = reader.ReadAtmosphereValues();
                         data.DoorStates = reader.ReadBooleanArray();
                         data.AirlockSafeties = reader.ReadBooleanArray();
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.Seed = reader.ReadInt32();
                         data.ParametersSeed = reader.ReadInt32();
@@ -310,11 +314,12 @@ namespace VoidSaving
                         data.EnemyLevelRangeMax = reader.ReadInt32();
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.CompletedSectors = reader.ReadSectors();
                         data.SessionStats = reader.ReadSessionStats();
 
-                        BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
+                        BepinPlugin.Log.LogInfo($"Finalized read at {fileStream.Position} Bytes");
                     }
                 }
             }
@@ -359,6 +364,7 @@ namespace VoidSaving
                         writer.Write(data.Alloy);
                         writer.Write(data.Biomass);
                         writer.Write(data.ShipHealth);
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.ShipLoadoutGUID);
                         writer.Write(data.ShipLoadout);
@@ -367,6 +373,7 @@ namespace VoidSaving
                         writer.Write(data.Relics);
                         writer.Write(data.UnlockedBPs);
                         writer.Write((byte)data.FabricatorTier);
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.RepairableShipHealth);
                         writer.WriteByteArray(data.Breaches);
@@ -374,6 +381,7 @@ namespace VoidSaving
 
                         writer.Write(data.ShipPowered);
                         writer.Write(data.BreakerData);
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.ShipSystemPowerStates);
                         writer.Write(data.ModulePowerStates);
@@ -383,6 +391,7 @@ namespace VoidSaving
                         writer.Write(data.KPDBullets);
                         writer.WriteByteArray(data.LifeSupportModeSwitches);
                         writer.WriteByteArray(data.AutoMechanicSwitches);
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.BoosterStates);
                         writer.Write(data.ShieldHealths);
@@ -390,6 +399,7 @@ namespace VoidSaving
                         writer.Write(data.AtmosphereValues);
                         writer.Write(data.DoorStates);
                         writer.Write(data.AirlockSafeties);
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.Seed);
                         writer.Write(data.ParametersSeed);
@@ -405,11 +415,12 @@ namespace VoidSaving
                         writer.Write(data.EnemyLevelRangeMax);
                         writer.Write(data.SectorsUsedInSolarSystem);
                         writer.Write(data.SectorsToUseInSolarSystem);
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.CompletedSectors);
                         writer.Write(data.SessionStats);
 
-                        BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
+                        BepinPlugin.Log.LogInfo($"Finalized write at {fileStream.Length} Bytes");
                     }
                 }
                 return true;
