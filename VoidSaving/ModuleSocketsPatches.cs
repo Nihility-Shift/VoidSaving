@@ -1,3 +1,4 @@
+﻿using CG.Game;
 ﻿using CG.Objects;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
@@ -38,9 +39,12 @@ namespace VoidSaving
         }
 
 
+        //Assigns space platform (prevents objects getting deleted on loading jump)
         //Run as carryables are loade, utilizing resource values from active data.
         static void LoadResourceContainers(CarryableObject carryable)
         {
+            carryable.SetPlatform(ClientGame.Current.PlayerShip.Platform);
+
             if (carryable is ResourceContainer resourceContainer)
             {
                 if (resourceContainer is PowerResourceContainer)
