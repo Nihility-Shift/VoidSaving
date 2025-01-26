@@ -258,6 +258,9 @@ namespace VoidSaving
                     using (BinaryReader reader = new BinaryReader(fileStream))
                     {
                         data.SaveDataVersion = reader.ReadUInt32();
+                        data.SaveID = reader.ReadString();
+                        data.IronManMode = reader.ReadBoolean();
+
                         data.Alloy = reader.ReadInt32();
                         data.Biomass = reader.ReadInt32();
                         data.ShipHealth = reader.ReadSingle();
@@ -350,6 +353,9 @@ namespace VoidSaving
                     using (BinaryWriter writer = new BinaryWriter(fileStream))
                     {
                         writer.Write(data.SaveDataVersion);
+                        writer.Write(data.SaveID);
+                        writer.Write(data.IronManMode);
+
                         writer.Write(data.Alloy);
                         writer.Write(data.Biomass);
                         writer.Write(data.ShipHealth);

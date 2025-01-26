@@ -11,10 +11,13 @@ namespace VoidSaving
 {
     public class SaveGameData
     {
-        public string FileName;
-
         public uint SaveDataVersion = 0;
 
+        public string FileName;
+
+        public string SaveID = string.Empty; // Utilized to organize iron-man saves
+
+        public bool IronManMode;
 
         //Data about resources
         public int Alloy;
