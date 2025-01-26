@@ -69,32 +69,36 @@ namespace VoidSaving
 
         public static SectorData[] GetCompletedSectorDatas(List<GameSessionSector> sectors)
         {
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collecting data of {sectors.Count()} sectors");
             SectorData[] sectorDatas = new SectorData[sectors.Count - 1];
-            for (int i = 1; i < sectors.Count; i++) //start at 1 to ignore starting sector
+            for (int i = 1; i < sectorDatas.Length; i++) //start at 1 to ignore starting sector
             {
                 GameSessionSector sector = sectors[i];
-
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Converting sector data");
                 sectorDatas[i] = new SectorData(sector.SectorObjective?.Objective.Asset.assetGuid ?? default, sector.Difficulty.DifficultyModifier, sector.ObjectiveState);
             }
-
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collected data of {sectorDatas.Length} sectors");
             return sectorDatas;
         }
 
         public static List<GameSessionSector> LoadCompletedSectors(EndlessQuest endlessQuest, SectorData[] sectorDatas)
         {
             List<GameSessionSector> CompletedSectors = new List<GameSessionSector>();
-
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Loading data of {sectorDatas.Count()} sectors");
             foreach (SectorData sectorData in sectorDatas)
             {
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Running sector data load loop");
+                if (sectorData.ObjectiveGUID == default) { BepinPlugin.Log.LogWarning("Detected default GUID on completed sector load."); continue; } //Skip null/empty GUIDs.
                 GameSessionSector sector = new GameSessionSector(new Code.Gameplay.Sector());
                 GameSessionSectorObjective objective = new GameSessionSectorObjective();
-                objective.Objective = new Objective(endlessQuest.context.NextSectionParameters.ViableMainObjectives.First(thing => thing.AssetGuid == sectorData.ObjectiveGUID).Asset);
+                objective.Objective = new Objective(endlessQuest.context.NextSectionParameters.ViableMainObjectives.FirstOrDefault(thing => thing.AssetGuid == sectorData.ObjectiveGUID).Asset);
                 objective.Objective.State = sectorData.State;
 
                 sector.SectorObjective = objective;
                 sector.Difficulty.DifficultyModifier = sectorData.Difficulty;
                 CompletedSectors.Add(sector);
             }
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Loaded data of {CompletedSectors.Count()} sectors");
             return CompletedSectors;
         }
 
@@ -189,11 +193,11 @@ namespace VoidSaving
                 if (module != null && ModuleIndexes.TryGetValue(module, out int index))
                 {
                     EnhancementDatas[i] = new EnhancementData(DetectedEhancements[i], index);
-            }
+                }
                 else
                 {
                     EnhancementDatas[i] = new EnhancementData(DetectedEhancements[i], -1);
-        }
+                }
             }
             return EnhancementDatas;
         }
@@ -255,7 +259,7 @@ namespace VoidSaving
 
                 try
                 {
-                enhancement.SetState(data.state, data.LastGrade, data.LastDurationMult, false);
+                    enhancement.SetState(data.state, data.LastGrade, data.LastDurationMult, false);
                     enhancement._activationStartTime = PhotonNetwork.ServerTimestamp + data.ActivationTimeStart;
                     enhancement._activationEndTime = PhotonNetwork.ServerTimestamp + data.ActivationTimeEnd;
                     enhancement._cooldownStartTime = PhotonNetwork.ServerTimestamp + data.CooldownTimeStart;

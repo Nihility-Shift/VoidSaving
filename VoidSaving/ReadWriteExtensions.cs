@@ -197,6 +197,7 @@ namespace VoidSaving
         public static void Write(this BinaryWriter Writer, SectorData[] sectorDatas)
         {
             Writer.Write(sectorDatas.Length);
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Writing {sectorDatas.Length} sector datas");
             foreach (SectorData sectorData in sectorDatas)
             {
                 Writer.Write(sectorData.ObjectiveGUID);
@@ -210,7 +211,7 @@ namespace VoidSaving
         {
             int length = reader.ReadInt32();
             SectorData[] sectors = new SectorData[length];
-
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Reading {length} sector datas");
             for (int i = 0; i < length; i++)
             {
                 sectors[i] = new SectorData()
