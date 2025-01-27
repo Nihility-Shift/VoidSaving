@@ -1,5 +1,6 @@
 ﻿using CG.Game;
 using CG.Game.SpaceObjects.Controllers;
+using CG.GameLoopStateMachine.GameStates;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
@@ -143,7 +144,6 @@ namespace VoidSaving
             HullDamageController HDC = __instance.GetComponentInChildren<HullDamageController>();
             HDC.State.repairableHp = activeData.RepairableShipHealth;
             Helpers.LoadBreachStates(HDC, activeData.Breaches);
-            Helpers.LoadDefectStates(__instance.GetComponent<PlayerShipDefectDamageController>(), activeData.Defects);
 
             Helpers.AddBlueprintsToFabricator(__instance, activeData.UnlockedBPs);
             Helpers.AddRelicsToShip(__instance, activeData.Relics);
@@ -230,41 +230,28 @@ namespace VoidSaving
         }
 
 
-        //Loads shield hitpoints after all shields loaded.
-        [HarmonyPatch(typeof(ShieldSystem), "AddShield"), HarmonyPostfix]
-        static void LoadShieldHealthPatch(ShieldSystem __instance)
+        //Load Alloy, biomass and sheilds post OnEnter (alloy assigned late in the target method, shield healths assigned in unordered start methods
+        [HarmonyPatch(typeof(GSIngame), "OnEnter"), HarmonyPostfix]
+        static void PostInGameLoadPatch()
         {
             if (!SaveHandler.LoadSavedData) return;
 
+            GameSessionSuppliesManager.Instance.AlloyAmount = SaveHandler.ActiveData.Alloy;
+            GameSessionSuppliesManager.Instance.BiomassAmount = SaveHandler.ActiveData.Biomass;
 
-            if (__instance._shields.Count == 4)
+            AbstractPlayerControlledShip playerShip = ClientGame.Current.PlayerShip;
+
+            ShieldSystem ShipShields = playerShip.GetComponent<ShieldSystem>();
+            for (int i = 0; i < 4; i++)
             {
-                for (int i = 0; i < 4; i++)
-                {
-                    __instance._shields[i].hitPoints = SaveHandler.ActiveData.ShieldHealths[i];
-                }
-                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.ShieldHealth);
+                ShipShields._shields[i].hitPoints = SaveHandler.ActiveData.ShieldHealths[i];
+                ShipShields._shields[i].UpdateShieldState();
             }
-        }
 
+            //Defects loaded post-start due to the DamageController gathering defectSystems via start methods.
+            Helpers.LoadDefectStates(playerShip.GetComponent<PlayerShipDefectDamageController>(), SaveHandler.ActiveData.Defects);
 
-        //Biomass and alloy are loaded after the ship, from the bonus value getters below.
-        [HarmonyPatch(typeof(GameSessionSuppliesManager), "GetTotalPlayerBiomassBonus"), HarmonyPostfix]
-        static void LoadBiomass(ref int __result)
-        {
-            if (!SaveHandler.LoadSavedData) return;
-
-            __result = SaveHandler.ActiveData.Biomass;
-            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.BiomassLoaded);
-        }
-
-        [HarmonyPatch(typeof(GameSessionSuppliesManager), "GetTotalPlayerAlloyBonus"), HarmonyPostfix]
-        static void LoadAlloy(ref int __result)
-        {
-            if (!SaveHandler.LoadSavedData) return;
-
-            __result = SaveHandler.ActiveData.Alloy;
-            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.AlloysLoaded);
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }
     }
 }
