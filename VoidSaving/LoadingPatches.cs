@@ -1,4 +1,5 @@
-﻿using CG.Game.SpaceObjects.Controllers;
+﻿using CG.Game;
+using CG.Game.SpaceObjects.Controllers;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
@@ -210,8 +211,7 @@ namespace VoidSaving
 
             Helpers.LoadEnhancements(__instance, activeData.Enhancements);
             Helpers.LoadBoosterStates(__instance, activeData.BoosterStates);
-            Helpers.LoadVoidDriveModule(__instance, activeData.JumpModule);
-            Helpers.LoadAtmosphereValues(__instance, activeData.AtmosphereValues);
+            Helpers.LoadAtmosphereValues(__instance, activeData.AtmosphereValues, activeData.AtmosphereBufferValues);
             Helpers.LoadDoorStates(__instance, activeData.DoorStates);
             Helpers.LoadAirlockSafeties(__instance, activeData.AirlockSafeties);
 
@@ -228,6 +228,10 @@ namespace VoidSaving
             __instance.DebugTransitionToRotatingState();
             __instance.DebugTransitionToSpinningUpState();
             __instance.DebugTransitionToTravellingState();
+
+
+            //Load module state after jumping.
+            Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
         }
 

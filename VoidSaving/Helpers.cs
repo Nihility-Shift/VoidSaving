@@ -299,7 +299,10 @@ namespace VoidSaving
         {
             VoidDriveModule drive = playerShip.GetComponentInChildren<VoidDriveModule>();
 
-            drive.engineChargedStates = data.engineChargedStates;
+            for (int i = 0; i < data.engineChargedStates.Length; i++)
+            {
+                drive.SetEngineCharging(i, data.engineChargedStates[i], new PhotonMessageInfo(PhotonNetwork.LocalPlayer, PhotonNetwork.ServerTimestamp, null));
+            }
             drive.JumpCharge = data.JumpCharge;
         }
 
