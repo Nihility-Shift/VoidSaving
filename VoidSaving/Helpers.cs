@@ -190,6 +190,7 @@ namespace VoidSaving
             for (int i = 0; i < DetectedEhancements.Length; i++)
             {
                 CellModule module = DetectedEhancements[i].GetComponentInParent<CellModule>();
+
                 if (module != null && ModuleIndexes.TryGetValue(module, out int index))
                 {
                     EnhancementDatas[i] = new EnhancementData(DetectedEhancements[i], index);
@@ -197,6 +198,13 @@ namespace VoidSaving
                 else
                 {
                     EnhancementDatas[i] = new EnhancementData(DetectedEhancements[i], -1);
+                }
+
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
+                {
+                    EnhancementData thingy = EnhancementDatas[i];
+                    Enhancement thing = DetectedEhancements[i];
+                    BepinPlugin.Log.LogInfo($"Collected Enhancement: {thing.contextInfo.HeaderText} {thing.name} of moduleIndex {thingy.ParentModuleID} with data: {thingy.state} Grade: {thingy.LastGrade} Duration: {thingy.LastDurationMult}x");
                 }
             }
             return EnhancementDatas;
@@ -255,7 +263,7 @@ namespace VoidSaving
                 }
 
                 if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
-                    BepinPlugin.Log.LogInfo($"Loading Enhancement: {enhancement.contextInfo.HeaderText} of moduleIndex {data.ParentModuleID} with data: {data.state} Grade: {data.LastGrade} Duration: {data.LastDurationMult}x");
+                    BepinPlugin.Log.LogInfo($"Loading Enhancement: {enhancement.contextInfo.HeaderText} {enhancement.name} of moduleIndex {data.ParentModuleID} with data: {data.state} Grade: {data.LastGrade} Duration: {data.LastDurationMult}x");
 
                 try
                 {

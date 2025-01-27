@@ -156,14 +156,8 @@ namespace VoidSaving
             int InstalledModuleIndex = 0;
             foreach (CellModule module in __instance.CoreSystems)
             {
-                if (module != null && module.PowerDrain != null)
-                {
-                    if (activeData.ShipSystemPowerStates[InstalledModuleIndex])
-                    {
-                        module.TurnOn();
-                    }
-                    InstalledModuleIndex++;
-                }
+                if (activeData.ShipSystemPowerStates[InstalledModuleIndex]) module.TurnOn();
+                InstalledModuleIndex++;
             }
 
             BuildSocketController bsc = __instance.GetComponent<BuildSocketController>();
@@ -243,9 +237,9 @@ namespace VoidSaving
             if (!SaveHandler.LoadSavedData) return;
 
 
-            if(__instance._shields.Count == 4)
+            if (__instance._shields.Count == 4)
             {
-                for(int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     __instance._shields[i].hitPoints = SaveHandler.ActiveData.ShieldHealths[i];
                 }

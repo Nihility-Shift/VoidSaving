@@ -122,9 +122,7 @@ namespace VoidSaving
 
                 List<bool> ShipSystemPoweredValues = new();
                 foreach (CellModule module in playerShip.CoreSystems)
-                {
                     ShipSystemPoweredValues.Add(module.IsPowered);
-                }
                 saveGameData.ShipSystemPowerStates = ShipSystemPoweredValues.ToArray();
 
                 BuildSocketController bsc = playerShip.GetComponent<BuildSocketController>();
