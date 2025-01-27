@@ -208,6 +208,8 @@ namespace VoidSaving
             AbstractPlayerShipStart = 2,
             QuestData = 4,
             ShieldHealth = 8,
+            BiomassLoaded = 16,
+            AlloysLoaded = 32,
         }
 
         static LoadingStage CompletedStages;
@@ -217,7 +219,7 @@ namespace VoidSaving
             CompletedStages |= stage;
             BepinPlugin.Log.LogInfo("Completed Loading Stage: " + stage);
             
-            if (CompletedStages == (LoadingStage.VoidJumpStart | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData | LoadingStage.ShieldHealth))
+            if (CompletedStages == (LoadingStage.VoidJumpStart | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData | LoadingStage.ShieldHealth | LoadingStage.BiomassLoaded | LoadingStage.AlloysLoaded))
             {
                 BepinPlugin.Log.LogInfo("Finished all loading stages");
                 LatestData = ActiveData;

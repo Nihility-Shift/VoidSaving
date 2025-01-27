@@ -215,9 +215,6 @@ namespace VoidSaving
             Helpers.LoadDoorStates(__instance, activeData.DoorStates);
             Helpers.LoadAirlockSafeties(__instance, activeData.AirlockSafeties);
 
-            GameSessionSuppliesManager.Instance.AlloyAmount = activeData.Alloy;
-            GameSessionSuppliesManager.Instance.BiomassAmount = activeData.Biomass;
-
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.AbstractPlayerShipStart);
         }
 
@@ -250,6 +247,26 @@ namespace VoidSaving
                 }
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.ShieldHealth);
             }
+        }
+
+
+        //Biomass and alloy are loaded after the ship, from the bonus value getters below.
+        [HarmonyPatch(typeof(GameSessionSuppliesManager), "GetTotalPlayerBiomassBonus"), HarmonyPostfix]
+        static void LoadBiomass(ref int __result)
+        {
+            if (!SaveHandler.LoadSavedData) return;
+
+            __result = SaveHandler.ActiveData.Biomass;
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.BiomassLoaded);
+        }
+
+        [HarmonyPatch(typeof(GameSessionSuppliesManager), "GetTotalPlayerAlloyBonus"), HarmonyPostfix]
+        static void LoadAlloy(ref int __result)
+        {
+            if (!SaveHandler.LoadSavedData) return;
+
+            __result = SaveHandler.ActiveData.Alloy;
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.AlloysLoaded);
         }
     }
 }
