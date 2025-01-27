@@ -5,6 +5,7 @@ using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
 using CG.Ship.Repair;
 using CG.Space;
+using Gameplay.Atmosphere;
 using Gameplay.CompositeWeapons;
 using Gameplay.Defects;
 using Gameplay.Power;
@@ -174,7 +175,9 @@ namespace VoidSaving
                 saveGameData.ShieldHealths = Helpers.GetShipShieldHealths(playerShip);
                 saveGameData.Enhancements = Helpers.GetEnhancements(playerShip);
                 saveGameData.JumpModule = new VoidDriveModuleData(playerShip.GetComponentInChildren<VoidDriveModule>());
-                saveGameData.AtmosphereValues = Helpers.GetAtmosphereValues(playerShip);
+                Tuple<AtmosphereValues[], AtmosphereValues[]> AtmosDatas = Helpers.GetAtmosphereValues(playerShip);
+                saveGameData.AtmosphereValues = AtmosDatas.Item1;
+                saveGameData.AtmosphereBufferValues = AtmosDatas.Item2;
                 saveGameData.DoorStates = Helpers.GetDoorStates(playerShip);
                 saveGameData.AirlockSafeties = Helpers.GetAirlockSafeties(playerShip);
 
@@ -298,6 +301,7 @@ namespace VoidSaving
                         data.ShieldHealths = reader.ReadSingleArray();
                         data.JumpModule = reader.ReadVoidDriveData();
                         data.AtmosphereValues = reader.ReadAtmosphereValues();
+                        data.AtmosphereBufferValues = reader.ReadAtmosphereValues();
                         data.DoorStates = reader.ReadBooleanArray();
                         data.AirlockSafeties = reader.ReadBooleanArray();
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
@@ -399,6 +403,7 @@ namespace VoidSaving
                         writer.Write(data.ShieldHealths);
                         writer.Write(data.JumpModule);
                         writer.Write(data.AtmosphereValues);
+                        writer.Write(data.AtmosphereBufferValues);
                         writer.Write(data.DoorStates);
                         writer.Write(data.AirlockSafeties);
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");

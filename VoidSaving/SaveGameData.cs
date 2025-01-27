@@ -64,6 +64,8 @@ namespace VoidSaving
 
         public AtmosphereValues[] AtmosphereValues;
 
+        public AtmosphereValues[] AtmosphereBufferValues;
+
         public bool[] DoorStates;
 
         public bool[] AirlockSafeties;

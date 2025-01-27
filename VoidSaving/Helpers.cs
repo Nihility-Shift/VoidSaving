@@ -307,19 +307,20 @@ namespace VoidSaving
         }
 
 
-        public static AtmosphereValues[] GetAtmosphereValues(AbstractPlayerControlledShip playerShip)
+        public static Tuple<AtmosphereValues[], AtmosphereValues[]> GetAtmosphereValues(AbstractPlayerControlledShip playerShip)
         {
             Atmosphere atmosphere = playerShip.GetComponentInChildren<Atmosphere>();
-            return atmosphere.Atmospheres.elements.ToArray();
+            return new Tuple<AtmosphereValues[], AtmosphereValues[]>(atmosphere.Atmospheres.elements.ToArray(), atmosphere._buffer.ToArray());
         }
 
-        public static void LoadAtmosphereValues(AbstractPlayerControlledShip playerShip, AtmosphereValues[] data)
+        public static void LoadAtmosphereValues(AbstractPlayerControlledShip playerShip, AtmosphereValues[] data, AtmosphereValues[] bufferData)
         {
             Atmosphere atmosphere = playerShip.GetComponentInChildren<Atmosphere>();
             for (int i = 0; i < data.Count(); i++)
             {
                 atmosphere.RoomAtmospheres.SetElementAt(i, data[i]);
             }
+            atmosphere._buffer = bufferData.ToList();
         }
 
 
