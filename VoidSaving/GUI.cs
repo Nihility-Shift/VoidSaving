@@ -101,6 +101,10 @@ namespace VoidSaving
                 {
                     Label("Not in Void Jump");
                 }
+                else if(!SaveHandler.StartedAsHost)
+                {
+                    Label("Must be the original host of the session.");
+                }
                 else
                 {
                     ToSaveFileName = TextField(ToSaveFileName);

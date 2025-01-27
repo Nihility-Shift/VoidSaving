@@ -9,7 +9,7 @@ namespace VoidSaving
     {
         static void Postfix()
         {
-            if (!Config.AutoSavingEnabled.Value || SaveHandler.LoadSavedData) return;
+            if (!Config.AutoSavingEnabled.Value || SaveHandler.LoadSavedData || !SaveHandler.StartedAsHost) return;
 
             Config.LastAutoSave.Value++;
             if (Config.LastAutoSave.Value > Config.AutoSaveLimit.Value)
