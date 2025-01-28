@@ -239,21 +239,21 @@ namespace VoidSaving
         /// <summary>
         /// Loads file with name from save directory
         /// </summary>
-        /// <param name="SaveName">File name and extension</param>
+        /// <param name="SaveName">File name</param>
         public static bool LoadSave(string SaveName)
         {
-            SaveName = Path.Combine(SaveLocation, SaveName);
+            string FullSavePath = Path.Combine(SaveLocation, SaveName + SaveExtension);
 
-            BepinPlugin.Log.LogInfo("Attempting to load save: " + SaveName);
+            BepinPlugin.Log.LogInfo("Attempting to load save: " + FullSavePath);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(SaveName));
+            Directory.CreateDirectory(Path.GetDirectoryName(FullSavePath));
 
             SaveGameData data = new SaveGameData();
             data.FileName = SaveName.Replace(SaveExtension, string.Empty);
 
             try
             {
-                using (FileStream fileStream = File.OpenRead(SaveName))
+                using (FileStream fileStream = File.OpenRead(FullSavePath))
                 {
                     BepinPlugin.Log.LogInfo($"Starting read save: {fileStream.Length} Bytes");
                     using (BinaryReader reader = new BinaryReader(fileStream))
@@ -327,7 +327,7 @@ namespace VoidSaving
             }
             catch (Exception ex)
             {
-                BepinPlugin.Log.LogError($"Failed to load save {SaveName}\n{ex.Message}");
+                BepinPlugin.Log.LogError($"Failed to load save {FullSavePath}\n{ex.Message}");
                 return false;
             }
 
@@ -341,23 +341,27 @@ namespace VoidSaving
         /// <summary>
         /// Writes file to path. Adds extension if missing.
         /// </summary>
-        /// <param name="SavePath">Full save path with/without extension</param>
+        /// <param name="FileName">File name with/without extension</param>
         /// <returns>Success</returns>
-        public static bool WriteSave(string SavePath)
+        public static bool WriteSave(string FileName)
         {
-            BepinPlugin.Log.LogInfo("Attempting to write save: " + SavePath);
+            string fullSavePath = Path.Combine(SaveLocation, FileName);
 
-            if (!SavePath.EndsWith(SaveExtension))
+            BepinPlugin.Log.LogInfo("Attempting to write save: " + fullSavePath);
+
+            if (!fullSavePath.EndsWith(SaveExtension))
             {
-                SavePath += SaveExtension;
+                fullSavePath += SaveExtension;
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(SavePath));
+            string safePath = fullSavePath + ".safe";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(fullSavePath));
 
             SaveGameData data = GetSessionSaveGameData();
             try
             {
-                using (FileStream fileStream = File.Create(SavePath))
+                using (FileStream fileStream = File.Create(safePath))
                 {
                     using (BinaryWriter writer = new BinaryWriter(fileStream))
                     {
@@ -428,12 +432,15 @@ namespace VoidSaving
                         BepinPlugin.Log.LogInfo($"Finalized write at {fileStream.Length} Bytes");
                     }
                 }
+                File.Delete(fullSavePath);
+                File.Move(safePath, fullSavePath);
                 return true;
             }
             catch (Exception ex)
             {
                 BepinPlugin.Log.LogError(ex);
             }
+
             return false;
         }
     }

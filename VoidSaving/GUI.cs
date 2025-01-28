@@ -76,7 +76,7 @@ namespace VoidSaving
                 }
                 else if (Button(SaveHandler.LoadSavedData ? $"Loading {SelectedSaveName} on next session start" : "Load Save"))
                 {
-                    FailedToLoadLastSave = !SaveHandler.LoadSave(SelectedSaveName + SaveHandler.SaveExtension);
+                    FailedToLoadLastSave = !SaveHandler.LoadSave(SelectedSaveName);
                 }
 
                 if (FailedToLoadLastSave)
@@ -111,7 +111,7 @@ namespace VoidSaving
 
                     if(Button("Save Game"))
                     {
-                        SaveHandler.WriteSave(Path.Combine(SaveHandler.SaveLocation, ToSaveFileName));
+                        SaveHandler.WriteSave(ToSaveFileName);
                     }
                 }
             }

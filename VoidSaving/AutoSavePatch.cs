@@ -16,7 +16,7 @@ namespace VoidSaving
             {
                 Config.LastAutoSave.Value = 1;
             }
-            SaveHandler.WriteSave(Path.Combine(SaveHandler.SaveLocation, $"AutoSave_{Config.LastAutoSave.Value}"));
+            SaveHandler.WriteSave($"AutoSave_{Config.LastAutoSave.Value}");
         }
     }
 }
