@@ -11,7 +11,7 @@ namespace VoidSaving
 {
     public class SaveGameData
     {
-        public uint SaveDataVersion = 0;
+        public uint SaveDataVersion;
 
         public string FileName;
 

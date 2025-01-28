@@ -336,6 +336,8 @@ namespace VoidSaving
             return true;
         }
 
+        public const uint CurrentDataVersion = 0;
+
         /// <summary>
         /// Writes file to path. Adds extension if missing.
         /// </summary>
@@ -359,7 +361,7 @@ namespace VoidSaving
                 {
                     using (BinaryWriter writer = new BinaryWriter(fileStream))
                     {
-                        writer.Write(data.SaveDataVersion);
+                        writer.Write(CurrentDataVersion);
                         writer.Write(data.SaveID);
                         writer.Write(data.IronManMode);
 
