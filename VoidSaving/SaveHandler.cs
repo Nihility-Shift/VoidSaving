@@ -249,7 +249,7 @@ namespace VoidSaving
             Directory.CreateDirectory(Path.GetDirectoryName(FullSavePath));
 
             SaveGameData data = new SaveGameData();
-            data.FileName = SaveName.Replace(SaveExtension, string.Empty);
+            data.FileName = SaveName;
 
             try
             {
