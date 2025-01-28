@@ -15,6 +15,7 @@ namespace VoidSaving
 {
     //Ship Load attempts to utilize carryable socket provider's carryables sockets, but these are not available on ship load.
     //Attempt to replace with connected sockets, which should get added to by individual mod slot components on awake.
+    //Also loading/saving ammo and power containers
     [HarmonyPatch]
     class ModuleSocketsLoadPatches
     {

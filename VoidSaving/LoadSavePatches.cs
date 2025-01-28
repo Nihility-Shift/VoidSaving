@@ -18,7 +18,7 @@ using ToolClasses;
 namespace VoidSaving
 {
     [HarmonyPatch]
-    internal class LoadingPatches
+    internal class LoadSavePatches
     {
         [HarmonyPatch(typeof(Quest), "NextJumpInterdictionCheck"), HarmonyPostfix]
         static void NJISeedCheck(int seed)
