@@ -66,7 +66,7 @@ namespace VoidSaving
             {
                 ConfirmedDelete = false;
                 SaveNames.Remove(ToDeleteFileName);
-                SaveHandler.DeleteSaveFile(ToDeleteFileName + SaveHandler.SaveExtension);
+                SaveHandler.DeleteSaveFile(ToDeleteFileName);
                 ToDeleteFileName = null;
             }
         }

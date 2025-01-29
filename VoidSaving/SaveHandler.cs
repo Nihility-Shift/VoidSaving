@@ -91,10 +91,13 @@ namespace VoidSaving
         }*/
 
 
-
+        /// <summary>
+        /// Deletes file of given name from save location;
+        /// </summary>
+        /// <param name="SaveName"></param>
         internal static void DeleteSaveFile(string SaveName)
         {
-            File.Delete(Path.Combine(SaveLocation, SaveName));
+            File.Delete(Path.Combine(SaveLocation, SaveName + SaveExtension));
         }
 
         internal static Dictionary<string, DateTime> GetSaveFileNames()
