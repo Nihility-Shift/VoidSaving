@@ -125,6 +125,8 @@ namespace VoidSaving
                 }
                 else
                 {
+                    DrawSaveFileList();
+
                     SaveName = TextField(SaveName);
 
                     if (ErrorMessage != null)
