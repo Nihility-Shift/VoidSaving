@@ -10,6 +10,7 @@ namespace VoidSaving
             LastSave = configFile.Bind("Settings", "LastSave", string.Empty);
             AutoSavingEnabled = configFile.Bind("Settings", "AutoSaving", true);
             AutoSaveLimit = configFile.Bind("Settings", "AutoSaveLimit", 10);
+            DefaultIronMan = configFile.Bind("Settings", "DefaultIronManMode", true);
             LastAutoSave = configFile.Bind("Data", "LastAutoSave", 0);
         }
 
@@ -18,5 +19,6 @@ namespace VoidSaving
         internal static ConfigEntry<bool> AutoSavingEnabled;
         internal static ConfigEntry<int> AutoSaveLimit;
         internal static ConfigEntry<int> LastAutoSave;
+        internal static ConfigEntry<bool> DefaultIronMan;
     }
 }

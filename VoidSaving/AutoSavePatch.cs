@@ -1,6 +1,5 @@
 ﻿using CG.Game.SpaceObjects.Controllers;
 using HarmonyLib;
-using System.IO;
 
 namespace VoidSaving
 {
@@ -10,6 +9,17 @@ namespace VoidSaving
         static void Postfix()
         {
             if (!Config.AutoSavingEnabled.Value || SaveHandler.LoadSavedData || !SaveHandler.StartedAsHost) return;
+
+
+            if (SaveHandler.IsIronManMode)
+            {
+                if (SaveHandler.LastSaveName == null)
+                {
+                    SaveHandler.LatestData.FileName = SaveHandler.GetNextIronManSaveName();
+                }
+                SaveHandler.WriteSave(SaveHandler.LastSaveName);
+            }
+
 
             Config.LastAutoSave.Value++;
             if (Config.LastAutoSave.Value > Config.AutoSaveLimit.Value)

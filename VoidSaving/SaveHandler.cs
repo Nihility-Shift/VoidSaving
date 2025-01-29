@@ -58,6 +58,25 @@ namespace VoidSaving
 
         internal static bool LoadSavedData = false;
 
+        internal static bool IsIronManMode
+        {
+            get
+            {
+                return LatestData.IronManMode;
+            }
+            set
+            {
+                LatestData.IronManMode = value;
+            }
+        }
+
+        internal static string LastSaveName
+        {
+            get
+            {
+                return LatestData.FileName;
+            }
+        }
 
         /*public static string SavesLocation
         {
@@ -70,6 +89,8 @@ namespace VoidSaving
                 Config.SavesLocation.Value = value;
             }
         }*/
+
+
 
         internal static void DeleteSaveFile(string SaveName)
         {
@@ -438,10 +459,39 @@ namespace VoidSaving
             }
             catch (Exception ex)
             {
+                Messaging.Notification("<color=red>Failed to Write Save!</color>");
                 BepinPlugin.Log.LogError(ex);
+                File.Delete(safePath);
             }
 
             return false;
+        }
+
+        public static bool WriteIronManSave(string FileName)
+        {
+            string oldSaveName = LastSaveName;
+            if (WriteSave(FileName))
+            {
+                BepinPlugin.Log.LogInfo($"Iron Man Save succesfully wrote {FileName}, deleting old file {oldSaveName}");
+                File.Delete(oldSaveName);
+                return true;
+            }
+            return false;
+        }
+
+        internal static string IronManSaveDefaultNameFromID(int SaveID)
+        {
+            return Path.Combine(SaveLocation, $"IronManSave_{SaveID.ToString("D2")}{SaveExtension}");
+        }
+
+        public static string GetNextIronManSaveName()
+        {
+            int LastIronManSave = 1;
+            while(File.Exists(Path.Combine(SaveLocation, $"IronManSave_{LastIronManSave.ToString("D2")}{SaveExtension}")))
+            {
+                LastIronManSave++;
+            }
+            return IronManSaveDefaultNameFromID(LastIronManSave);
         }
     }
 }

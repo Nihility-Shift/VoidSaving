@@ -15,9 +15,9 @@ namespace VoidSaving
 
         public string FileName;
 
-        public string SaveID = string.Empty; // Utilized to organize iron-man saves
+        public string SaveID = string.Empty; // Early save data string. Original plan scrapped, may still be usefull for peeking file data.
 
-        public bool IronManMode;
+        public bool IronManMode = Config.DefaultIronMan.Value;
 
         //Data about resources
         public int Alloy;
