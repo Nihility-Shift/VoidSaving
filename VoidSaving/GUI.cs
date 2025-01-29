@@ -113,6 +113,8 @@ namespace VoidSaving
             }
             else if(GameSessionManager.HasActiveSession)
             {
+                DrawSaveFileList();
+
                 VoidJumpSystem voidJumpSystem = ClientGame.Current?.PlayerShip?.transform?.GetComponent<VoidJumpSystem>();
                 VoidJumpState voidJumpState = voidJumpSystem?.ActiveState;
                 if (voidJumpState == null || (voidJumpState is not VoidJumpTravellingStable && voidJumpState is not VoidJumpTravellingUnstable))
@@ -125,8 +127,6 @@ namespace VoidSaving
                 }
                 else
                 {
-                    DrawSaveFileList();
-
                     SaveName = TextField(SaveName);
 
                     if (ErrorMessage != null)
