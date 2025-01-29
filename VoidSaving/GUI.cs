@@ -2,10 +2,10 @@
 using CG.Game.SpaceObjects.Controllers;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using VoidManager.CustomGUI;
 using VoidManager.Utilities;
+using WebSocketSharp;
 using static UnityEngine.GUILayout;
 
 namespace VoidSaving
@@ -19,69 +19,87 @@ namespace VoidSaving
 
         Dictionary<string, DateTime> SaveNames;
 
-        string SelectedSaveName;
-
         Vector2 SaveScrollPosition;
 
         bool FailedToLoadLastSave;
 
+        bool IronManMode = true;
 
-        string ToSaveFileName;
 
         string ToDeleteFileName;
 
         bool ConfirmedDelete;
+
+        //Used for Loading and Saving.
+        string SaveName;
+
+        string ErrorMessage;
+
+
+        private void DrawSaveFileList()
+        {
+            SaveScrollPosition = BeginScrollView(SaveScrollPosition);
+            foreach (KeyValuePair<string, DateTime> KVP in SaveNames)
+            {
+                BeginHorizontal();
+                if (GUITools.DrawButtonSelected($"{KVP.Key} - {KVP.Value.ToLocalTime()}", SaveName == KVP.Key))
+                {
+                    SaveName = KVP.Key;
+                }
+                if (Button("X", MaxWidth(25f)))
+                {
+                    ToDeleteFileName = KVP.Key;
+                }
+                EndHorizontal();
+
+                if (ToDeleteFileName == KVP.Key)
+                {
+                    if (Button("Confirm delete file?"))
+                    {
+                        ConfirmedDelete = true;
+                    }
+                }
+            }
+            EndScrollView();
+
+            if (ConfirmedDelete)
+            {
+                ConfirmedDelete = false;
+                SaveNames.Remove(ToDeleteFileName);
+                SaveHandler.DeleteSaveFile(ToDeleteFileName + SaveHandler.SaveExtension);
+                ToDeleteFileName = null;
+            }
+        }
 
 
         public override void Draw()
         {
             if (GameSessionManager.InHub)
             {
-                SaveScrollPosition = BeginScrollView(SaveScrollPosition);
-                foreach (KeyValuePair<string, DateTime> KVP in SaveNames)
+                GUITools.DrawCheckbox("Default Iron Man Mode", ref Config.DefaultIronMan);
+                if (GUITools.DrawCheckbox("Iron Man Mode for next save", ref IronManMode))
                 {
-                    BeginHorizontal();
-                    if (GUITools.DrawButtonSelected($"{KVP.Key} - {KVP.Value.ToLocalTime()}", SelectedSaveName == KVP.Key))
-                    {
-                        SelectedSaveName = KVP.Key;
-                    }
-                    if (Button("X", MaxWidth(25f)))
-                    {
-                        ToDeleteFileName = KVP.Key;
-                    }
-                    EndHorizontal();
-
-                    if (ToDeleteFileName == KVP.Key)
-                    {
-                        if (Button("Confirm delete file?"))
-                        {
-                            ConfirmedDelete = true;
-                        }
-                    }
-                }
-                EndScrollView();
-
-                if (ConfirmedDelete)
-                {
-                    ConfirmedDelete = false;
-                    SaveNames.Remove(ToDeleteFileName);
-                    SaveHandler.DeleteSaveFile(ToDeleteFileName + SaveHandler.SaveExtension);
-                    ToDeleteFileName = null;
+                    SaveHandler.IsIronManMode = IronManMode;
                 }
 
+                DrawSaveFileList();
 
-                if (SelectedSaveName == null)
+
+                if (SaveName == null)
                 {
                     Label("Select a save");
                 }
-                else if (Button(SaveHandler.LoadSavedData ? $"Loading {SelectedSaveName} on next session start" : "Load Save"))
+                else if (Button(SaveHandler.LoadSavedData ? $"Loading {SaveName} on next session start" : "Load Save"))
                 {
-                    FailedToLoadLastSave = !SaveHandler.LoadSave(SelectedSaveName);
+                    if (!SaveHandler.LoadSave(SaveName))
+                    {
+                        ErrorMessage = $"<color=red>Failed to load {SaveName}</color>";
+                    }
                 }
 
-                if (FailedToLoadLastSave)
+                if(ErrorMessage != null)
                 {
-                    Label($"<color=red>Failed to load {SelectedSaveName}</color>");
+                    Label(ErrorMessage);
                 }
 
                 if (SaveHandler.LoadSavedData)
@@ -107,11 +125,30 @@ namespace VoidSaving
                 }
                 else
                 {
-                    ToSaveFileName = TextField(ToSaveFileName);
+                    SaveName = TextField(SaveName);
 
-                    if(Button("Save Game"))
+                    if (ErrorMessage != null)
                     {
-                        SaveHandler.WriteSave(ToSaveFileName);
+                        Label(ErrorMessage);
+                    }
+
+                    if (SaveHandler.IsIronManMode && Button("Save Game"))
+                    {
+                        if (SaveName.IsNullOrEmpty())
+                        {
+                            ErrorMessage = $"<color=red>Cannot save without a file name.</color>";
+                            return;
+                        }
+                        SaveHandler.WriteIronManSave(SaveName);
+                    }
+                    else if(Button("Save Game"))
+                    {
+                        if (SaveName.IsNullOrEmpty())
+                        {
+                            ErrorMessage = $"<color=red>Cannot save without a file name.</color>";
+                            return;
+                        }
+                        SaveHandler.WriteSave(SaveName);
                     }
                 }
             }
@@ -123,10 +160,21 @@ namespace VoidSaving
 
         public override void OnOpen()
         {
+            IronManMode = SaveHandler.IsIronManMode;
             FailedToLoadLastSave = false;
-            SelectedSaveName = SaveHandler.ActiveData?.FileName;
             ToDeleteFileName = null;
             SaveNames = SaveHandler.GetSaveFileNames();
+
+            if (SaveHandler.ActiveData != null)
+            {
+                SaveName = SaveHandler.ActiveData?.FileName;
+            }
+            else
+            {
+                SaveName = SaveHandler.LastSaveName;
+            }
+
+            ErrorMessage = null;
         }
     }
 }
