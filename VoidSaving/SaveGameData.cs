@@ -15,7 +15,7 @@ namespace VoidSaving
 
         public string FileName;
 
-        public string PeekInfo = string.Empty; // Early save data string. Original plan scrapped, may still be usefull for peeking file data.
+        public string PeekInfo = string.Empty;
 
         public bool IronManMode = Config.DefaultIronMan.Value;
 

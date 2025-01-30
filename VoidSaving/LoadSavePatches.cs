@@ -171,7 +171,6 @@ namespace VoidSaving
             InstalledModuleIndex = 0;
             int WeaponBulletsModuleIndex = 0;
             int KPDBulletsModuleIndex = 0;
-            int SheildModuleDirectionsIndex = 0;
             int AutoMechanicSwitchIndex = 0;
             int lifeSupportSwitchIndex = 0;
 
@@ -191,12 +190,6 @@ namespace VoidSaving
                 else if (socket.InstalledModule is KineticPointDefenseModule KPDModule)
                 {
                     KPDModule.AmmoCount = activeData.KPDBullets[KPDBulletsModuleIndex++];
-                }
-                else if (socket.InstalledModule is ShieldModule shieldModule)
-                {
-                    shieldModule.IsClockwise.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
-                    shieldModule.IsForward.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
-                    shieldModule.IsCounterClockwise.ForceChange(activeData.ShieldDirections[SheildModuleDirectionsIndex++]);
                 }
                 else if (socket.InstalledModule is AutoMechanicModule autoMechanicModule)
                 {
@@ -253,6 +246,19 @@ namespace VoidSaving
             {
                 ShipShields._shields[i].hitPoints = SaveHandler.ActiveData.ShieldHealths[i];
                 ShipShields._shields[i].UpdateShieldState();
+            }
+
+            BuildSocketController bsc = playerShip.GetComponent<BuildSocketController>();
+            int SheildModuleDirectionsIndex = 0;
+            foreach (BuildSocket socket in bsc.Sockets)
+            {
+                if (socket.InstalledModule == null) continue;
+                if (socket.InstalledModule is ShieldModule shieldModule)
+                {
+                    shieldModule.IsClockwise.ForceChange(SaveHandler.ActiveData.ShieldDirections[SheildModuleDirectionsIndex++]);
+                    shieldModule.IsForward.ForceChange(SaveHandler.ActiveData.ShieldDirections[SheildModuleDirectionsIndex++]);
+                    shieldModule.IsCounterClockwise.ForceChange(SaveHandler.ActiveData.ShieldDirections[SheildModuleDirectionsIndex++]);
+                }
             }
 
             //Defects loaded post-start due to the DamageController gathering defectSystems via start methods.
