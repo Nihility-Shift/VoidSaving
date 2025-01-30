@@ -18,6 +18,7 @@ namespace VoidSaving
                     SaveHandler.LatestData.FileName = SaveHandler.GetNextIronManSaveName();
                 }
                 SaveHandler.WriteSave(SaveHandler.LastSaveName);
+                return;
             }
 
 
