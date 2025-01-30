@@ -12,28 +12,61 @@ Requires: [Dependencies]
 
 ---------------------
 
-### 💡 Function(s)
+### 💡 Function(s) - [Description]
 
-- [Description]
+- Saves game data on warp via manual or auto save.
+- Iron Man Mode - Users are limited to one save, which is deleted on ship death. This mode is on by default to maintain the spirit of the gameplay.
+- Save Management - Save files can be viewed and deleted in-game via the F5 menu.
+- Data saved: 
+  - Generation data for next sectors
+  - Modules
+  - Mods and batteries in module sockets
+  - Carriables lying around in the ship and in shelves
+  - Module and ship systems power states
+  - Ship powered on state
+  - Relics
+  - Ship health
+  - Breaches
+  - Defects
+  - Unlocked Blueprints
+  - Completed missions
+  - Booster states
+  - Ammo in turrets
+  - Ammo in KPDs
+  - Ammo in crates/batteries
+  - Shield Directions
+  - Shield Charges
+  - Engine Trims and Enhancement Panels
+  - Breakers
+  - Fabricator level
+  - Mission Statistics
+  - Void Drive charge states
+  - Atmosphere levels
+  - Airlock Safeties
+  - Door states
+  - Life support/brain Mode Selection
 
 ### 🎮 Client Usage
 
-- 
+- Loading
+  - While in hub, select a save file via F5 > Mod Settings > [UserModName]
+  - Click 'Load Save'
+  - Start a match by having all players sit down.
+- Saving
+  - While in a run, in void, F5 > Mod Settings > [UserModName]
+  - Select a save file to overwrite or create a new save file by entering a name and clicking 'Save Game'
+- Save file deletion
+  - Go to the settings menu (F5 > Mod Settings > [UserModName])
+  - Click the X button next to the save entry you wish to delete.
+  - Confirm deletion.
+- Configuration
+  - Configure Iron Man Mode in hub. Iron Man Mode is on by default, default and next run mode can be configured.
 
 ### 👥 Multiplayer Functionality
 
-# Note to mod developer: Remove all but those which match, and describe any custom functionality.
-- ✅ Client
-  - Only the client needs this mod.
 - ✅ Host
   - Only the host needs this mod.
-- ✅ Session
-  - Requires the room to be marked as Mod_Session for functionality.
-  - Requires the room to be marked as Mod_Session for joining.
-  - Marks the room as Mod_Session when starting session as host.
-  - Marks the room as Mod_Session when hosting.
-- ✅ All
-  - All players must have this mod installed.
+  - Must be the host who started the session.
 
 ---------------------
 
