@@ -75,13 +75,22 @@ namespace VoidSaving
 
         public override void Draw()
         {
+            if (!GameSessionManager.HasActiveSession)
+            {
+                DrawSaveFileList();
+                Label("Must be in hub to load a save file");
+                return;
+            }
+
             if (GameSessionManager.InHub)
             {
+                BeginHorizontal();
                 GUITools.DrawCheckbox("Default Iron Man Mode", ref Config.DefaultIronMan);
-                if (GUITools.DrawCheckbox("Iron Man Mode for next save", ref IronManMode))
+                if (GUITools.DrawCheckbox("Iron Man Mode for next game", ref IronManMode))
                 {
                     SaveHandler.IsIronManMode = IronManMode;
                 }
+                EndHorizontal();
 
                 DrawSaveFileList();
 
@@ -112,7 +121,7 @@ namespace VoidSaving
                     Label(string.Empty);
                 }
             }
-            else if(GameSessionManager.HasActiveSession)
+            else
             {
                 DrawSaveFileList();
 
@@ -138,17 +147,18 @@ namespace VoidSaving
                     if (SaveHandler.IsIronManMode)
                     {
                         if (Button("Save Game"))
-                    {
-                        if (SaveName.IsNullOrEmpty())
                         {
-                            ErrorMessage = $"<color=red>Cannot save without a file name.</color>";
-                            return;
-                        }
+                            if (SaveName.IsNullOrEmpty())
+                            {
+                                ErrorMessage = $"<color=red>Cannot save without a file name.</color>";
+                                return;
+                            }
                             if (SaveHandler.WriteIronManSave(SaveName))
                             {
                                 SaveNames = SaveHandler.GetPeekedSaveFiles();
+                                ErrorMessage = $"Successfully wrote {SaveName}";
                             }
-                            }
+                        }
                     }
                     else if(Button("Save Game"))
                     {
@@ -157,13 +167,12 @@ namespace VoidSaving
                             ErrorMessage = $"<color=red>Cannot save without a file name.</color>";
                             return;
                         }
-                        SaveHandler.WriteSave(SaveName);
+                        if (SaveHandler.WriteSave(SaveName))
+                        {
+                            ErrorMessage = $"Successfully wrote {SaveName}";
+                        }
                     }
                 }
-            }
-            else
-            {
-                Label("Must be in hub");
             }
         }
 
