@@ -360,6 +360,7 @@ namespace VoidSaving
 
             LoadSavedData = true;
             ActiveData = data;
+            Messaging.Echo($"Loading save '{SaveName}' on next game start.", false);
             return true;
         }
 
