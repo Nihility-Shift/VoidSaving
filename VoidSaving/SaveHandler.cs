@@ -212,8 +212,6 @@ namespace VoidSaving
                 EndlessQuest activeQuest = session.ActiveQuest as EndlessQuest;
 
                 saveGameData.Seed = activeQuest.QuestParameters.Seed;
-                saveGameData.JumpCounter = activeQuest.JumpCounter;
-                saveGameData.InterdictionCounter = activeQuest.InterdictionCounter;
                 saveGameData.SessionStats = GameSessionTracker.Statistics;
 
                 saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);

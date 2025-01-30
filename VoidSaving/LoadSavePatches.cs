@@ -66,15 +66,19 @@ namespace VoidSaving
                 __instance.context.SectorsUsedInSolarSystem = activeData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = activeData.SectorsToUseInSolarSystem;
 
+                __instance.JumpCounter = activeData.JumpCounter;
+                __instance.InterdictionCounter = activeData.InterdictionCounter;
+
+
                 SaveHandler.LatestData.Random = activeData.Random;
-                __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
+                __instance.context.Random = activeData.Random.DeepCopy();
 
                 Helpers.LoadCompletedSectors(__instance, activeData.CompletedSectors);
 
                 GameSessionTracker.Instance._statistics = activeData.SessionStats;
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
             }
-            else
+            else if (!GameSessionManager.InHub)
             {
                 //Capture current random and quest data for saving prior to generation of next section.
                 SaveHandler.LatestData.ParametersSeed = __instance.Context.NextSectionParameters.Seed;
@@ -87,17 +91,21 @@ namespace VoidSaving
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
 
+                SaveHandler.LatestData.JumpCounter = __instance.JumpCounter;
+                SaveHandler.LatestData.InterdictionCounter = __instance.InterdictionCounter;
+
 
                 SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
             }
         }
 
         [HarmonyPatch(typeof(HubQuestManager), "StartQuest"), HarmonyPrefix]
-        static void LoadShipGUID(HubQuestManager __instance)
+        static void LoadShipGUID(HubQuestManager __instance, Quest quest)
         {
             if (!SaveHandler.LoadSavedData) return;
 
             __instance.SelectedShipGuid = SaveHandler.ActiveData.ShipLoadoutGUID;
+            quest.QuestParameters.Seed = SaveHandler.ActiveData.Seed;
             PunSingleton<PhotonService>.Instance.SetCurrentRoomShip(__instance.SelectedShipGuid);
         }
 
