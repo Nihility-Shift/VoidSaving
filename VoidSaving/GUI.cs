@@ -1,6 +1,5 @@
 ﻿using CG.Game;
 using CG.Game.SpaceObjects.Controllers;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VoidManager.CustomGUI;
@@ -72,6 +71,14 @@ namespace VoidSaving
             }
         }
 
+        private void DrawAutoSaveSelection()
+        {
+            BeginHorizontal();
+            GUITools.DrawCheckbox("Auto Saves Enabled", ref Config.AutoSavingEnabled);
+            GUITools.DrawTextField("Auto Save Limit", ref Config.AutoSaveLimit);
+            EndHorizontal();
+        }
+
 
         public override void Draw()
         {
@@ -92,6 +99,8 @@ namespace VoidSaving
                 }
                 EndHorizontal();
 
+                DrawAutoSaveSelection();
+
                 DrawSaveFileList();
 
 
@@ -107,7 +116,7 @@ namespace VoidSaving
                     }
                 }
 
-                if(ErrorMessage != null)
+                if (ErrorMessage != null)
                 {
                     Label(ErrorMessage);
                 }
@@ -127,13 +136,13 @@ namespace VoidSaving
 
                 VoidJumpSystem voidJumpSystem = ClientGame.Current?.PlayerShip?.transform?.GetComponent<VoidJumpSystem>();
                 VoidJumpState voidJumpState = voidJumpSystem?.ActiveState;
-                if (voidJumpState == null || (voidJumpState is not VoidJumpTravellingStable && voidJumpState is not VoidJumpTravellingUnstable))
-                {
-                    Label("Not in Void Jump");
-                }
-                else if(!SaveHandler.StartedAsHost)
+                if (!SaveHandler.StartedAsHost)
                 {
                     Label("Must be the original host of the session.");
+                }
+                else if (voidJumpState == null || (voidJumpState is not VoidJumpTravellingStable && voidJumpState is not VoidJumpTravellingUnstable))
+                {
+                    Label("Cannot save outside void jump.");
                 }
                 else
                 {
@@ -143,6 +152,8 @@ namespace VoidSaving
                     {
                         Label(ErrorMessage);
                     }
+
+                    DrawAutoSaveSelection();
 
                     if (SaveHandler.IsIronManMode)
                     {
@@ -160,7 +171,7 @@ namespace VoidSaving
                             }
                         }
                     }
-                    else if(Button("Save Game"))
+                    else if (Button("Save Game"))
                     {
                         if (SaveName.IsNullOrEmpty())
                         {
