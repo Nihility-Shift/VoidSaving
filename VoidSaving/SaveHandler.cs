@@ -512,10 +512,10 @@ namespace VoidSaving
         public static bool WriteIronManSave(string FileName)
         {
             string oldSaveName = LastSaveName;
-            if (WriteSave(FileName))
+            if (WriteSave(FileName) && FileName != oldSaveName)
             {
                 BepinPlugin.Log.LogInfo($"Iron Man Save succesfully wrote {FileName}, deleting old file {oldSaveName}");
-                File.Delete(oldSaveName);
+                DeleteSaveFile(oldSaveName);
                 return true;
             }
             return false;
@@ -523,7 +523,7 @@ namespace VoidSaving
 
         internal static string IronManSaveDefaultNameFromID(int SaveID)
         {
-            return Path.Combine(SaveLocation, $"IronManSave_{SaveID.ToString("D2")}{SaveExtension}");
+            return $"IronManSave_{SaveID.ToString("D2")}";
         }
 
         public static string GetNextIronManSaveName()

@@ -135,14 +135,20 @@ namespace VoidSaving
                         Label(ErrorMessage);
                     }
 
-                    if (SaveHandler.IsIronManMode && Button("Save Game"))
+                    if (SaveHandler.IsIronManMode)
+                    {
+                        if (Button("Save Game"))
                     {
                         if (SaveName.IsNullOrEmpty())
                         {
                             ErrorMessage = $"<color=red>Cannot save without a file name.</color>";
                             return;
                         }
-                        SaveHandler.WriteIronManSave(SaveName);
+                            if (SaveHandler.WriteIronManSave(SaveName))
+                            {
+                                SaveNames = SaveHandler.GetPeekedSaveFiles();
+                            }
+                            }
                     }
                     else if(Button("Save Game"))
                     {
