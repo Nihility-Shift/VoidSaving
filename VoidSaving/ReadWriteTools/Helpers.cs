@@ -81,7 +81,7 @@ namespace VoidSaving
             return sectorDatas;
         }
 
-        public static List<GameSessionSector> LoadCompletedSectors(EndlessQuest endlessQuest, SectorData[] sectorDatas)
+        public static void LoadCompletedSectors(EndlessQuest endlessQuest, SectorData[] sectorDatas)
         {
             List<GameSessionSector> CompletedSectors = new List<GameSessionSector>();
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Loading data of {sectorDatas.Count()} sectors");
@@ -99,11 +99,10 @@ namespace VoidSaving
                 CompletedSectors.Add(sector);
             }
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Loaded data of {CompletedSectors.Count()} sectors");
-            return CompletedSectors;
-        }
+            endlessQuest.context.CompletedSectors = CompletedSectors;
 
-        public static List<SectorCompletionInfo> LoadCompletedSectorStatus(SectorData[] sectorDatas)
-        {
+
+            //Load Statuses
             List<SectorCompletionInfo> completedInfos = new List<SectorCompletionInfo>(sectorDatas.Length);
             foreach (SectorData sectorData in sectorDatas)
             {
@@ -127,8 +126,7 @@ namespace VoidSaving
 
                 completedInfos.Add(completionInfo);
             }
-
-            return completedInfos;
+            endlessQuest.context.CompletedSectorStatus = completedInfos;
         }
 
         public static BoosterStatus[] GetBoosterStates(AbstractPlayerControlledShip PlayerShip)

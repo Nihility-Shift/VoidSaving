@@ -69,8 +69,7 @@ namespace VoidSaving
                 SaveHandler.LatestData.Random = activeData.Random;
                 __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
 
-                __instance.context.CompletedSectors = Helpers.LoadCompletedSectors(__instance, activeData.CompletedSectors);
-                __instance.context.CompletedSectorStatus = Helpers.LoadCompletedSectorStatus(activeData.CompletedSectors);
+                Helpers.LoadCompletedSectors(__instance, activeData.CompletedSectors);
 
                 GameSessionTracker.Instance._statistics = activeData.SessionStats;
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
