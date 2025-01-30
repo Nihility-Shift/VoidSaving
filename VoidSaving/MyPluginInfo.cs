@@ -7,8 +7,8 @@ namespace VoidSaving
         public const string PLUGIN_GUID = $"{PLUGIN_ORIGINAL_AUTHOR}.{PLUGIN_NAME}";
         public const string PLUGIN_NAME = "VoidSaving";
         public const string USERS_PLUGIN_NAME = "Void Saving";
-        public const string PLUGIN_VERSION = "0.0.2";
-        public const string PLUGIN_DESCRIPTION = "VoidSaving";
+        public const string PLUGIN_VERSION = "0.1.0";
+        public const string PLUGIN_DESCRIPTION = "Saves the game while in Void, allowing users to load back up where they left off.";
         public const string PLUGIN_ORIGINAL_AUTHOR = "Dragon";
         public const string PLUGIN_AUTHORS = "Dragon";
         public const string PLUGIN_THUNDERSTORE_ID = "";
