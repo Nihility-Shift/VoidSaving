@@ -100,16 +100,17 @@ namespace VoidSaving
             File.Delete(Path.Combine(SaveLocation, SaveName + SaveExtension));
         }
 
-        internal static Dictionary<string, DateTime> GetSaveFileNames()
+        internal static Dictionary<string, SaveFilePeekData> GetPeekedSaveFiles()
         {
             string[] Files = Directory.GetFiles(SaveLocation);
-            Dictionary<string, DateTime> FilesAndDates = new();
+            Dictionary<string, SaveFilePeekData> FilesAndDates = new();
 
             foreach (string file in Files)
             {
                 if (file.EndsWith(SaveExtension))
                 {
-                    FilesAndDates.Add(Path.GetFileNameWithoutExtension(file), Directory.GetLastWriteTime(file));
+                    string FileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+                    FilesAndDates.Add(FileNameWithoutExtension, new SaveFilePeekData(FileNameWithoutExtension, File.GetLastWriteTime(file)));
                 }
             }
 
@@ -216,6 +217,10 @@ namespace VoidSaving
                 saveGameData.SessionStats = GameSessionTracker.Statistics;
 
                 saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);
+
+
+                //Peek Data
+                saveGameData.PeekInfo = $"{playerShip.DisplayName},{saveGameData.JumpCounter + 1},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours}";
             }
             catch (Exception e)
             {
@@ -283,7 +288,7 @@ namespace VoidSaving
                     using (BinaryReader reader = new BinaryReader(fileStream))
                     {
                         data.SaveDataVersion = reader.ReadUInt32();
-                        data.SaveID = reader.ReadString();
+                        data.PeekInfo = reader.ReadString();
                         data.IronManMode = reader.ReadBoolean();
 
                         data.Alloy = reader.ReadInt32();
@@ -360,6 +365,38 @@ namespace VoidSaving
             return true;
         }
 
+        public static SaveGameData PeekSaveFile(string SaveName)
+        {
+            string FullSavePath = Path.Combine(SaveLocation, SaveName + SaveExtension);
+
+            BepinPlugin.Log.LogInfo("Attempting to peek save: " + FullSavePath);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(FullSavePath));
+
+            SaveGameData data = new();
+
+            try
+            {
+                using (FileStream fileStream = File.OpenRead(FullSavePath))
+                {
+                    BepinPlugin.Log.LogInfo($"Starting peek save: {fileStream.Length} Bytes");
+                    using (BinaryReader reader = new BinaryReader(fileStream))
+                    {
+                        data.SaveDataVersion = reader.ReadUInt32();
+                        data.PeekInfo = reader.ReadString();
+                        data.IronManMode = reader.ReadBoolean();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                BepinPlugin.Log.LogError($"Failed to peek save {FullSavePath}\n{ex.Message}");
+            }
+
+            return data;
+        }
+
+
         public const uint CurrentDataVersion = 0;
 
         /// <summary>
@@ -383,6 +420,7 @@ namespace VoidSaving
             Directory.CreateDirectory(Path.GetDirectoryName(fullSavePath));
 
             SaveGameData data = GetSessionSaveGameData();
+            data.FileName = FileName;
             try
             {
                 using (FileStream fileStream = File.Create(safePath))
@@ -390,7 +428,7 @@ namespace VoidSaving
                     using (BinaryWriter writer = new BinaryWriter(fileStream))
                     {
                         writer.Write(CurrentDataVersion);
-                        writer.Write(data.SaveID);
+                        writer.Write(data.PeekInfo);
                         writer.Write(data.IronManMode);
 
                         writer.Write(data.Alloy);
@@ -456,6 +494,7 @@ namespace VoidSaving
                         BepinPlugin.Log.LogInfo($"Finalized write at {fileStream.Length} Bytes");
                     }
                 }
+                LatestData = data;
                 File.Delete(fullSavePath);
                 File.Move(safePath, fullSavePath);
                 return true;

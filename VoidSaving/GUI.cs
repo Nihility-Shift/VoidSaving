@@ -17,7 +17,7 @@ namespace VoidSaving
             return MyPluginInfo.USERS_PLUGIN_NAME;
         }
 
-        Dictionary<string, DateTime> SaveNames;
+        Dictionary<string, SaveFilePeekData> SaveNames;
 
         Vector2 SaveScrollPosition;
 
@@ -39,10 +39,11 @@ namespace VoidSaving
         private void DrawSaveFileList()
         {
             SaveScrollPosition = BeginScrollView(SaveScrollPosition);
-            foreach (KeyValuePair<string, DateTime> KVP in SaveNames)
+            foreach (KeyValuePair<string, SaveFilePeekData> KVP in SaveNames)
             {
                 BeginHorizontal();
-                if (GUITools.DrawButtonSelected($"{KVP.Key} - {KVP.Value.ToLocalTime()}", SaveName == KVP.Key))
+                SaveFilePeekData data = KVP.Value;
+                if (GUITools.DrawButtonSelected($"{KVP.Key}{(data.IronMan ? "(IronMan)" : string.Empty)} - {data.writeTime} | {data.ShipName}, {data.JumpCounter} Jumps. {data.TimePlayed.ToString(@"hh\:mm")} Played", SaveName == KVP.Key))
                 {
                     SaveName = KVP.Key;
                 }
@@ -165,7 +166,7 @@ namespace VoidSaving
             IronManMode = SaveHandler.IsIronManMode;
             FailedToLoadLastSave = false;
             ToDeleteFileName = null;
-            SaveNames = SaveHandler.GetSaveFileNames();
+            SaveNames = SaveHandler.GetPeekedSaveFiles();
 
             if (SaveHandler.ActiveData != null)
             {
