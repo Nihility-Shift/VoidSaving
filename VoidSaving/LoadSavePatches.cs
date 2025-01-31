@@ -73,8 +73,6 @@ namespace VoidSaving
                 SaveHandler.LatestData.Random = activeData.Random;
                 __instance.context.Random = activeData.Random.DeepCopy();
 
-                Helpers.LoadCompletedSectors(__instance, activeData.CompletedSectors);
-
                 GameSessionTracker.Instance._statistics = activeData.SessionStats;
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
             }
@@ -228,6 +226,7 @@ namespace VoidSaving
 
             //Load module state after jumping.
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
+            Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
         }
 
