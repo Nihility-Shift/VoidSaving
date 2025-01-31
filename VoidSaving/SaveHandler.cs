@@ -130,6 +130,8 @@ namespace VoidSaving
                 GameSession session = GameSessionManager.Instance.activeGameSession;
                 AbstractPlayerControlledShip playerShip = ClientGame.Current.PlayerShip;
 
+                saveGameData.ProgressionDisabled = !VoidManager.Progression.ProgressionHandler.ProgressionEnabled;
+
                 //Ship data
                 saveGameData.Alloy = GameSessionSuppliesManager.Instance.AlloyAmount;
                 saveGameData.Biomass = GameSessionSuppliesManager.Instance.BiomassAmount;
@@ -218,7 +220,7 @@ namespace VoidSaving
 
 
                 //Peek Data
-                saveGameData.PeekInfo = $"{playerShip.DisplayName},{saveGameData.JumpCounter + 1},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours}";
+                saveGameData.PeekInfo = $"{playerShip.DisplayName},{saveGameData.JumpCounter + 1},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours},{saveGameData.ProgressionDisabled}";
             }
             catch (Exception e)
             {
@@ -288,6 +290,8 @@ namespace VoidSaving
                         data.SaveDataVersion = reader.ReadUInt32();
                         data.PeekInfo = reader.ReadString();
                         data.IronManMode = reader.ReadBoolean();
+                        if (data.SaveDataVersion >= 1)
+                            data.ProgressionDisabled = reader.ReadBoolean();
 
                         data.Alloy = reader.ReadInt32();
                         data.Biomass = reader.ReadInt32();
@@ -361,6 +365,8 @@ namespace VoidSaving
             LoadSavedData = true;
             ActiveData = data;
             Messaging.Echo($"Loading save '{SaveName}' on next game start.", false);
+            if(data.ProgressionDisabled)
+                Messaging.Echo("Progress will be disabled after starting.");
             return true;
         }
 
@@ -396,7 +402,7 @@ namespace VoidSaving
         }
 
 
-        public const uint CurrentDataVersion = 0;
+        public const uint CurrentDataVersion = 1;
 
         /// <summary>
         /// Writes file to path. Adds extension if missing.
@@ -429,6 +435,7 @@ namespace VoidSaving
                         writer.Write(CurrentDataVersion);
                         writer.Write(data.PeekInfo);
                         writer.Write(data.IronManMode);
+                        writer.Write(data.ProgressionDisabled);
 
                         writer.Write(data.Alloy);
                         writer.Write(data.Biomass);

@@ -107,6 +107,8 @@ namespace VoidSaving
             __instance.SelectedShipGuid = SaveHandler.ActiveData.ShipLoadoutGUID;
             quest.QuestParameters.Seed = SaveHandler.ActiveData.Seed;
             PunSingleton<PhotonService>.Instance.SetCurrentRoomShip(__instance.SelectedShipGuid);
+            if (SaveHandler.ActiveData.ProgressionDisabled)
+                VoidManager.Progression.ProgressionHandler.DisableProgression(MyPluginInfo.PLUGIN_GUID);
         }
 
         //Sets seed at earliest point

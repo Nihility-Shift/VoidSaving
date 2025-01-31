@@ -17,6 +17,10 @@ namespace VoidSaving
                 ShipName = DataEntries[0];
                 JumpCounter = int.Parse(DataEntries[1]);
                 TimePlayed = TimeSpan.FromHours(Double.Parse(DataEntries[2]));
+                if (DataEntries.Length > 3)
+                {
+                    ProgressDisabled = bool.Parse(DataEntries[3]);
+                }
             }
             else
             {
@@ -38,5 +42,7 @@ namespace VoidSaving
         public TimeSpan TimePlayed;
 
         public bool IronMan;
+
+        public bool ProgressDisabled;
     }
 }

@@ -19,6 +19,8 @@ namespace VoidSaving
 
         public bool IronManMode = Config.DefaultIronMan.Value;
 
+        public bool ProgressionDisabled;
+
         //Data about resources
         public int Alloy;
 
