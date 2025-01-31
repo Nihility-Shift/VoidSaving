@@ -216,7 +216,7 @@ namespace VoidSaving
                 saveGameData.Seed = activeQuest.QuestParameters.Seed;
                 saveGameData.SessionStats = GameSessionTracker.Statistics;
 
-                saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest.context.CompletedSectors);
+                saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest);
 
 
                 //Peek Data

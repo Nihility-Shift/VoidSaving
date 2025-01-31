@@ -8,12 +8,14 @@ using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
 using Client.Utils;
+using Code.Gameplay;
 using Gameplay.Atmosphere;
 using Gameplay.Defects;
 using Gameplay.Enhancements;
 using Gameplay.Power;
 using Gameplay.Quests;
 using Photon.Pun;
+using ResourceAssets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,39 +69,60 @@ namespace VoidSaving
         }
 
 
-        public static SectorData[] GetCompletedSectorDatas(List<GameSessionSector> sectors)
+        public static SectorData[] GetCompletedSectorDatas(EndlessQuest quest)
         {
+            List<GameSessionSector> sectors = quest.context.CompletedSectors;
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collecting data of {sectors.Count()} sectors");
-            SectorData[] sectorDatas = new SectorData[sectors.Count - 1];
-            for (int i = 1; i < sectorDatas.Length; i++) //start at 1 to ignore starting sector
+
+            List<SolarSystem> solarSystems = quest.parameters.SolarSystems;
+
+            List<SectorData> sectorDatas = new();
+            foreach (GameSessionSector sector in sectors) //start at 1 to ignore starting sector
             {
-                GameSessionSector sector = sectors[i];
-                if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Converting sector data");
-                sectorDatas[i] = new SectorData(sector.SectorObjective?.Objective.Asset.assetGuid ?? default, sector.Difficulty.DifficultyModifier, sector.ObjectiveState);
+                if (sector == quest.StartSector) continue;
+                sectorDatas.Add( new SectorData(sector, solarSystems.IndexOf(sector.SectorAsset.ParentSolarSystem)));
             }
-            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collected data of {sectorDatas.Length} sectors");
-            return sectorDatas;
+
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collected data of {sectorDatas.Count} sectors");
+            return sectorDatas.ToArray();
         }
 
         public static void LoadCompletedSectors(EndlessQuest endlessQuest, SectorData[] sectorDatas)
         {
-            List<GameSessionSector> CompletedSectors = new List<GameSessionSector>();
+            List<GameSessionSector> CompletedSectors = new List<GameSessionSector>(sectorDatas.Length);
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Loading data of {sectorDatas.Count()} sectors");
+
+            List<SolarSystem> solarSystems = endlessQuest.Asset.EndlessQuestConfiguration.SolarSystems;
+            List<SolarSystemBossOptions> BossOptionsList = endlessQuest.Asset.EndlessQuestConfiguration.SolarSystemBosses.SolarSystemConfig;
+
             foreach (SectorData sectorData in sectorDatas)
             {
                 if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Running sector data load loop");
-                if (sectorData.ObjectiveGUID == default) { BepinPlugin.Log.LogWarning("Detected default GUID on completed sector load."); continue; } //Skip null/empty GUIDs.
-                GameSessionSector sector = new GameSessionSector(new Code.Gameplay.Sector());
-                GameSessionSectorObjective objective = new GameSessionSectorObjective();
-                objective.Objective = new Objective(endlessQuest.context.NextSectionParameters.ViableMainObjectives.FirstOrDefault(thing => thing.AssetGuid == sectorData.ObjectiveGUID).Asset);
-                objective.Objective.State = sectorData.State;
+                if (sectorData.SectorContainerGUID == default) { BepinPlugin.Log.LogWarning("Detected default GUID on completed sector load."); continue; } //Skip null/empty GUIDs. Should never occur.
 
-                sector.SectorObjective = objective;
-                sector.Difficulty.DifficultyModifier = sectorData.Difficulty;
-                CompletedSectors.Add(sector);
+                try
+                {
+                    //Load Sector
+
+                    //Attempt get boss config by checking objective GUIDs in all boss option lists.
+                    BossObjectiveConfig bossConfig = BossOptionsList[sectorData.SolarSystemIndex].BossOptions.FirstOrDefault(bossOption => bossOption.Objective.AssetGuid == sectorData.ObjectiveGUID);
+
+                    //Create sector from boss config if found, otherwise use detected value from sectors.
+                    GameSessionSector sector = new GameSessionSector(bossConfig.Sector ?? solarSystems[sectorData.SolarSystemIndex].Sectors.First(sector => sector.ContainerGuid == sectorData.SectorContainerGUID));
+
+                    //load Objective
+                    sector.SetObjective(new Objective(ObjectiveDataContainer.Instance.GetAssetDefById(sectorData.ObjectiveGUID).Asset));
+                    sector.SectorObjective.Objective.State = sectorData.State;
+                    sector.Difficulty.DifficultyModifier = sectorData.Difficulty;
+                    CompletedSectors.Add(sector);
+                }
+                catch (Exception ex)
+                {
+                    BepinPlugin.Log.LogError($"Failed to load a sector-objective pair.\n{ex}");
+                }
             }
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Loaded data of {CompletedSectors.Count()} sectors");
-            endlessQuest.context.CompletedSectors = CompletedSectors;
+            endlessQuest.context.CompletedSectors.AddRange(CompletedSectors);
 
 
             //Load Statuses
@@ -126,7 +149,7 @@ namespace VoidSaving
 
                 completedInfos.Add(completionInfo);
             }
-            endlessQuest.context.CompletedSectorStatus = completedInfos;
+            endlessQuest.context.CompletedSectorStatus.AddRange(completedInfos);
         }
 
         public static BoosterStatus[] GetBoosterStates(AbstractPlayerControlledShip PlayerShip)

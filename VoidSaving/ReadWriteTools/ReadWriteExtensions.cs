@@ -200,6 +200,8 @@ namespace VoidSaving
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Writing {sectorDatas.Length} sector datas");
             foreach (SectorData sectorData in sectorDatas)
             {
+                Writer.Write((byte)sectorData.SolarSystemIndex);
+                Writer.Write(sectorData.SectorContainerGUID);
                 Writer.Write(sectorData.ObjectiveGUID);
                 Writer.Write((byte)sectorData.Difficulty);
                 Writer.Write((byte)sectorData.State);
@@ -216,6 +218,8 @@ namespace VoidSaving
             {
                 sectors[i] = new SectorData()
                 {
+                    SolarSystemIndex = reader.ReadByte(),
+                    SectorContainerGUID = reader.ReadGUIDUnion(),
                     ObjectiveGUID = reader.ReadGUIDUnion(),
                     Difficulty = (DifficultyModifier)reader.ReadByte(),
                     State = (ObjectiveState)reader.ReadByte()

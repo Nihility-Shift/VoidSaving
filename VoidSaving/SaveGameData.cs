@@ -126,12 +126,20 @@ namespace VoidSaving
 
     public struct SectorData
     {
-        public SectorData(GUIDUnion objectiveGUID, DifficultyModifier difficulty, ObjectiveState state)
+        public SectorData(GameSessionSector Sector, int solarSystemIndex)
         {
-            ObjectiveGUID = objectiveGUID;
-            Difficulty = difficulty;
-            State = state;
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Converting sector data");
+            SolarSystemIndex = solarSystemIndex;
+            SectorContainerGUID = Sector.SectorAsset.ContainerGuid;
+            ObjectiveGUID = Sector.SectorObjective.Objective.Asset.ContainerGuid;
+            Difficulty = Sector.Difficulty.DifficultyModifier;
+            State = Sector.ObjectiveState;
         }
+
+        //Save/Load as Byte.
+        public int SolarSystemIndex;
+
+        public GUIDUnion SectorContainerGUID;
 
         public GUIDUnion ObjectiveGUID;
 
