@@ -290,8 +290,7 @@ namespace VoidSaving
                         data.SaveDataVersion = reader.ReadUInt32();
                         data.PeekInfo = reader.ReadString();
                         data.IronManMode = reader.ReadBoolean();
-                        if (data.SaveDataVersion >= 1)
-                            data.ProgressionDisabled = reader.ReadBoolean();
+                        data.ProgressionDisabled = reader.ReadBoolean();
 
                         data.Alloy = reader.ReadInt32();
                         data.Biomass = reader.ReadInt32();
@@ -402,7 +401,7 @@ namespace VoidSaving
         }
 
 
-        public const uint CurrentDataVersion = 1;
+        public const uint CurrentDataVersion = 0;
 
         /// <summary>
         /// Writes file to path. Adds extension if missing.
