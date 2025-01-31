@@ -44,6 +44,8 @@ namespace VoidSaving
         //Run as carryables are loade, utilizing resource values from active data.
         static void LoadResourceContainers(CarryableObject carryable)
         {
+            if (!SaveHandler.LoadSavedData) return;
+
             carryable.SetPlatform(ClientGame.Current.PlayerShip.Platform);
 
             if (carryable is ResourceContainer resourceContainer)
@@ -219,7 +221,7 @@ namespace VoidSaving
         }
 
 
-        //Save Power and Ammo Resource Containers.
+        //collects battery and ammo can data from additional assets (loose carryables)
         static void SLRCPatchMethod(CarryableObject carryable)
         {
             if (carryable is ResourceContainer Container)
