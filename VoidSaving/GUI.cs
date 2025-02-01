@@ -181,6 +181,7 @@ namespace VoidSaving
                         }
                         if (SaveHandler.WriteSave(SaveName))
                         {
+                            SaveNames = SaveHandler.GetPeekedSaveFiles();
                             ErrorMessage = $"Successfully wrote {SaveName}";
                         }
                     }
