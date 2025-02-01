@@ -206,26 +206,6 @@ namespace VoidSaving
             }
         }
 
-        //VJS start puts VJ into inactive. Put into travelling state after load.
-        /*[HarmonyPatch(typeof(VoidJumpSystem), "Start"), HarmonyPostfix]
-        static void PostVoidJumpSystemStartPatch(VoidJumpSystem __instance)
-        {
-            if (!SaveHandler.LoadSavedData) return;
-
-            __instance.DebugTransitionToExitVectorSetState();
-            __instance.DebugTransitionToRotatingState();
-            __instance.DebugTransitionToSpinningUpState();
-            __instance.DebugTransitionToTravellingState();
-
-
-            //Load module state after jumping.
-            Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
-            //Load completed sectors after jumping.
-            Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
-            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
-        }*/
-
-
         //Load Alloy, biomass and sheilds post OnEnter (alloy assigned late in the target method, shield healths assigned in unordered start methods
         [HarmonyPatch(typeof(GSIngame), "OnEnter"), HarmonyPostfix]
         static void PostInGameLoadPatch()
