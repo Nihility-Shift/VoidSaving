@@ -148,7 +148,7 @@ namespace VoidSaving
                     GameSessionSector sector = new GameSessionSector(bossConfig.Sector ?? solarSystems[sectorData.SolarSystemIndex].Sectors.First(sector => sector.ContainerGuid == sectorData.SectorContainerGUID));
 
                     //load Objective
-                    sector.SetObjective(new Objective(ObjectiveDataContainer.Instance.GetAssetDefById(sectorData.ObjectiveGUID).Asset));
+                    sector.SetObjective(new Objective(ObjectiveDataContainer.Instance.GetAssetDefById(sectorData.ObjectiveGUID).Asset), sectorData.IsMainObjective);
                     sector.SectorObjective.Objective.State = sectorData.State;
                     sector.Difficulty.DifficultyModifier = sectorData.Difficulty;
                     CompletedSectors.Add(sector);

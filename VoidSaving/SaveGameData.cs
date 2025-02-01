@@ -136,6 +136,7 @@ namespace VoidSaving
             ObjectiveGUID = Sector.SectorObjective.Objective.Asset.ContainerGuid;
             Difficulty = Sector.Difficulty.DifficultyModifier;
             State = Sector.ObjectiveState;
+            IsMainObjective = Sector.SectorObjective.IsMainObjective;
         }
 
         //Save/Load as Byte.
@@ -148,6 +149,8 @@ namespace VoidSaving
         public DifficultyModifier Difficulty;
 
         public ObjectiveState State;
+
+        public bool IsMainObjective;
     }
 
     public struct SectorData
