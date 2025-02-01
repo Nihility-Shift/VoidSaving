@@ -158,7 +158,7 @@ namespace VoidSaving
                 __instance.context.NextSectionParameters.EnemyLevelRange.Max = SaveHandler.ActiveData.EnemyLevelRangeMax;
                 __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
-                Helpers.LoadLastUsedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
+                __instance.context.SideObjectiveGuaranteeInterval = SaveHandler.ActiveData.SideObjectiveGuaranteeInterval;
                 Helpers.LoadLastUsedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
 
 
@@ -178,7 +178,7 @@ namespace VoidSaving
                 SaveHandler.LatestData.EnemyLevelRangeMax = __instance.context.NextSectionParameters.EnemyLevelRange.Max;
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
-                SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGeneratedSectors(__instance);
+                SaveHandler.LatestData.SideObjectiveGuaranteeInterval = __instance.context.SideObjectiveGuaranteeInterval;
                 SaveHandler.LatestData.GenerationResultsUsedObjectives = Helpers.GetLastGeneratedMainObjectives(__instance);
 
 
