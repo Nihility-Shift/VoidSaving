@@ -158,6 +158,9 @@ namespace VoidSaving
                 __instance.context.NextSectionParameters.EnemyLevelRange.Max = SaveHandler.ActiveData.EnemyLevelRangeMax;
                 __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
+                Helpers.LoadLastUsedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
+                Helpers.LoadLastUsedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
+
 
                 SaveHandler.LatestData.Random = SaveHandler.ActiveData.Random;
                 __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
@@ -175,6 +178,8 @@ namespace VoidSaving
                 SaveHandler.LatestData.EnemyLevelRangeMax = __instance.context.NextSectionParameters.EnemyLevelRange.Max;
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
+                SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGeneratedSectors(__instance);
+                SaveHandler.LatestData.GenerationResultsUsedObjectives = Helpers.GetLastGeneratedMainObjectives(__instance);
 
 
                 SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();

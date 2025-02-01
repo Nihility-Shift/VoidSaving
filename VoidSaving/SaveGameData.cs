@@ -117,16 +117,18 @@ namespace VoidSaving
 
         public int SectorsToUseInSolarSystem;
 
-        public int SideObjectiveGuaranteeInterval;
+        public List<SectorData> GenerationResultsUsedSectors;
 
-        public SectorData[] CompletedSectors;
+        public GUIDUnion[] GenerationResultsUsedObjectives;
+
+        public CompletedSectorData[] CompletedSectors;
 
         public GameSessionStatistics SessionStats;
     }
 
-    public struct SectorData
+    public struct CompletedSectorData
     {
-        public SectorData(GameSessionSector Sector, int solarSystemIndex)
+        public CompletedSectorData(GameSessionSector Sector, int solarSystemIndex)
         {
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Converting sector data");
             SolarSystemIndex = solarSystemIndex;
@@ -146,6 +148,19 @@ namespace VoidSaving
         public DifficultyModifier Difficulty;
 
         public ObjectiveState State;
+    }
+
+    public struct SectorData
+    {
+        public SectorData(int solarSystemIndex, GUIDUnion sectorContainerGUID)
+        {
+            SolarSystemIndex = solarSystemIndex;
+            SectorContainerGUID = sectorContainerGUID;
+        }
+
+        public int SolarSystemIndex;
+
+        public GUIDUnion SectorContainerGUID;
     }
 
     public struct BoosterStatus

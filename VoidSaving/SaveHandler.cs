@@ -345,9 +345,11 @@ namespace VoidSaving
                         data.EnemyLevelRangeMax = reader.ReadInt32();
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
+                        data.GenerationResultsUsedSectors = reader.ReadSectorDatas();
+                        data.GenerationResultsUsedObjectives = reader.ReadGUIDUnionArray();
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
-                        data.CompletedSectors = reader.ReadSectors();
+                        data.CompletedSectors = reader.ReadCompletedSectorDatas();
                         data.SessionStats = reader.ReadSessionStats();
 
                         BepinPlugin.Log.LogInfo($"Finalized read at {fileStream.Position} Bytes");
@@ -489,6 +491,8 @@ namespace VoidSaving
                         writer.Write(data.EnemyLevelRangeMax);
                         writer.Write(data.SectorsUsedInSolarSystem);
                         writer.Write(data.SectorsToUseInSolarSystem);
+                        writer.Write(data.GenerationResultsUsedSectors);
+                        writer.Write(data.GenerationResultsUsedObjectives);
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.CompletedSectors);

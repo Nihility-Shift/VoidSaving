@@ -194,11 +194,11 @@ namespace VoidSaving
         }
 
 
-        public static void Write(this BinaryWriter Writer, SectorData[] sectorDatas)
+        public static void Write(this BinaryWriter Writer, CompletedSectorData[] sectorDatas)
         {
             Writer.Write(sectorDatas.Length);
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Writing {sectorDatas.Length} sector datas");
-            foreach (SectorData sectorData in sectorDatas)
+            foreach (CompletedSectorData sectorData in sectorDatas)
             {
                 Writer.Write((byte)sectorData.SolarSystemIndex);
                 Writer.Write(sectorData.SectorContainerGUID);
@@ -209,14 +209,14 @@ namespace VoidSaving
         }
 
 
-        public static SectorData[] ReadSectors(this BinaryReader reader)
+        public static CompletedSectorData[] ReadCompletedSectorDatas(this BinaryReader reader)
         {
             int length = reader.ReadInt32();
-            SectorData[] sectors = new SectorData[length];
+            CompletedSectorData[] sectors = new CompletedSectorData[length];
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Reading {length} sector datas");
             for (int i = 0; i < length; i++)
             {
-                sectors[i] = new SectorData()
+                sectors[i] = new CompletedSectorData()
                 {
                     SolarSystemIndex = reader.ReadByte(),
                     SectorContainerGUID = reader.ReadGUIDUnion(),
@@ -426,6 +426,28 @@ namespace VoidSaving
             }
 
             return data;
+        }
+
+        public static void Write(this BinaryWriter Writer, List<SectorData> Values)
+        {
+            int count = Values.Count;
+            Writer.Write(count);
+            for (int i = 0; i < count; i++)
+            {
+                Writer.Write(Values[i].SolarSystemIndex);
+                Writer.Write(Values[i].SectorContainerGUID);
+            }
+        }
+
+        public static List<SectorData> ReadSectorDatas(this BinaryReader reader)
+        {
+            int count = reader.ReadInt32();
+            List<SectorData> values = new List<SectorData>(count);
+            for (int i = 0; i < count; i++)
+            {
+                values.Add( new SectorData(reader.ReadInt32(), reader.ReadGUIDUnion()) );
+            }
+            return values;
         }
     }
 }
