@@ -20,12 +20,7 @@ namespace VoidSaving
     [HarmonyPatch]
     internal class LoadSavePatches
     {
-        [HarmonyPatch(typeof(Quest), "NextJumpInterdictionCheck"), HarmonyPostfix]
-        static void NJISeedCheck(int seed)
-        {
-            BepinPlugin.Log.LogInfo($"NJI Seed check: " + seed);
-        }
-
+        //Sets seed at earliest point
         [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnEnter")]
         internal class CapturePreJumpPatch
         {
@@ -109,16 +104,7 @@ namespace VoidSaving
                 VoidManager.Progression.ProgressionHandler.DisableProgression(MyPluginInfo.PLUGIN_GUID);
         }
 
-        //Sets seed at earliest point
-        [HarmonyPatch(typeof(GameSession), "LoadQuest"), HarmonyPrefix]
-        static void QuestLoadPrefix(GameSession __instance)
-        {
-            if (!SaveHandler.LoadSavedData || __instance.SessionQuestParameters == null) return;
-
-            __instance.SessionQuestParameters.Seed = SaveHandler.ActiveData.Seed;
-        }
-
-        //Sets jump and interdiction counters prior to first usage
+        //Sets jump and interdiction counters prior to first use, in this case on quest generation.
         [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
         static void QuestLoadPostfix(Quest __result)
         {
