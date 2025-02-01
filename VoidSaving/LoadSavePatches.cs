@@ -159,8 +159,8 @@ namespace VoidSaving
                 __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
                 __instance.context.SideObjectiveGuaranteeInterval = SaveHandler.ActiveData.SideObjectiveGuaranteeInterval;
+                Helpers.LoadLastGenUsedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
                 Helpers.LoadLastUsedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
-
 
                 SaveHandler.LatestData.Random = SaveHandler.ActiveData.Random;
                 __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
@@ -179,6 +179,7 @@ namespace VoidSaving
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
                 SaveHandler.LatestData.SideObjectiveGuaranteeInterval = __instance.context.SideObjectiveGuaranteeInterval;
+                SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGenUsedSectors(__instance);
                 SaveHandler.LatestData.GenerationResultsUsedObjectives = Helpers.GetLastGeneratedMainObjectives(__instance);
 
 
@@ -248,11 +249,13 @@ namespace VoidSaving
             jumpSystem.DebugTransitionToSpinningUpState();
             jumpSystem.DebugTransitionToTravellingState();
 
-
             //Load module state after jumping.
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
+
             //Load completed sectors after jumping.
             Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
+            Helpers.LoadSectionHistory((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData);
+
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }

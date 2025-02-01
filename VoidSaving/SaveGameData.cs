@@ -118,6 +118,7 @@ namespace VoidSaving
         public int SectorsToUseInSolarSystem;
 
         public int SideObjectiveGuaranteeInterval;
+
         public List<SectorData> GenerationResultsUsedSectors;
 
         public GUIDUnion[] GenerationResultsUsedObjectives;

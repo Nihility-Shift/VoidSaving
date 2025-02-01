@@ -470,5 +470,24 @@ namespace VoidSaving
                 }
             }
         }
+
+
+        public static void LoadSectionHistory(EndlessQuest quest, SaveGameData data)
+        {
+            int completedSectorCount = quest.context.CompletedSectors.Count();
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
+                BepinPlugin.Log.LogInfo($"LoadSectionHistory found {completedSectorCount} completed sectors");
+            for (int i = 0; i < data.SectorsUsedInSolarSystem; i++)
+            {
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
+                    BepinPlugin.Log.LogInfo($"LoadSectionHistory attempting sector at index {completedSectorCount - data.SectorsUsedInSolarSystem - i}");
+                GameSessionSection section = new GameSessionSection();
+                GameSessionSector sector = quest.context.CompletedSectors[completedSectorCount - data.SectorsUsedInSolarSystem - i];
+                section.ObjectiveSectors.Add(sector);
+                section.SolarSystem = sector.SectorAsset.ParentSolarSystem;
+
+                quest.context.CompletedSections.Add(section);
+            }
+        }
     }
 }
