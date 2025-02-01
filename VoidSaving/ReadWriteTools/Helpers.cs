@@ -68,8 +68,10 @@ namespace VoidSaving
             }
         }
 
-        public static List<SectorData> GetLastGeneratedSectors(EndlessQuest quest)
+        public static List<SectorData> GetLastGenUsedSectors(EndlessQuest quest)
         {
+            if (quest.context.lastGenerationResults.UsedSectors == null) return new();
+
             List<SolarSystem> solarSystems = quest.parameters.SolarSystems;
 
             return quest.context.lastGenerationResults.UsedSectors.ConvertAll<SectorData>
@@ -82,7 +84,7 @@ namespace VoidSaving
                 );
         }
 
-        public static void LoadLastUsedSectors(EndlessQuest quest, List<SectorData> data)
+        public static void LoadLastGenUsedSectors(EndlessQuest quest, List<SectorData> data)
         {
             List<SolarSystem> solarSystems = quest.parameters.SolarSystems;
 
@@ -94,12 +96,14 @@ namespace VoidSaving
 
         public static GUIDUnion[] GetLastGeneratedMainObjectives(EndlessQuest quest)
         {
+            if (quest.context.lastGenerationResults.UsedMainObjectiveDefinitions == null) return new GUIDUnion[0];
+
             return quest.context.lastGenerationResults.UsedMainObjectiveDefinitions.Select(objectiveDef => objectiveDef.AssetGuid).ToArray();
         }
 
         public static void LoadLastUsedMainObjectives(EndlessQuest quest, GUIDUnion[] data)
         {
-            quest.context.lastGenerationResults.UsedMainObjectiveDefinitions = data.Select(objectiveGUID => (ObjectiveDataRef)ObjectiveDataContainer.Instance.GetAssetDefById(objectiveGUID).Ref).ToList();
+            quest.context.lastGenerationResults.UsedMainObjectiveDefinitions = data.Select(objectiveGUID => new ObjectiveDataRef(objectiveGUID.AsIntArray())).ToList();
         }
 
         public static CompletedSectorData[] GetCompletedSectorDatas(EndlessQuest quest)
