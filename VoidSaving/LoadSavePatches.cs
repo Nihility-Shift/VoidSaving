@@ -33,17 +33,6 @@ namespace VoidSaving
                 VoidManager.Progression.ProgressionHandler.DisableProgression(MyPluginInfo.PLUGIN_GUID);
         }
 
-        //Sets jump and interdiction counters prior to first use, in this case on quest generation.
-        [HarmonyPatch(typeof(QuestGenerator), "Create"), HarmonyPostfix]
-        static void QuestLoadPostfix(Quest __result)
-        {
-            if (!SaveHandler.LoadSavedData || __result is not EndlessQuest quest) return;
-
-            //Load JumpCounter prior to jump to keep Interdiction chance the same.
-            quest.JumpCounter = SaveHandler.ActiveData.JumpCounter - 1;
-            quest.InterdictionCounter = SaveHandler.ActiveData.InterdictionCounter;
-        }
-
         //Loads ship from vanilla ship data save/load system
         [HarmonyPatch(typeof(GameSessionManager), "LoadGameSessionNetworkedAssets"), HarmonyPrefix]
         static void ShipLoadPatch(GameSessionManager __instance)
@@ -187,27 +176,28 @@ namespace VoidSaving
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
 
-                SaveHandler.LatestData.JumpCounter = __instance.JumpCounter;
-                SaveHandler.LatestData.InterdictionCounter = __instance.InterdictionCounter;
-
 
                 SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
             }
         }
 
-        //Interdiction chance captured and loaded pre-jump
+        //Interdiction chance and jump counts captured and loaded pre-jump
         [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnEnter"), HarmonyPrefix]
         static void CapturePreJumpPatch()
         {
             if (GameSessionManager.ActiveSession.ActiveQuest is not EndlessQuest endlessQuest) return;
 
-            if (!SaveHandler.LoadSavedData)
+            if (SaveHandler.LoadSavedData)
             {
-                SaveHandler.LatestData.CurrentInterdictionChance = endlessQuest.CurrentInterdictionChance;
+                endlessQuest.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
+                endlessQuest.JumpCounter = SaveHandler.ActiveData.JumpCounter;
+                endlessQuest.InterdictionCounter = SaveHandler.ActiveData.InterdictionCounter;
             }
             else
             {
-                endlessQuest.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
+                SaveHandler.LatestData.CurrentInterdictionChance = endlessQuest.CurrentInterdictionChance;
+                SaveHandler.LatestData.JumpCounter = endlessQuest.JumpCounter;
+                SaveHandler.LatestData.InterdictionCounter = endlessQuest.InterdictionCounter;
             }
         }
 
@@ -279,8 +269,6 @@ namespace VoidSaving
             //Load completed sectors after jumping.
             Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
-
-
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }
     }
