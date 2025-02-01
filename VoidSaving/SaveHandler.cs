@@ -337,10 +337,8 @@ namespace VoidSaving
                         data.InterdictionCounter = reader.ReadInt32();
                         data.CurrentInterdictionChance = reader.ReadSingle();
                         data.Random = reader.ReadRandom();
-                        data.NextSectorID = reader.ReadInt32();
                         data.ActiveSolarSystemID = reader.ReadInt32();
                         data.NextSolarSystemID = reader.ReadInt32();
-                        data.NextSectionIndex = reader.ReadInt32();
                         data.EnemyLevelRangeMin = reader.ReadInt32();
                         data.EnemyLevelRangeMax = reader.ReadInt32();
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
@@ -483,10 +481,8 @@ namespace VoidSaving
                         writer.Write(data.InterdictionCounter);
                         writer.Write(data.CurrentInterdictionChance);
                         writer.Write(data.Random);
-                        writer.Write(data.NextSectorID);
                         writer.Write(data.ActiveSolarSystemID);
                         writer.Write(data.NextSolarSystemID);
-                        writer.Write(data.NextSectionIndex);
                         writer.Write(data.EnemyLevelRangeMin);
                         writer.Write(data.EnemyLevelRangeMax);
                         writer.Write(data.SectorsUsedInSolarSystem);
