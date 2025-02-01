@@ -56,7 +56,7 @@ namespace VoidSaving
 
         public static bool StartedAsHost { get; internal set; }
 
-        internal static bool LoadSavedData = false;
+        internal static bool LoadSavedData { get { return ActiveData != null; } }
 
         internal static bool IsIronManMode
         {
@@ -260,7 +260,6 @@ namespace VoidSaving
         /// </summary>
         public static void CancelOrFinalzeLoad()
         {
-            LoadSavedData = false;
             ActiveData = null;
             CompletedStages = LoadingStage.None;
         }
@@ -361,7 +360,6 @@ namespace VoidSaving
                 return false;
             }
 
-            LoadSavedData = true;
             ActiveData = data;
             Messaging.Echo($"Loading save '{SaveName}' on next game start.", false);
             if(data.ProgressionDisabled)
