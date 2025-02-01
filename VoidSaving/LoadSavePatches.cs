@@ -21,77 +21,6 @@ namespace VoidSaving
     internal class LoadSavePatches
     {
         //Sets seed at earliest point
-        [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnEnter")]
-        internal class CapturePreJumpPatch
-        {
-            static void Prefix()
-            {
-                if (GameSessionManager.ActiveSession.ActiveQuest is not EndlessQuest endlessQuest) return;
-
-                if (!SaveHandler.LoadSavedData)
-                {
-                    SaveHandler.LatestData.CurrentInterdictionChance = endlessQuest.CurrentInterdictionChance;
-                }
-                else
-                {
-                    endlessQuest.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(EndlessQuest), "GenerateNextSection"), HarmonyPrefix]
-        static void SectionDataLoadPatch(EndlessQuest __instance)
-        {
-            BepinPlugin.Log.LogInfo("GNS called");
-
-            if (SaveHandler.LoadSavedData)
-            {
-                SaveGameData activeData = SaveHandler.ActiveData;
-
-                __instance.context.NextSectionParameters.Seed = activeData.ParametersSeed;
-                __instance.context.NextSectionParameters.NextSectorId = activeData.NextSectorID;
-
-                __instance.context.ActiveSolarSystemIndex = activeData.ActiveSolarSystemID;
-                __instance.context.NextSectionParameters.SolarSystem = __instance.parameters.SolarSystems[activeData.ActiveSolarSystemID];
-
-                __instance.context.NextSolarSystemIndex = activeData.NextSolarSystemID;
-                __instance.context.NextSectionParameters.SectionIndex = activeData.NextSectionIndex;
-                __instance.context.NextSectionParameters.EnemyLevelRange.Min = activeData.EnemyLevelRangeMin;
-                __instance.context.NextSectionParameters.EnemyLevelRange.Max = activeData.EnemyLevelRangeMax;
-                __instance.context.SectorsUsedInSolarSystem = activeData.SectorsUsedInSolarSystem;
-                __instance.context.SectorsToUseInSolarSystem = activeData.SectorsToUseInSolarSystem;
-
-                __instance.JumpCounter = activeData.JumpCounter;
-                __instance.InterdictionCounter = activeData.InterdictionCounter;
-
-
-                SaveHandler.LatestData.Random = activeData.Random;
-                __instance.context.Random = activeData.Random.DeepCopy();
-
-                GameSessionTracker.Instance._statistics = activeData.SessionStats;
-                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
-            }
-            else if (!GameSessionManager.InHub)
-            {
-                //Capture current random and quest data for saving prior to generation of next section.
-                SaveHandler.LatestData.ParametersSeed = __instance.Context.NextSectionParameters.Seed;
-                SaveHandler.LatestData.NextSectorID = __instance.context.NextSectionParameters.NextSectorId;
-                SaveHandler.LatestData.ActiveSolarSystemID = __instance.context.ActiveSolarSystemIndex;
-                SaveHandler.LatestData.NextSolarSystemID = __instance.context.NextSolarSystemIndex;
-                SaveHandler.LatestData.NextSectionIndex = __instance.context.NextSectionParameters.SectionIndex;
-                SaveHandler.LatestData.EnemyLevelRangeMin = __instance.context.NextSectionParameters.EnemyLevelRange.Min;
-                SaveHandler.LatestData.EnemyLevelRangeMax = __instance.context.NextSectionParameters.EnemyLevelRange.Max;
-                SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
-                SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
-
-                SaveHandler.LatestData.JumpCounter = __instance.JumpCounter;
-                SaveHandler.LatestData.InterdictionCounter = __instance.InterdictionCounter;
-
-
-                SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
-            }
-        }
-
         [HarmonyPatch(typeof(HubQuestManager), "StartQuest"), HarmonyPrefix]
         static void LoadShipGUID(HubQuestManager __instance, Quest quest)
         {
@@ -198,6 +127,90 @@ namespace VoidSaving
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.AbstractPlayerShipStart);
         }
 
+        //Quest Loading orders:
+        //
+        //CreateEndlessQuest
+        //  GenerateStartingSection
+        //    GenerateNextSection
+        //
+        //Void Jump Spin Up OnEnter
+        //  VoidJumpInterdictionChance calculated by original quest seed, interdiction counter, jump counter
+        //Void Jump Spin Up OnExit
+        //  ExitCurrentSector
+        //    EndlessQuestManager.Sector exited => CompleteSector => Add completed sectors
+        //  EnterVoid
+        //    AstralMapControler.VoidEntered
+        //VoidJumpTravellingStable OnEnter
+        //  if will be unstable, random time til unstable
+        //VoidJumpSpinningDown OnEnter
+        //  VoidJumpSystem.EnterSector
+        //    GameSessionManager.EnterSectorInternal
+        //      EndlessQuestManager.EndCurrentSection
+        //GenerateNextSection
+        //  PrepareSectionParameters
+        //  GenerateSection
+        //
+
+        //Section generation data loaded
+        [HarmonyPatch(typeof(EndlessQuest), "GenerateNextSection"), HarmonyPrefix]
+        static void SectionDataLoadPatch(EndlessQuest __instance)
+        {
+            BepinPlugin.Log.LogInfo("GNS called");
+
+            if (SaveHandler.LoadSavedData)
+            {
+                __instance.context.NextSectionParameters.Seed = SaveHandler.ActiveData.ParametersSeed;
+
+                __instance.context.ActiveSolarSystemIndex = SaveHandler.ActiveData.ActiveSolarSystemID;
+                __instance.context.NextSectionParameters.SolarSystem = __instance.parameters.SolarSystems[SaveHandler.ActiveData.ActiveSolarSystemID];
+
+                __instance.context.NextSolarSystemIndex = SaveHandler.ActiveData.NextSolarSystemID;
+                __instance.context.NextSectionParameters.EnemyLevelRange.Min = SaveHandler.ActiveData.EnemyLevelRangeMin;
+                __instance.context.NextSectionParameters.EnemyLevelRange.Max = SaveHandler.ActiveData.EnemyLevelRangeMax;
+                __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
+                __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
+
+                SaveHandler.LatestData.Random = SaveHandler.ActiveData.Random;
+                __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
+
+
+                GameSessionTracker.Instance._statistics = SaveHandler.ActiveData.SessionStats;
+            }
+            else if (!GameSessionManager.InHub)
+            {
+                //Capture current random and quest data for saving prior to generation of next section.
+                SaveHandler.LatestData.ParametersSeed = __instance.Context.NextSectionParameters.Seed;
+                SaveHandler.LatestData.ActiveSolarSystemID = __instance.context.ActiveSolarSystemIndex;
+                SaveHandler.LatestData.NextSolarSystemID = __instance.context.NextSolarSystemIndex;
+                SaveHandler.LatestData.EnemyLevelRangeMin = __instance.context.NextSectionParameters.EnemyLevelRange.Min;
+                SaveHandler.LatestData.EnemyLevelRangeMax = __instance.context.NextSectionParameters.EnemyLevelRange.Max;
+                SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
+                SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
+
+                SaveHandler.LatestData.JumpCounter = __instance.JumpCounter;
+                SaveHandler.LatestData.InterdictionCounter = __instance.InterdictionCounter;
+
+
+                SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
+            }
+        }
+
+        //Interdiction chance captured and loaded pre-jump
+        [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnEnter"), HarmonyPrefix]
+        static void CapturePreJumpPatch()
+        {
+            if (GameSessionManager.ActiveSession.ActiveQuest is not EndlessQuest endlessQuest) return;
+
+            if (!SaveHandler.LoadSavedData)
+            {
+                SaveHandler.LatestData.CurrentInterdictionChance = endlessQuest.CurrentInterdictionChance;
+            }
+            else
+            {
+                endlessQuest.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
+            }
+        }
+
         //VJS start puts VJ into inactive. Put into travelling state after load.
         /*[HarmonyPatch(typeof(VoidJumpSystem), "Start"), HarmonyPostfix]
         static void PostVoidJumpSystemStartPatch(VoidJumpSystem __instance)
@@ -212,6 +225,7 @@ namespace VoidSaving
 
             //Load module state after jumping.
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
+            //Load completed sectors after jumping.
             Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
         }*/
