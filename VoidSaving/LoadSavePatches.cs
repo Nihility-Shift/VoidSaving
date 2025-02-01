@@ -213,7 +213,7 @@ namespace VoidSaving
         }
 
         //VJS start puts VJ into inactive. Put into travelling state after load.
-        [HarmonyPatch(typeof(VoidJumpSystem), "Start"), HarmonyPostfix]
+        /*[HarmonyPatch(typeof(VoidJumpSystem), "Start"), HarmonyPostfix]
         static void PostVoidJumpSystemStartPatch(VoidJumpSystem __instance)
         {
             if (!SaveHandler.LoadSavedData) return;
@@ -228,7 +228,7 @@ namespace VoidSaving
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
             Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
-        }
+        }*/
 
 
         //Load Alloy, biomass and sheilds post OnEnter (alloy assigned late in the target method, shield healths assigned in unordered start methods
@@ -264,6 +264,22 @@ namespace VoidSaving
 
             //Defects loaded post-start due to the DamageController gathering defectSystems via start methods.
             Helpers.LoadDefectStates(playerShip.GetComponent<PlayerShipDefectDamageController>(), SaveHandler.ActiveData.Defects);
+
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
+
+            VoidJumpSystem jumpSystem = playerShip.GetComponent<VoidJumpSystem>();
+            jumpSystem.DebugTransitionToExitVectorSetState();
+            jumpSystem.DebugTransitionToRotatingState();
+            jumpSystem.DebugTransitionToSpinningUpState();
+            jumpSystem.DebugTransitionToTravellingState();
+
+
+            //Load module state after jumping.
+            Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
+            //Load completed sectors after jumping.
+            Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
+
 
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }
