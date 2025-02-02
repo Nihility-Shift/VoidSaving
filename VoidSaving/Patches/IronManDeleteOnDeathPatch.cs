@@ -1,7 +1,7 @@
 ﻿using CG.Space;
 using HarmonyLib;
 
-namespace VoidSaving
+namespace VoidSaving.Patches
 {
     //Handle here to avoid exploit-based save loss.
     [HarmonyPatch(typeof(AbstractPlayerControlledShip), "Kill")]

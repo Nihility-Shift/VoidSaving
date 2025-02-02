@@ -3,7 +3,7 @@ using CG.GameLoopStateMachine.GameStates;
 using HarmonyLib;
 using VoidManager.Utilities;
 
-namespace VoidSaving
+namespace VoidSaving.Patches
 {
     [HarmonyPatch(typeof(GSIngame), "OnEnter")]
     internal class IronManNotifiyPatch

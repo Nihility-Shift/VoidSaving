@@ -11,7 +11,7 @@ using System.Reflection.Emit;
 using UnityEngine;
 using static VoidManager.Utilities.HarmonyHelpers;
 
-namespace VoidSaving
+namespace VoidSaving.Patches
 {
     //Ship Load attempts to utilize carryable socket provider's carryables sockets, but these are not available on ship load.
     //Attempt to replace with connected sockets, which should get added to by individual mod slot components on awake.

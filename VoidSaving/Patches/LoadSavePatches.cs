@@ -15,7 +15,7 @@ using Gameplay.Quests;
 using HarmonyLib;
 using ToolClasses;
 
-namespace VoidSaving
+namespace VoidSaving.Patches
 {
     [HarmonyPatch]
     internal class LoadSavePatches

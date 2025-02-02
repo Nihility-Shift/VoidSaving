@@ -1,7 +1,7 @@
 ﻿using CG.Game.SpaceObjects.Controllers;
 using HarmonyLib;
 
-namespace VoidSaving
+namespace VoidSaving.Patches
 {
     [HarmonyPatch(typeof(VoidJumpSystem), "EnterVoid")]
     internal class AutoSavePatch
