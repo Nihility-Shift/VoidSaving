@@ -148,6 +148,11 @@ namespace VoidSaving
 
             if (SaveHandler.LoadSavedData)
             {
+                __instance.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
+                __instance.JumpCounter = SaveHandler.ActiveData.JumpCounter;
+                __instance.InterdictionCounter = SaveHandler.ActiveData.InterdictionCounter;
+
+                //Load saved random and quest data
                 __instance.context.NextSectionParameters.Seed = SaveHandler.ActiveData.ParametersSeed;
 
                 __instance.context.ActiveSolarSystemIndex = SaveHandler.ActiveData.ActiveSolarSystemID;
@@ -170,6 +175,12 @@ namespace VoidSaving
             }
             else if (!GameSessionManager.InHub)
             {
+                SaveHandler.LatestData.CurrentInterdictionChance = __instance.CurrentInterdictionChance;
+                SaveHandler.LatestData.JumpCounter = __instance.JumpCounter;
+                SaveHandler.LatestData.InterdictionCounter = __instance.InterdictionCounter;
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
+                    BepinPlugin.Log.LogInfo($"Captured Interdiction at {__instance.CurrentInterdictionChance}");
+
                 //Capture current random and quest data for saving prior to generation of next section.
                 SaveHandler.LatestData.ParametersSeed = __instance.Context.NextSectionParameters.Seed;
                 SaveHandler.LatestData.ActiveSolarSystemID = __instance.context.ActiveSolarSystemIndex;
@@ -184,26 +195,6 @@ namespace VoidSaving
 
 
                 SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
-            }
-        }
-
-        //Interdiction chance and jump counts captured and loaded pre-jump
-        [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnEnter"), HarmonyPrefix]
-        static void CapturePreJumpPatch()
-        {
-            if (GameSessionManager.ActiveSession.ActiveQuest is not EndlessQuest endlessQuest) return;
-
-            if (SaveHandler.LoadSavedData)
-            {
-                endlessQuest.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
-                endlessQuest.JumpCounter = SaveHandler.ActiveData.JumpCounter;
-                endlessQuest.InterdictionCounter = SaveHandler.ActiveData.InterdictionCounter;
-            }
-            else
-            {
-                SaveHandler.LatestData.CurrentInterdictionChance = endlessQuest.CurrentInterdictionChance;
-                SaveHandler.LatestData.JumpCounter = endlessQuest.JumpCounter;
-                SaveHandler.LatestData.InterdictionCounter = endlessQuest.InterdictionCounter;
             }
         }
 
