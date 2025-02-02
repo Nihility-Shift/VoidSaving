@@ -39,6 +39,10 @@ namespace VoidSaving
             SaveHandler.StartedAsHost = input.StartedSessionAsHost;
             switch (input.CallType)
             {
+                case CallType.Joining;
+                    //Reset latest data doesn't carry into next run
+                    SaveHandler.LatestData = null;
+                    break;
                 case CallType.HostCreateRoom:
                     return new SessionChangedReturn() { SetMod_Session = true };
                 case CallType.HostChange:

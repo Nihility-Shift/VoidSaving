@@ -12,8 +12,6 @@ namespace VoidSaving
         {
             if (previous is GSSpawn && GameSessionManager.InHub && SaveHandler.StartedAsHost)
             {
-                //Reset latest data so next saves don't carry data over.
-                SaveHandler.LatestData = null;
                 if (SaveHandler.IsIronManMode)
                 {
                     Messaging.Notification("Iron Man for the next session is ON");
