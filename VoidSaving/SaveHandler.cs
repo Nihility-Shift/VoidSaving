@@ -294,7 +294,7 @@ namespace VoidSaving
                         data.Alloy = reader.ReadInt32();
                         data.Biomass = reader.ReadInt32();
                         data.ShipHealth = reader.ReadSingle();
-                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
+                        if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.ShipLoadoutGUID = reader.ReadGUIDUnion();
                         data.ShipLoadout = reader.ReadJObject();

@@ -118,9 +118,19 @@ namespace VoidSaving
 
         //Quest Loading orders:
         //
+        //HubQuestManager.GenerateQuestsUsingParameters
         //CreateEndlessQuest
         //  GenerateStartingSection
         //    GenerateNextSection
+        //
+        //GSMasterStartGame.CreateGameSequence
+        //GameSessionManager.HostGameSession()
+        //  GameSession.LoadQuest()
+        //    EndlessQuestManager.ActivateEndlessQuest()
+        //      EndlessQuestManager.CatchUpToHostSection()
+        //        EndlessQuest.EndCurrentSection()
+        //          EndlessQuest.GenerateNextSection()
+        //
         //
         //Void Jump Spin Up OnEnter
         //  VoidJumpInterdictionChance calculated by original quest seed, interdiction counter, jump counter

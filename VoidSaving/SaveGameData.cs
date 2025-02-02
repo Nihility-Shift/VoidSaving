@@ -101,13 +101,9 @@ namespace VoidSaving
 
         public float CurrentInterdictionChance;
 
-        public int NextSectorID;
-
         public int ActiveSolarSystemID;
 
         public int NextSolarSystemID;
-
-        public int NextSectionIndex;
 
         public int EnemyLevelRangeMin;
 
