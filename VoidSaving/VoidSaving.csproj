@@ -23,6 +23,9 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="HideAdditionalSectorsPatch.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" PrivateAssets="all" />
     <PackageReference Include="VCMT.Thunderstore.DocBuilder" Version="0.2.1" PrivateAssets="all" />
