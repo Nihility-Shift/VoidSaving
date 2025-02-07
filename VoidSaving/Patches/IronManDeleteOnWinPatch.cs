@@ -1,11 +1,10 @@
-﻿using CG.Space;
+﻿using CG.GameLoopStateMachine.GameStates;
 using HarmonyLib;
 
 namespace VoidSaving.Patches
 {
-    //Handle here to avoid exploit-based save loss.
-    [HarmonyPatch(typeof(AbstractPlayerControlledShip), "Kill")]
-    internal class IronManDeleteOnDeathPatch
+    [HarmonyPatch(typeof(GSEndSession), "OnEnter")]
+    internal class IronManDeleteOnWinPatch
     {
         static void Postfix()
         {
