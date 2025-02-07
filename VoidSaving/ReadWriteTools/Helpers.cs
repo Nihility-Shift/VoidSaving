@@ -351,15 +351,15 @@ namespace VoidSaving
         }
 
 
-        public static List<SectorData> GetLastGeneratedSectors(EndlessQuest quest)
+        public static List<SimpleSectorData> GetLastGeneratedSectors(EndlessQuest quest)
         {
             if (quest.context.lastGenerationResults.UsedSectors == null) return new();
 
             List<SolarSystem> solarSystems = quest.parameters.SolarSystems;
 
-            return quest.context.lastGenerationResults.UsedSectors.ConvertAll<SectorData>
+            return quest.context.lastGenerationResults.UsedSectors.ConvertAll<SimpleSectorData>
                 (
-                    sector => new SectorData()
+                    sector => new SimpleSectorData()
                     {
                         SolarSystemIndex = solarSystems.IndexOf(sector.ParentSolarSystem),
                         SectorContainerGUID = sector.ContainerGuid
@@ -367,7 +367,7 @@ namespace VoidSaving
                 );
         }
 
-        public static void LoadLastGeneratedSectors(EndlessQuest quest, List<SectorData> data)
+        public static void LoadLastGeneratedSectors(EndlessQuest quest, List<SimpleSectorData> data)
         {
             List<SolarSystem> solarSystems = quest.parameters.SolarSystems;
 

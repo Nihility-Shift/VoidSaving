@@ -115,18 +115,19 @@ namespace VoidSaving
 
         public int SideObjectiveGuaranteeInterval;
 
-        public List<SectorData> GenerationResultsUsedSectors;
+        public List<SimpleSectorData> GenerationResultsUsedSectors;
 
         public GUIDUnion[] GenerationResultsUsedObjectives;
 
-        public CompletedSectorData[] CompletedSectors;
+        public FullSectorData[] CompletedSectors;
 
         public GameSessionStatistics SessionStats;
     }
 
     public struct CompletedSectorData
+    public struct FullSectorData
     {
-        public CompletedSectorData(GameSessionSector Sector, int solarSystemIndex)
+        public FullSectorData(GameSessionSector Sector, int solarSystemIndex)
         {
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Converting sector data");
             SolarSystemIndex = solarSystemIndex;
@@ -151,9 +152,9 @@ namespace VoidSaving
         public bool IsMainObjective;
     }
 
-    public struct SectorData
+    public struct SimpleSectorData
     {
-        public SectorData(int solarSystemIndex, GUIDUnion sectorContainerGUID)
+        public SimpleSectorData(int solarSystemIndex, GUIDUnion sectorContainerGUID)
         {
             SolarSystemIndex = solarSystemIndex;
             SectorContainerGUID = sectorContainerGUID;

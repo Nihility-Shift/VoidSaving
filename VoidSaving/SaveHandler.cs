@@ -344,11 +344,11 @@ namespace VoidSaving
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
                         data.SideObjectiveGuaranteeInterval = reader.ReadInt32();
-                        data.GenerationResultsUsedSectors = reader.ReadSectorDatas();
+                        data.GenerationResultsUsedSectors = reader.ReadSimpleSectorDatas();
                         data.GenerationResultsUsedObjectives = reader.ReadGUIDUnionArray();
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
-                        data.CompletedSectors = reader.ReadCompletedSectorDatas();
+                        data.CompletedSectors = reader.ReadFullSectorDatas();
                         data.SessionStats = reader.ReadSessionStats();
 
                         BepinPlugin.Log.LogInfo($"Finalized read at {fileStream.Position} Bytes");
