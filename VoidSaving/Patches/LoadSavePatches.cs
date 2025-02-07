@@ -187,12 +187,14 @@ namespace VoidSaving.Patches
                     BepinPlugin.Log.LogInfo("Reading used Sectors");
                     foreach (var sector in __instance.context.lastGenerationResults.UsedSectors)
                     {
-                        BepinPlugin.Log.LogInfo(sector.DisplayName);
+                        if (sector != default)
+                            BepinPlugin.Log.LogInfo(sector.DisplayName);
                     }
                     BepinPlugin.Log.LogInfo("Reading used objectives");
                     foreach (var objective in __instance.context.lastGenerationResults.UsedMainObjectiveDefinitions)
                     {
-                        BepinPlugin.Log.LogInfo(objective.Filename);
+                        if (objective != default)
+                            BepinPlugin.Log.LogInfo(objective.Filename);
                     }
                 }
             }
@@ -224,12 +226,14 @@ namespace VoidSaving.Patches
                     BepinPlugin.Log.LogInfo("Reading used Sectors");
                     foreach (var sector in __instance.context.lastGenerationResults.UsedSectors)
                     {
-                        BepinPlugin.Log.LogInfo(sector.DisplayName);
+                        if (sector != default)
+                            BepinPlugin.Log.LogInfo(sector.DisplayName);
                     }
                     BepinPlugin.Log.LogInfo("Reading used objectives");
                     foreach (var objective in __instance.context.lastGenerationResults.UsedMainObjectiveDefinitions)
                     {
-                        BepinPlugin.Log.LogInfo(objective.Filename);
+                        if (objective != default)
+                            BepinPlugin.Log.LogInfo(objective.Filename);
                     }
                 }
             }
