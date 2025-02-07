@@ -194,7 +194,7 @@ namespace VoidSaving.Patches
                     {
                         BepinPlugin.Log.LogInfo(objective.Filename);
                     }
-            }
+                }
             }
             else if (!GameSessionManager.InHub)
             {
@@ -275,7 +275,10 @@ namespace VoidSaving.Patches
             jumpSystem.DebugTransitionToExitVectorSetState();
             jumpSystem.DebugTransitionToRotatingState();
             jumpSystem.DebugTransitionToSpinningUpState();
-            jumpSystem.DebugTransitionToTravellingState();
+
+            //forcing next state via debug method ignores interdiction instant unstable chance. Instead, we'll force SpinUp start time -3 seconds
+            var spinUpState = (VoidJumpSpinningUp)jumpSystem.activeState;
+            spinUpState.enterTimestamp -= 3000;
 
             //Load module state after jumping.
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
