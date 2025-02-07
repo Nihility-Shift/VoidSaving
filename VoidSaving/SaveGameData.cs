@@ -121,10 +121,20 @@ namespace VoidSaving
 
         public FullSectorData[] CompletedSectors;
 
+        public SectionData[] CompletedSections;
+
+        public SectionData CurrentSection;
+
         public GameSessionStatistics SessionStats;
     }
 
-    public struct CompletedSectorData
+    public struct SectionData
+    {
+        public FullSectorData[] ObjectiveSectors;
+
+        public int SolarSystemIndex;
+    }
+
     public struct FullSectorData
     {
         public FullSectorData(GameSessionSector Sector, int solarSystemIndex)

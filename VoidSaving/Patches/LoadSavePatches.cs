@@ -176,6 +176,9 @@ namespace VoidSaving.Patches
                 __instance.context.SideObjectiveGuaranteeInterval = SaveHandler.ActiveData.SideObjectiveGuaranteeInterval;
                 Helpers.LoadLastGeneratedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
                 Helpers.LoadLastGeneratedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
+                Helpers.LoadCompletedSectors(__instance, SaveHandler.ActiveData.CompletedSectors);
+                Helpers.LoadCompletedSections(__instance, SaveHandler.ActiveData.CompletedSections);
+                Helpers.LoadCurrentSection(__instance, SaveHandler.ActiveData.CurrentSection, __instance.CurrentInterdictionChance == __instance.Asset.InterdictionChanceOnReset);
 
                 __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
 
@@ -200,7 +203,7 @@ namespace VoidSaving.Patches
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
                 SaveHandler.LatestData.SideObjectiveGuaranteeInterval = __instance.context.SideObjectiveGuaranteeInterval;
-                SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGenUsedSectors(__instance);
+                SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGeneratedSectors(__instance);
                 SaveHandler.LatestData.GenerationResultsUsedObjectives = Helpers.GetLastGeneratedMainObjectives(__instance);
 
 
@@ -242,7 +245,6 @@ namespace VoidSaving.Patches
             //Defects loaded post-start due to the DamageController gathering defectSystems via start methods.
             Helpers.LoadDefectStates(playerShip.GetComponent<PlayerShipDefectDamageController>(), SaveHandler.ActiveData.Defects);
 
-            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
 
             VoidJumpSystem jumpSystem = playerShip.GetComponent<VoidJumpSystem>();
             jumpSystem.DebugTransitionToExitVectorSetState();

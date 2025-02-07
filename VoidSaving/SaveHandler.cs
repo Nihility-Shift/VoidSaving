@@ -217,6 +217,7 @@ namespace VoidSaving
                 saveGameData.SessionStats = GameSessionTracker.Statistics;
 
                 saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest);
+                saveGameData.CompletedSections = Helpers.GetCompletedSections(activeQuest);
 
 
                 //Peek Data
@@ -349,6 +350,8 @@ namespace VoidSaving
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.CompletedSectors = reader.ReadFullSectorDatas();
+                        data.CompletedSections = reader.ReadSectionDatas();
+                        data.CurrentSection = reader.ReadSectionData();
                         data.SessionStats = reader.ReadSessionStats();
 
                         BepinPlugin.Log.LogInfo($"Finalized read at {fileStream.Position} Bytes");
@@ -495,6 +498,8 @@ namespace VoidSaving
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.CompletedSectors);
+                        writer.Write(data.CompletedSections);
+                        writer.Write(data.CurrentSection);
                         writer.Write(data.SessionStats);
 
                         BepinPlugin.Log.LogInfo($"Finalized write at {fileStream.Length} Bytes");

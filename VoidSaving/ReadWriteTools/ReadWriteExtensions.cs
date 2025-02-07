@@ -450,5 +450,43 @@ namespace VoidSaving
 
             return sectors;
         }
+
+        
+        public static void Write(this BinaryWriter Writer, SectionData sectionData)
+        {
+            Writer.Write(sectionData.ObjectiveSectors);
+            Writer.Write(sectionData.SolarSystemIndex);
+        }
+
+        public static SectionData ReadSectionData(this BinaryReader Reader)
+        {
+            return new SectionData()
+            {
+                ObjectiveSectors = Reader.ReadFullSectorDatas(),
+                SolarSystemIndex = Reader.ReadInt32(),
+            };
+        }
+
+
+        public static void Write(this BinaryWriter Writer, SectionData[] sections)
+        {
+            int length = sections.Length;
+            Writer.Write(length);
+            for (int i = 0; i < sections.Length; i++)
+            {
+                Writer.Write(sections[i]);
+            }
+        }
+
+        public static SectionData[] ReadSectionDatas(this BinaryReader Reader)
+        {
+            int length = Reader.ReadInt32();
+            SectionData[] sections = new SectionData[length];
+            for (int i = 0; i < length; i++)
+            {
+                sections[i] = Reader.ReadSectionData();
+            }
+            return sections;
+        }
     }
 }
