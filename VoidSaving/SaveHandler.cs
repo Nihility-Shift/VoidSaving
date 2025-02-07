@@ -218,6 +218,7 @@ namespace VoidSaving
 
                 saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest);
                 saveGameData.CompletedSections = Helpers.GetCompletedSections(activeQuest);
+                saveGameData.CurrentSection = Helpers.GetCurrentSection(activeQuest);
 
 
                 //Peek Data
@@ -251,7 +252,6 @@ namespace VoidSaving
             if (CompletedStages == (LoadingStage.VoidJumpStart | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData | LoadingStage.InGameLoad))
             {
                 BepinPlugin.Log.LogInfo("Finished all loading stages");
-                LatestData = ActiveData;
                 CancelOrFinalzeLoad();
             }
         }

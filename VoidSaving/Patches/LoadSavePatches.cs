@@ -118,17 +118,13 @@ namespace VoidSaving.Patches
 
         //Quest Loading orders:
         //
-        //HubQuestManager.GenerateQuestsUsingParameters
-        //CreateEndlessQuest
-        //  GenerateStartingSection
-        //    GenerateNextSection
         //
         //GSMasterStartGame.CreateGameSequence
         //GameSessionManager.HostGameSession()
         //  GameSession.LoadQuest()
-        //    EndlessQuestManager.ActivateEndlessQuest()
-        //      EndlessQuestManager.CatchUpToHostSection()
-        //        EndlessQuest.EndCurrentSection()
+        //    QuestGenerator.Create()
+        //      EndlessQuestGenerator.CreateEndlessQuest()
+        //        EndlessQuest.GenerateStartingSection()
         //          EndlessQuest.GenerateNextSection()
         //
         //
@@ -185,6 +181,20 @@ namespace VoidSaving.Patches
                 GameSessionTracker.Instance._statistics = SaveHandler.ActiveData.SessionStats;
 
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
+
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
+                {
+                    BepinPlugin.Log.LogInfo("Reading used Sectors");
+                    foreach (var sector in __instance.context.lastGenerationResults.UsedSectors)
+                    {
+                        BepinPlugin.Log.LogInfo(sector.DisplayName);
+                    }
+                    BepinPlugin.Log.LogInfo("Reading used objectives");
+                    foreach (var objective in __instance.context.lastGenerationResults.UsedMainObjectiveDefinitions)
+                    {
+                        BepinPlugin.Log.LogInfo(objective.Filename);
+                    }
+            }
             }
             else if (!GameSessionManager.InHub)
             {
@@ -208,6 +218,20 @@ namespace VoidSaving.Patches
 
 
                 SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
+
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode && __instance.context.lastGenerationResults.UsedSectors != null)
+                {
+                    BepinPlugin.Log.LogInfo("Reading used Sectors");
+                    foreach (var sector in __instance.context.lastGenerationResults.UsedSectors)
+                    {
+                        BepinPlugin.Log.LogInfo(sector.DisplayName);
+                    }
+                    BepinPlugin.Log.LogInfo("Reading used objectives");
+                    foreach (var objective in __instance.context.lastGenerationResults.UsedMainObjectiveDefinitions)
+                    {
+                        BepinPlugin.Log.LogInfo(objective.Filename);
+                    }
+                }
             }
         }
 
@@ -246,6 +270,7 @@ namespace VoidSaving.Patches
             Helpers.LoadDefectStates(playerShip.GetComponent<PlayerShipDefectDamageController>(), SaveHandler.ActiveData.Defects);
 
 
+            //Jump System loaded post-start due to start() race condition conflicts with astral map
             VoidJumpSystem jumpSystem = playerShip.GetComponent<VoidJumpSystem>();
             jumpSystem.DebugTransitionToExitVectorSetState();
             jumpSystem.DebugTransitionToRotatingState();
@@ -255,12 +280,65 @@ namespace VoidSaving.Patches
             //Load module state after jumping.
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
 
-            //Load completed sectors after jumping.
-            Helpers.LoadCompletedSectors((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData.CompletedSectors);
-            Helpers.LoadSectionHistory((EndlessQuest)GameSessionManager.ActiveSession.ActiveQuest, SaveHandler.ActiveData);
+            //reload astral map.
+            //AstralMapController mapController = playerShip.GetComponentInChildren<AstralMapController>();
+            //mapController.StartCoroutine(mapController.Init());
 
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }
+
+
+        /*//Skips adding of current sector to completed sectors
+        internal static bool SkipSectorComplete;
+
+        static void SkipSectorCompletePatchMethod(EndlessQuestManager manager, GameSessionSector gameSessionSector, int index, byte status)
+        {
+            if (!SkipSectorComplete)
+            {
+                manager.endlessQuest.Context.CompletedSectors.Add(manager.endlessQuest.GetSector(index, true));
+                manager.endlessQuest.Context.CompletedSectorStatus.Add(new SectorCompletionInfo
+                {
+                    CompletionStatus = (SectorCompletionStatus)status,
+                    SectorDifficultyModifier = gameSessionSector.Difficulty.DifficultyModifier
+                });
+            }
+        }
+
+        static IEnumerable<CodeInstruction> SkipSectorCompletePatch(IEnumerable<CodeInstruction> instructions)
+        {
+            CodeInstruction[] targetSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Ldc_I4_1),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Callvirt),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Newobj),
+                new CodeInstruction(OpCodes.Dup),
+                new CodeInstruction(OpCodes.Ldloc_0),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Ldfld),
+                new CodeInstruction(OpCodes.Stfld),
+                new CodeInstruction(OpCodes.Callvirt),
+            };
+
+            CodeInstruction[] patchSequence = new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_0),
+                new CodeInstruction(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Ldarg_2),
+            };
+
+            return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.REPLACE, CheckMode.NEVER);
+        }*/
     }
 }

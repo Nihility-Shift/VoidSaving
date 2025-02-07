@@ -142,10 +142,10 @@ namespace VoidSaving
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Converting sector data");
             SolarSystemIndex = solarSystemIndex;
             SectorContainerGUID = Sector.SectorAsset.ContainerGuid;
-            ObjectiveGUID = Sector.SectorObjective.Objective.Asset.ContainerGuid;
+            ObjectiveGUID = Sector.SectorObjective?.Objective?.Asset?.ContainerGuid ?? default;
             Difficulty = Sector.Difficulty.DifficultyModifier;
             State = Sector.ObjectiveState;
-            IsMainObjective = Sector.SectorObjective.IsMainObjective;
+            IsMainObjective = Sector.SectorObjective?.IsMainObjective ?? true;
         }
 
         //Save/Load as Byte.
