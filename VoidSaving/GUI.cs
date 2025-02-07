@@ -20,8 +20,6 @@ namespace VoidSaving
 
         Vector2 SaveScrollPosition;
 
-        bool FailedToLoadLastSave;
-
         bool IronManMode = true;
 
 
@@ -192,7 +190,6 @@ namespace VoidSaving
         public override void OnOpen()
         {
             IronManMode = SaveHandler.IsIronManMode;
-            FailedToLoadLastSave = false;
             ToDeleteFileName = null;
             SaveNames = SaveHandler.GetPeekedSaveFiles();
 
