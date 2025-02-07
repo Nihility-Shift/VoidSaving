@@ -633,9 +633,6 @@ namespace VoidSaving
                 currentSection.ObjectiveSectors[1].Id = quest.context.NextSectionParameters.NextSectorId++;
             }
             currentSection.SolarSystem = quest.parameters.SolarSystems[data.SolarSystemIndex];
-
-
-            //Interdiction sector fucks with DistributeHostData.
         }
     }
 }
