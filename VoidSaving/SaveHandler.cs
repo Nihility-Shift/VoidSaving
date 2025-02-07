@@ -362,6 +362,7 @@ namespace VoidSaving
             }
 
             ActiveData = data;
+            LatestData = data;
             Messaging.Echo($"Loading save '{SaveName}' on next game start.", false);
             if(data.ProgressionDisabled)
                 Messaging.Echo("Progress will be disabled after starting.");
@@ -499,7 +500,6 @@ namespace VoidSaving
                         BepinPlugin.Log.LogInfo($"Finalized write at {fileStream.Length} Bytes");
                     }
                 }
-                LatestData = data;
                 File.Delete(fullSavePath);
                 File.Move(safePath, fullSavePath);
                 return true;
