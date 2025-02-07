@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace VoidSaving
+namespace VoidSaving.Patches
 {
     [HarmonyPatch]
     internal class LoadInInterdictionTimerPatches

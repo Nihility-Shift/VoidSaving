@@ -1,7 +1,7 @@
 ﻿using Gameplay.Quests;
 using HarmonyLib;
 
-namespace VoidSaving
+namespace VoidSaving.VanillaFixes
 {
     [HarmonyPatch(typeof(GameSession), "AsJObject")]
     internal class GameSessionAntiSerializePatches

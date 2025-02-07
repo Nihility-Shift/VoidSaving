@@ -2,7 +2,7 @@
 using Gameplay.Quests;
 using HarmonyLib;
 
-namespace VoidSaving
+namespace VoidSaving.VanillaFixes
 {
     //On load state is assigned to started, however if the mission is already failed there's no need for this.
     [HarmonyPatch(typeof(QuestManager), "SetQuestObjectiveState")]

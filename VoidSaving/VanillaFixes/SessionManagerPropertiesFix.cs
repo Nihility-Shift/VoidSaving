@@ -4,7 +4,7 @@ using Photon.Pun;
 namespace VoidSaving
 {
     [HarmonyPatch(typeof(GameSessionSectorManager), "OnRoomPropertiesUpdate")]
-    internal class SessonManagerPropertiesFix
+    internal class SessionManagerPropertiesFix
     {
         static bool Prefix()
         {

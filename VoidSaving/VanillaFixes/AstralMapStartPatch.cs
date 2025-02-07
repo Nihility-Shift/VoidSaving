@@ -2,8 +2,9 @@
 using HarmonyLib;
 using UI.AstralMap;
 
-namespace VoidSaving
+namespace VoidSaving.VanillaFixes
 {
+    //Map thinks it's not the starting sector if completed sectors has data, so replace with decent check code.
     [HarmonyPatch(typeof(AstralMapController), "CheckForGameStart")]
     internal class AstralMapStartPatch
     {
