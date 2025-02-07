@@ -194,44 +194,6 @@ namespace VoidSaving
         }
 
 
-        public static void Write(this BinaryWriter Writer, CompletedSectorData[] sectorDatas)
-        {
-            Writer.Write(sectorDatas.Length);
-            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Writing {sectorDatas.Length} sector datas");
-            foreach (CompletedSectorData sectorData in sectorDatas)
-            {
-                Writer.Write((byte)sectorData.SolarSystemIndex);
-                Writer.Write(sectorData.SectorContainerGUID);
-                Writer.Write(sectorData.ObjectiveGUID);
-                Writer.Write((byte)sectorData.Difficulty);
-                Writer.Write((byte)sectorData.State);
-                Writer.Write(sectorData.IsMainObjective);
-            }
-        }
-
-
-        public static CompletedSectorData[] ReadCompletedSectorDatas(this BinaryReader reader)
-        {
-            int length = reader.ReadInt32();
-            CompletedSectorData[] sectors = new CompletedSectorData[length];
-            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Reading {length} sector datas");
-            for (int i = 0; i < length; i++)
-            {
-                sectors[i] = new CompletedSectorData()
-                {
-                    SolarSystemIndex = reader.ReadByte(),
-                    SectorContainerGUID = reader.ReadGUIDUnion(),
-                    ObjectiveGUID = reader.ReadGUIDUnion(),
-                    Difficulty = (DifficultyModifier)reader.ReadByte(),
-                    State = (ObjectiveState)reader.ReadByte(),
-                    IsMainObjective = reader.ReadBoolean()
-                };
-            }
-
-            return sectors;
-        }
-
-
         public static void Write(this BinaryWriter Writer, BoosterStatus[] boosterStatuses)
         {
             Writer.Write(boosterStatuses.Length);
@@ -430,7 +392,7 @@ namespace VoidSaving
             return data;
         }
 
-        public static void Write(this BinaryWriter Writer, List<SectorData> Values)
+        public static void Write(this BinaryWriter Writer, List<SimpleSectorData> Values)
         {
             int count = Values.Count;
             Writer.Write(count);
@@ -441,15 +403,52 @@ namespace VoidSaving
             }
         }
 
-        public static List<SectorData> ReadSectorDatas(this BinaryReader reader)
+        public static List<SimpleSectorData> ReadSimpleSectorDatas(this BinaryReader reader)
         {
             int count = reader.ReadInt32();
-            List<SectorData> values = new List<SectorData>(count);
+            List<SimpleSectorData> values = new List<SimpleSectorData>(count);
             for (int i = 0; i < count; i++)
             {
-                values.Add( new SectorData(reader.ReadInt32(), reader.ReadGUIDUnion()) );
+                values.Add( new SimpleSectorData(reader.ReadInt32(), reader.ReadGUIDUnion()) );
             }
             return values;
+        }
+
+
+        public static void Write(this BinaryWriter Writer, FullSectorData[] sectorDatas)
+        {
+            Writer.Write(sectorDatas.Length);
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Writing {sectorDatas.Length} sector datas");
+            foreach (FullSectorData sectorData in sectorDatas)
+            {
+                Writer.Write((byte)sectorData.SolarSystemIndex);
+                Writer.Write(sectorData.SectorContainerGUID);
+                Writer.Write(sectorData.ObjectiveGUID);
+                Writer.Write((byte)sectorData.Difficulty);
+                Writer.Write((byte)sectorData.State);
+                Writer.Write(sectorData.IsMainObjective);
+            }
+        }
+
+        public static FullSectorData[] ReadFullSectorDatas(this BinaryReader reader)
+        {
+            int length = reader.ReadInt32();
+            FullSectorData[] sectors = new FullSectorData[length];
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Reading {length} sector datas");
+            for (int i = 0; i < length; i++)
+            {
+                sectors[i] = new FullSectorData()
+                {
+                    SolarSystemIndex = reader.ReadByte(),
+                    SectorContainerGUID = reader.ReadGUIDUnion(),
+                    ObjectiveGUID = reader.ReadGUIDUnion(),
+                    Difficulty = (DifficultyModifier)reader.ReadByte(),
+                    State = (ObjectiveState)reader.ReadByte(),
+                    IsMainObjective = reader.ReadBoolean()
+                };
+            }
+
+            return sectors;
         }
     }
 }

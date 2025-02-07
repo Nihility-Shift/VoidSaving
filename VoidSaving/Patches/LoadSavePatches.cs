@@ -174,14 +174,14 @@ namespace VoidSaving.Patches
                 __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
                 __instance.context.SideObjectiveGuaranteeInterval = SaveHandler.ActiveData.SideObjectiveGuaranteeInterval;
-                Helpers.LoadLastGenUsedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
-                Helpers.LoadLastUsedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
+                Helpers.LoadLastGeneratedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
+                Helpers.LoadLastGeneratedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
 
-                SaveHandler.LatestData.Random = SaveHandler.ActiveData.Random;
                 __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
 
-
                 GameSessionTracker.Instance._statistics = SaveHandler.ActiveData.SessionStats;
+
+                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
             }
             else if (!GameSessionManager.InHub)
             {

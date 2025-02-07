@@ -389,7 +389,8 @@ namespace VoidSaving
             quest.context.lastGenerationResults.UsedMainObjectiveDefinitions = data.Select(objectiveGUID => new ObjectiveDataRef(objectiveGUID.AsIntArray())).ToList();
         }
 
-        public static CompletedSectorData[] GetCompletedSectorDatas(EndlessQuest quest)
+
+        public static FullSectorData[] GetSectorDatasFromList(List<GameSessionSector> sectors, List<SolarSystem> solarSystems)
         {
             List<GameSessionSector> sectors = quest.context.CompletedSectors;
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collecting data of {sectors.Count()} sectors");
@@ -407,7 +408,7 @@ namespace VoidSaving
             return sectorDatas.ToArray();
         }
 
-        public static void LoadCompletedSectors(EndlessQuest endlessQuest, CompletedSectorData[] sectorDatas)
+        public static List<GameSessionSector> LoadSectorsFromData(EndlessQuest quest, FullSectorData[] datas, bool LoadWithIDs = false)
         {
             List<GameSessionSector> completedSectors = new List<GameSessionSector>(sectorDatas.Length);
             List<SectorCompletionInfo> completedInfos = new List<SectorCompletionInfo>(sectorDatas.Length);
