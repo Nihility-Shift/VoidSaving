@@ -11,7 +11,7 @@ namespace VoidSaving
             AutoSavingEnabled = configFile.Bind("Settings", "AutoSaving", true, "Auto Saving Enabled/Disabled");
             AutoSaveLimit = configFile.Bind("Settings", "AutoSaveLimit", 10, "How many auto save IDs to loop through");
             DefaultIronMan = configFile.Bind("Settings", "DefaultIronManMode", true, "Default state for iron man setting.");
-            ExtraMSUntilInterdiction = configFile.Bind("Settings", "ExtraMSUntilInterdiction", 10000, "Time in MS added to interdictiosn during load.");
+            ExtraMSUntilInterdiction = configFile.Bind("Settings", "ExtraMSUntilInterdiction", 10000, "Time in MS added to interdictions during load.");
             LastAutoSave = configFile.Bind("Data", "LastAutoSave", 0);
         }
 

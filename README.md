@@ -4,7 +4,7 @@
 
 # Void Saving
 
-Version 0.1.1  
+Version 0.2.0  
 For Game Version 1.0.4  
 Developed by Dragon  
 Requires:  BepInEx-BepInExPack-5.4.2100, VoidCrewModdingTeam-VoidManager-1.2.5
