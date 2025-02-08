@@ -115,7 +115,7 @@ namespace VoidSaving
             }
 
             //sort by date
-            FilesAndDates.OrderBy(x => x.Value);
+            FilesAndDates.OrderBy(x => x.Value.writeTime);
 
             return FilesAndDates;
         }
