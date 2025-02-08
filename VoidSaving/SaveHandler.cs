@@ -102,6 +102,9 @@ namespace VoidSaving
 
         internal static Dictionary<string, SaveFilePeekData> GetPeekedSaveFiles()
         {
+            //Fix GUI exceptions when peeking
+            Directory.CreateDirectory(SaveLocation);
+
             string[] Files = Directory.GetFiles(SaveLocation);
             Dictionary<string, SaveFilePeekData> FilesAndDates = new();
 
