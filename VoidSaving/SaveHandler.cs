@@ -348,6 +348,8 @@ namespace VoidSaving
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
                         data.SideObjectiveGuaranteeInterval = reader.ReadInt32();
+                        data.NextSectorID = reader.ReadInt32();
+                        data.NextMissionID = reader.ReadInt32();
                         data.GenerationResultsUsedSectors = reader.ReadSimpleSectorDatas();
                         data.GenerationResultsUsedObjectives = reader.ReadGUIDUnionArray();
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
@@ -496,6 +498,8 @@ namespace VoidSaving
                         writer.Write(data.SectorsUsedInSolarSystem);
                         writer.Write(data.SectorsToUseInSolarSystem);
                         writer.Write(data.SideObjectiveGuaranteeInterval);
+                        writer.Write(data.NextSectorID);
+                        writer.Write(data.NextMissionID);
                         writer.Write(data.GenerationResultsUsedSectors);
                         writer.Write(data.GenerationResultsUsedObjectives);
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");

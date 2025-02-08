@@ -170,6 +170,8 @@ namespace VoidSaving.Patches
                 __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
                 __instance.context.SideObjectiveGuaranteeInterval = SaveHandler.ActiveData.SideObjectiveGuaranteeInterval;
+                __instance.context.NextSectionParameters.NextSectorId = SaveHandler.ActiveData.NextSectorID;
+                __instance.context.NextSectionParameters.MissionId = SaveHandler.ActiveData.NextMissionID;
                 Helpers.LoadLastGeneratedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
                 Helpers.LoadLastGeneratedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
                 Helpers.LoadCompletedSectors(__instance, SaveHandler.ActiveData.CompletedSectors);
@@ -215,6 +217,8 @@ namespace VoidSaving.Patches
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
                 SaveHandler.LatestData.SideObjectiveGuaranteeInterval = __instance.context.SideObjectiveGuaranteeInterval;
+                SaveHandler.LatestData.NextSectorID = __instance.context.NextSectionParameters.NextSectorId;
+                SaveHandler.LatestData.NextMissionID = __instance.context.NextSectionParameters.MissionId;
                 SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGeneratedSectors(__instance);
                 SaveHandler.LatestData.GenerationResultsUsedObjectives = Helpers.GetLastGeneratedMainObjectives(__instance);
 

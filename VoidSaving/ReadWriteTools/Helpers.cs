@@ -470,12 +470,17 @@ namespace VoidSaving
                     sectorInternal = quest.context.NextSectionParameters.SolarSystem.StagingSector;
                 }
                 GameSessionSector sector = new GameSessionSector(sectorInternal, quest.context.NextSectionParameters.NextSectorId++);
-
+                sector.Id = sectorData.SectorID;
+                
                 //load Objective if not default GUID
                 if (sectorData.ObjectiveGUID != default)
                 {
                     Objective objective = new Objective(ObjectiveDataContainer.Instance.GetAssetDefById(sectorData.ObjectiveGUID).Asset);
                     objective.PrimarySector = sector;
+                    for(int j = 0; j < objective.Missions.Count(); j++)
+                    {
+                        objective.Missions[j].Id = sectorData.MissionID + j;
+                    }
                     sector.SetObjective(objective, sectorData.IsMainObjective);
                     sector.SectorObjective.Objective.State = sectorData.State;
                     sector.Difficulty.DifficultyModifier = sectorData.Difficulty;

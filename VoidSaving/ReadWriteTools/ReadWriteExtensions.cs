@@ -427,6 +427,8 @@ namespace VoidSaving
                 Writer.Write((byte)sectorData.Difficulty);
                 Writer.Write((byte)sectorData.State);
                 Writer.Write(sectorData.IsMainObjective);
+                Writer.Write(sectorData.MissionID);
+                Writer.Write(sectorData.SectorID);
             }
         }
 
@@ -444,7 +446,9 @@ namespace VoidSaving
                     ObjectiveGUID = reader.ReadGUIDUnion(),
                     Difficulty = (DifficultyModifier)reader.ReadByte(),
                     State = (ObjectiveState)reader.ReadByte(),
-                    IsMainObjective = reader.ReadBoolean()
+                    IsMainObjective = reader.ReadBoolean(),
+                    MissionID = reader.ReadInt32(),
+                    SectorID = reader.ReadInt32(),
                 };
             }
 
