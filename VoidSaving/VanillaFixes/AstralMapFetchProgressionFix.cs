@@ -1,6 +1,7 @@
 ﻿using CG.Game.Scenarios;
 using Gameplay.Quests;
 using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using UI.AstralMap;
 
@@ -27,7 +28,7 @@ namespace VoidSaving.VanillaFixes
 
             //New Code - Changed from foreach loop to for loop, focusing on last 5/6 sections. This stops creation of progression history items for old sections and avoids looping through too many times.
             int length = CompletedSections.Count;
-            for (int i = length - 6; i < length; i++)
+            for (int i = Math.Max(length - 6, 0); i < length; i++)
             {
                 GameSessionSection CurrentSection = CompletedSections[i];
                 if (CurrentSection.SolarSystem == endlessQuest.Context.CurrentSection.SolarSystem)
