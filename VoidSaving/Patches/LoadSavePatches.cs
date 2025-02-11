@@ -335,7 +335,6 @@ namespace VoidSaving.Patches
             CalledInit = true;
             mapController.StartCoroutine(mapController.Init());
 
-            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }
 

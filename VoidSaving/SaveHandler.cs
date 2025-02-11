@@ -240,7 +240,7 @@ namespace VoidSaving
         public enum LoadingStage
         {
             None = 0,
-            VoidJumpStart = 1,
+            LoadCurrentSection = 1,
             AbstractPlayerShipStart = 2,
             QuestData = 4,
             InGameLoad = 8,
@@ -248,12 +248,14 @@ namespace VoidSaving
 
         static LoadingStage CompletedStages;
 
+        static LoadingStage AllLoadingStages = LoadingStage.LoadCurrentSection | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData | LoadingStage.InGameLoad;
+
         public static void CompleteLoadingStage(LoadingStage stage)
         {
             CompletedStages |= stage;
             BepinPlugin.Log.LogInfo("Completed Loading Stage: " + stage);
             
-            if (CompletedStages == (LoadingStage.VoidJumpStart | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData | LoadingStage.InGameLoad))
+            if (CompletedStages == AllLoadingStages)
             {
                 BepinPlugin.Log.LogInfo("Finished all loading stages");
                 CancelOrFinalzeLoad();
