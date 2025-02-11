@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace VoidSaving
+namespace VoidSaving.ReadWriteTools
 {
     public static class ReadWriteExtensions
     {

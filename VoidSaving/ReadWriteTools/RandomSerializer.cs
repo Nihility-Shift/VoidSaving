@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VoidSaving
+namespace VoidSaving.ReadWriteTools
 {
     //Stolen from zORg Alex, https://stackoverflow.com/a/67604192
     public static class RandomSerializer

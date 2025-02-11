@@ -15,6 +15,7 @@ using Gameplay.Quests;
 using HarmonyLib;
 using ToolClasses;
 using UI.AstralMap;
+using VoidSaving.ReadWriteTools;
 
 namespace VoidSaving.Patches
 {

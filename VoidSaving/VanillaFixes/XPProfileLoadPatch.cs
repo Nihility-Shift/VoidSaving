@@ -1,7 +1,7 @@
 ﻿using CG.Cloud;
 using HarmonyLib;
 
-namespace VoidSaving
+namespace VoidSaving.VanillaFixes
 {
     [HarmonyPatch(typeof(CloudPlayerProfileDataSync), "ClaimPendingXp")]
     internal class XPProfileLoadPatch

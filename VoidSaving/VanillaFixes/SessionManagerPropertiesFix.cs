@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Photon.Pun;
 
-namespace VoidSaving
+namespace VoidSaving.VanillaFixes
 {
     [HarmonyPatch(typeof(GameSessionSectorManager), "OnRoomPropertiesUpdate")]
     internal class SessionManagerPropertiesFix

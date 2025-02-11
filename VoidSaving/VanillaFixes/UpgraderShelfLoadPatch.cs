@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace VoidSaving
+namespace VoidSaving.VanillaFixes
 {
     //Upgraders being placed in shelves on ship load break here. Stop original code from running if attempting to run (no calls needed from vanilla at time of writing)
     [HarmonyPatch(typeof(ModuleUpgraderEffects), "StartBeingCarried")]
