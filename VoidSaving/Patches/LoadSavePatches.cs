@@ -14,6 +14,7 @@ using Gameplay.Power;
 using Gameplay.Quests;
 using HarmonyLib;
 using ToolClasses;
+using UI.AstralMap;
 
 namespace VoidSaving.Patches
 {
@@ -140,13 +141,59 @@ namespace VoidSaving.Patches
         //VoidJumpSpinningDown OnEnter
         //  VoidJumpSystem.EnterSector
         //    GameSessionManager.EnterSectorInternal
-        //      EndlessQuestManager.EndCurrentSection
+        //      If entered next section, call EndlessQuestManager.EndCurrentSection
         //GenerateNextSection
         //  PrepareSectionParameters
         //  GenerateSection
         //
 
-        //Section generation data loaded
+        //Just before void jump - Cache per-jump data.
+        [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnEnter"), HarmonyPrefix]
+        static void GetInterdictionChancesPatch(VoidJumpSpinningUp __instance)
+        {
+            if (GameSessionManager.ActiveSession?.ActiveQuest is not EndlessQuest quest) return;
+
+            if (SaveHandler.LoadSavedData)
+            {
+                quest.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
+                quest.JumpCounter = SaveHandler.ActiveData.JumpCounter;
+                quest.InterdictionCounter = SaveHandler.ActiveData.InterdictionCounter;
+            }
+            else
+            {
+                SaveHandler.LatestData.CurrentInterdictionChance = quest.CurrentInterdictionChance;
+                SaveHandler.LatestData.JumpCounter = quest.JumpCounter;
+                SaveHandler.LatestData.InterdictionCounter = quest.InterdictionCounter;
+            }
+        }
+
+        //Collect last sector ID.
+        [HarmonyPatch(typeof(EndlessQuestManager), "SectorEntered"), HarmonyPrefix]
+        static void SectorEnteredDataCollectionPatch(EndlessQuestManager __instance, GameSessionSector sector)
+        {
+            if(!SaveHandler.LoadSavedData)
+            {
+                SaveHandler.LatestData.LastSectorID = sector.Id;
+            }
+        }
+
+        //Load into last sector.
+        [HarmonyPatch(typeof(GameSessionManager), "LoadActiveSector"), HarmonyPrefix]
+        static bool LoadCurrentSectionPatch(GameSessionManager __instance)
+        {
+            if (SaveHandler.LoadSavedData)
+            {
+                EndlessQuest quest = (EndlessQuest)__instance.activeGameSession.ActiveQuest;
+                Helpers.LoadCurrentSection(quest, SaveHandler.ActiveData);
+                GameSessionSectorManager.Instance.EnterSector(SaveHandler.ActiveData.LastSectorID);
+                GameSessionSectorManager.Instance.SetDestinationSector(-1);
+                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.LoadCurrentSection);
+                return false;
+            }
+            else return true;
+        }
+
+        //Section generation data loaded - Runs after entering a sector belonging to the next section.
         [HarmonyPatch(typeof(EndlessQuest), "GenerateNextSection"), HarmonyPrefix]
         static void SectionDataLoadPatch(EndlessQuest __instance)
         {
@@ -154,10 +201,6 @@ namespace VoidSaving.Patches
 
             if (SaveHandler.LoadSavedData)
             {
-                __instance.CurrentInterdictionChance = SaveHandler.ActiveData.CurrentInterdictionChance;
-                __instance.JumpCounter = SaveHandler.ActiveData.JumpCounter;
-                __instance.InterdictionCounter = SaveHandler.ActiveData.InterdictionCounter;
-
                 //Load saved random and quest data
                 __instance.context.NextSectionParameters.Seed = SaveHandler.ActiveData.ParametersSeed;
 
@@ -170,13 +213,13 @@ namespace VoidSaving.Patches
                 __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
                 __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
                 __instance.context.SideObjectiveGuaranteeInterval = SaveHandler.ActiveData.SideObjectiveGuaranteeInterval;
+                __instance.context.NextSectionParameters.SectionIndex = SaveHandler.ActiveData.NextSectionID;
                 __instance.context.NextSectionParameters.NextSectorId = SaveHandler.ActiveData.NextSectorID;
                 __instance.context.NextSectionParameters.MissionId = SaveHandler.ActiveData.NextMissionID;
                 Helpers.LoadLastGeneratedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
                 Helpers.LoadLastGeneratedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
                 Helpers.LoadCompletedSectors(__instance, SaveHandler.ActiveData.CompletedSectors);
                 Helpers.LoadCompletedSections(__instance, SaveHandler.ActiveData.CompletedSections);
-                Helpers.LoadCurrentSection(__instance, SaveHandler.ActiveData.CurrentSection, __instance.CurrentInterdictionChance == __instance.Asset.InterdictionChanceOnReset);
 
                 __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
 
@@ -202,12 +245,6 @@ namespace VoidSaving.Patches
             }
             else if (!GameSessionManager.InHub)
             {
-                SaveHandler.LatestData.CurrentInterdictionChance = __instance.CurrentInterdictionChance;
-                SaveHandler.LatestData.JumpCounter = __instance.JumpCounter;
-                SaveHandler.LatestData.InterdictionCounter = __instance.InterdictionCounter;
-                if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
-                    BepinPlugin.Log.LogInfo($"Captured Interdiction at {__instance.CurrentInterdictionChance}");
-
                 //Capture current random and quest data for saving prior to generation of next section.
                 SaveHandler.LatestData.ParametersSeed = __instance.Context.NextSectionParameters.Seed;
                 SaveHandler.LatestData.ActiveSolarSystemID = __instance.context.ActiveSolarSystemIndex;
@@ -217,6 +254,7 @@ namespace VoidSaving.Patches
                 SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
                 SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
                 SaveHandler.LatestData.SideObjectiveGuaranteeInterval = __instance.context.SideObjectiveGuaranteeInterval;
+                SaveHandler.LatestData.NextSectionID = __instance.context.NextSectionParameters.SectionIndex;
                 SaveHandler.LatestData.NextSectorID = __instance.context.NextSectionParameters.NextSectorId;
                 SaveHandler.LatestData.NextMissionID = __instance.context.NextSectionParameters.MissionId;
                 SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGeneratedSectors(__instance);
@@ -292,64 +330,30 @@ namespace VoidSaving.Patches
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
 
             //reload astral map.
-            //AstralMapController mapController = playerShip.GetComponentInChildren<AstralMapController>();
-            //mapController.StartCoroutine(mapController.Init());
+            AstralMapController mapController = playerShip.GetComponentInChildren<AstralMapController>();
+            CalledInit = true;
+            mapController.StartCoroutine(mapController.Init());
 
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.VoidJumpStart);
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }
 
+        static bool CalledInit;
 
-        /*//Skips adding of current sector to completed sectors
-        internal static bool SkipSectorComplete;
-
-        static void SkipSectorCompletePatchMethod(EndlessQuestManager manager, GameSessionSector gameSessionSector, int index, byte status)
+        [HarmonyPatch(typeof(AstralMapController), "InitSections"), HarmonyPrefix]
+        static void InitSectionsPrefix(AstralMapController __instance)
         {
-            if (!SkipSectorComplete)
-            {
-                manager.endlessQuest.Context.CompletedSectors.Add(manager.endlessQuest.GetSector(index, true));
-                manager.endlessQuest.Context.CompletedSectorStatus.Add(new SectorCompletionInfo
-                {
-                    CompletionStatus = (SectorCompletionStatus)status,
-                    SectorDifficultyModifier = gameSessionSector.Difficulty.DifficultyModifier
-                });
-            }
+            if (!CalledInit) return;
+
+            __instance._gameStart = true;
         }
 
-        static IEnumerable<CodeInstruction> SkipSectorCompletePatch(IEnumerable<CodeInstruction> instructions)
+        [HarmonyPatch(typeof(AstralMapController), "InitSections"), HarmonyPostfix]
+        static void InitSectionsPostfix(AstralMapController __instance)
         {
-            CodeInstruction[] targetSequence = new CodeInstruction[]
-            {
-                new CodeInstruction(OpCodes.Ldfld),
-                new CodeInstruction(OpCodes.Callvirt),
-                new CodeInstruction(OpCodes.Ldfld),
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Ldfld),
-                new CodeInstruction(OpCodes.Ldarg_1),
-                new CodeInstruction(OpCodes.Ldc_I4_1),
-                new CodeInstruction(OpCodes.Callvirt),
-                new CodeInstruction(OpCodes.Callvirt),
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Ldfld),
-                new CodeInstruction(OpCodes.Callvirt),
-                new CodeInstruction(OpCodes.Ldfld),
-                new CodeInstruction(OpCodes.Newobj),
-                new CodeInstruction(OpCodes.Dup),
-                new CodeInstruction(OpCodes.Ldloc_0),
-                new CodeInstruction(OpCodes.Ldfld),
-                new CodeInstruction(OpCodes.Ldfld),
-                new CodeInstruction(OpCodes.Stfld),
-                new CodeInstruction(OpCodes.Callvirt),
-            };
+            if (!CalledInit) return;
 
-            CodeInstruction[] patchSequence = new CodeInstruction[]
-            {
-                new CodeInstruction(OpCodes.Ldloc_0),
-                new CodeInstruction(OpCodes.Ldarg_1),
-                new CodeInstruction(OpCodes.Ldarg_2),
-            };
-
-            return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.REPLACE, CheckMode.NEVER);
-        }*/
+            __instance._gameStart = false;
+        }
     }
 }
