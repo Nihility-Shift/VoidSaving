@@ -430,7 +430,7 @@ namespace VoidSaving
             return sectorDatas.ToArray();
         }
 
-        public static List<GameSessionSector> LoadSectorsFromData(EndlessQuest quest, FullSectorData[] datas, bool LoadWithIDs = false)
+        public static List<GameSessionSector> LoadSectorsFromData(EndlessQuest quest, FullSectorData[] datas)
         {
             int dataLength = datas.Length;
             List<GameSessionSector> sectors = new List<GameSessionSector>(dataLength);
@@ -444,40 +444,45 @@ namespace VoidSaving
 
                 FullSectorData sectorData = datas[i];
 
-
+                SolarSystem solarSystem = solarSystems[sectorData.SolarSystemIndex];
                 Sector sectorInternal;
-                //Skip sector if Objective doesn't exist.
-                if (sectorData.ObjectiveGUID != default)
+                BossObjectiveConfig bossConfig = new();
+
+                if (sectorData.SectorContainerGUID == solarSystem.InterdictionSector.ContainerGuid)
                 {
-
-                    //Attempt get boss config by checking objective GUIDs in all boss option lists.
-                    BossObjectiveConfig bossConfig = BossOptionsList[sectorData.SolarSystemIndex].BossOptions.FirstOrDefault(bossOption => bossOption.Objective.AssetGuid == sectorData.ObjectiveGUID);
-
-                    //Create sector from boss config if found, otherwise use detected value from sectors.
-
-                    if (bossConfig.Sector)
-                        sectorInternal = bossConfig.Sector;
-                    else
-                        sectorInternal = solarSystems[sectorData.SolarSystemIndex].Sectors.FirstOrDefault(sector => sector.ContainerGuid == sectorData.SectorContainerGUID);
-
-                    if (sectorInternal == null)
-                    {
-                        sectorInternal = quest.context.NextSectionParameters.SolarSystem.StagingSector;
-                    }
+                    //Interdiction sector
+                    sectorInternal = solarSystem.InterdictionSector;
                 }
                 else
                 {
-                    sectorInternal = quest.context.NextSectionParameters.SolarSystem.StagingSector;
+                    bossConfig = BossOptionsList[sectorData.SolarSystemIndex].BossOptions.FirstOrDefault(bossOption => bossOption.Objective.AssetGuid == sectorData.ObjectiveGUID);
+                    if (bossConfig.Sector)
+                    {
+                        //Boss sector
+                        sectorInternal = bossConfig.Sector;
+                    }
+                    else
+                    {
+                        //Main/Side objective sector
+                        sectorInternal = solarSystem.Sectors.FirstOrDefault(sector => sector.ContainerGuid == sectorData.SectorContainerGUID);
+                    }
                 }
-                GameSessionSector sector = new GameSessionSector(sectorInternal, quest.context.NextSectionParameters.NextSectorId++);
-                sector.Id = sectorData.SectorID;
+                if (sectorInternal == null)
+                {
+                    sectorInternal = solarSystem.StagingSector;
+                }
+                GameSessionSector sector = new GameSessionSector(sectorInternal, sectorData.SectorID);
                 
                 //load Objective if not default GUID
                 if (sectorData.ObjectiveGUID != default)
                 {
+                    //All objective Types exist in data container.
                     Objective objective = new Objective(ObjectiveDataContainer.Instance.GetAssetDefById(sectorData.ObjectiveGUID).Asset);
+
                     objective.PrimarySector = sector;
-                    for(int j = 0; j < objective.Missions.Count(); j++)
+                    objective.ObjectiveSectors = new List<GameSessionSector> { sector };
+                    objective.OffWorldSector = quest.OffWorldSector;
+                    for (int j = 0; j < objective.Missions.Count(); j++)
                     {
                         objective.Missions[j].Id = sectorData.MissionID + j;
                     }
