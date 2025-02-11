@@ -1,4 +1,6 @@
-﻿using CG.Client.Ship;
+﻿using CG.Client.Quests;
+using CG.Client.Ship;
+using CG.Game.Missions;
 using CG.Game.Scenarios;
 using CG.Game.SpaceObjects.Controllers;
 using CG.Objects;
@@ -429,7 +431,7 @@ namespace VoidSaving.ReadWriteTools
             return sectorDatas.ToArray();
         }
 
-        public static List<GameSessionSector> LoadSectorsFromData(EndlessQuest quest, FullSectorData[] datas)
+        public static List<GameSessionSector> LoadSectorsFromData(EndlessQuest quest, FullSectorData[] datas, bool LoadMissions = false)
         {
             int dataLength = datas.Length;
             List<GameSessionSector> sectors = new List<GameSessionSector>(dataLength);
@@ -481,9 +483,17 @@ namespace VoidSaving.ReadWriteTools
                     objective.PrimarySector = sector;
                     objective.ObjectiveSectors = new List<GameSessionSector> { sector };
                     objective.OffWorldSector = quest.OffWorldSector;
-                    for (int j = 0; j < objective.Missions.Count(); j++)
+
+                    //Create objectives
+                    if (LoadMissions)
                     {
-                        objective.Missions[j].Id = sectorData.MissionID + j;
+                        objective.AddClassifiersData(objective.Asset.GetAllClassifiers());
+                        List<Mission> list2 = MissionsLoader.CreateMissions(objective.Classifiers);
+                        for (int j = 0; j < list2.Count; j++)
+                        {
+                            list2[j].Id = j + sectorData.MissionID;
+                        }
+                        objective.ObjectiveMissions.AddRange(list2);
                     }
                     sector.SetObjective(objective, sectorData.IsMainObjective);
                     sector.SectorObjective.Objective.State = sectorData.State;
@@ -619,10 +629,10 @@ namespace VoidSaving.ReadWriteTools
 
             if (data.InterdictionSector.SectorID != -99)
             {
-                currentSection.InterdictionSector = LoadSectorsFromData(quest, [data.InterdictionSector])[0];
+                currentSection.InterdictionSector = LoadSectorsFromData(quest, [data.InterdictionSector], true)[0];
             }
 
-            currentSection.ObjectiveSectors = LoadSectorsFromData(quest, data.ObjectiveSectors);
+            currentSection.ObjectiveSectors = LoadSectorsFromData(quest, data.ObjectiveSectors, true);
 
             currentSection.SolarSystem = quest.parameters.SolarSystems[data.SolarSystemIndex];
 
