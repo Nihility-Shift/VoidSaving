@@ -503,12 +503,10 @@ namespace VoidSaving
             SectionData[] data = new SectionData[length];
             for (int i = 0; i < length; i++)
             {
-                //Remove start and exit sectors.
-                List<GameSessionSector> objectiveSectors = sections[i].AllAvailableSectors.Where(sector => sector.SectorAsset != sector.SectorAsset.ParentSolarSystem.StagingSector && sector != quest.ExitSector).ToList();
-
                 int SystemID = solarSystems.IndexOf(sections[i].SolarSystem);
-                data[i].ObjectiveSectors = GetSectorDatasFromList(objectiveSectors, SystemID);
+                data[i].ObjectiveSectors = GetSectorDatasFromList(sections[i].ObjectiveSectors, SystemID);
                 data[i].SolarSystemIndex = SystemID;
+                data[i].SectionIndex = sections[i].SectionIndex;
             }
             return data;
         }
@@ -528,6 +526,7 @@ namespace VoidSaving
 
                 currentSection.ObjectiveSectors = LoadSectorsFromData(quest, data.ObjectiveSectors);
                 currentSection.SolarSystem = solarSystems[data.SolarSystemIndex];
+                currentSection.SectionIndex = data.SectionIndex;
 
                 sections.Add(currentSection);
             }

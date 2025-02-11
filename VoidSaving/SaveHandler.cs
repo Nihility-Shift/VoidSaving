@@ -348,6 +348,8 @@ namespace VoidSaving
                         data.SectorsUsedInSolarSystem = reader.ReadInt32();
                         data.SectorsToUseInSolarSystem = reader.ReadInt32();
                         data.SideObjectiveGuaranteeInterval = reader.ReadInt32();
+                        data.NextSectionID = reader.ReadInt32();
+                        data.LastSectorID = reader.ReadInt32();
                         data.NextSectorID = reader.ReadInt32();
                         data.NextMissionID = reader.ReadInt32();
                         data.GenerationResultsUsedSectors = reader.ReadSimpleSectorDatas();
@@ -356,7 +358,7 @@ namespace VoidSaving
 
                         data.CompletedSectors = reader.ReadFullSectorDatas();
                         data.CompletedSections = reader.ReadSectionDatas();
-                        data.CurrentSection = reader.ReadSectionData();
+                        data.CurrentSection = reader.ReadSectionData(true);
                         data.SessionStats = reader.ReadSessionStats();
 
                         BepinPlugin.Log.LogInfo($"Finalized read at {fileStream.Position} Bytes");
@@ -498,6 +500,8 @@ namespace VoidSaving
                         writer.Write(data.SectorsUsedInSolarSystem);
                         writer.Write(data.SectorsToUseInSolarSystem);
                         writer.Write(data.SideObjectiveGuaranteeInterval);
+                        writer.Write(data.NextSectionID);
+                        writer.Write(data.LastSectorID);
                         writer.Write(data.NextSectorID);
                         writer.Write(data.NextMissionID);
                         writer.Write(data.GenerationResultsUsedSectors);
@@ -506,7 +510,7 @@ namespace VoidSaving
 
                         writer.Write(data.CompletedSectors);
                         writer.Write(data.CompletedSections);
-                        writer.Write(data.CurrentSection);
+                        writer.Write(data.CurrentSection, true);
                         writer.Write(data.SessionStats);
 
                         BepinPlugin.Log.LogInfo($"Finalized write at {fileStream.Length} Bytes");

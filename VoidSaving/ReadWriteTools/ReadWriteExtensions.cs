@@ -392,6 +392,7 @@ namespace VoidSaving
             return data;
         }
 
+
         public static void Write(this BinaryWriter Writer, List<SimpleSectorData> Values)
         {
             int count = Values.Count;
@@ -425,6 +426,8 @@ namespace VoidSaving
                 Writer.Write(sectorData.SectorContainerGUID);
                 Writer.Write(sectorData.ObjectiveGUID);
                 Writer.Write((byte)sectorData.Difficulty);
+                Writer.Write(sectorData.EnemyLevelMin);
+                Writer.Write(sectorData.EnemyLevelMax);
                 Writer.Write((byte)sectorData.State);
                 Writer.Write(sectorData.IsMainObjective);
                 Writer.Write(sectorData.MissionID);
@@ -445,6 +448,8 @@ namespace VoidSaving
                     SectorContainerGUID = reader.ReadGUIDUnion(),
                     ObjectiveGUID = reader.ReadGUIDUnion(),
                     Difficulty = (DifficultyModifier)reader.ReadByte(),
+                    EnemyLevelMin = reader.ReadInt32(),
+                    EnemyLevelMax = reader.ReadInt32(),
                     State = (ObjectiveState)reader.ReadByte(),
                     IsMainObjective = reader.ReadBoolean(),
                     MissionID = reader.ReadInt32(),
@@ -456,17 +461,20 @@ namespace VoidSaving
         }
 
         
-        public static void Write(this BinaryWriter Writer, SectionData sectionData)
+        public static void Write(this BinaryWriter Writer, SectionData sectionData, bool IncludeInterdictionData = false)
         {
             Writer.Write(sectionData.ObjectiveSectors);
+            if (IncludeInterdictionData)
+                Writer.Write([sectionData.InterdictionSector]);
             Writer.Write(sectionData.SolarSystemIndex);
         }
 
-        public static SectionData ReadSectionData(this BinaryReader Reader)
+        public static SectionData ReadSectionData(this BinaryReader Reader, bool IncludeInterdictionData = false)
         {
             return new SectionData()
             {
                 ObjectiveSectors = Reader.ReadFullSectorDatas(),
+                InterdictionSector = IncludeInterdictionData ? Reader.ReadFullSectorDatas()[0] : default,
                 SolarSystemIndex = Reader.ReadInt32(),
             };
         }
