@@ -331,14 +331,22 @@ namespace VoidSaving.Patches
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
 
             //reload astral map.
-            AstralMapController mapController = playerShip.GetComponentInChildren<AstralMapController>();
-            CalledInit = true;
-            mapController.StartCoroutine(mapController.Init());
+            //AstralMapController mapController = playerShip.GetComponentInChildren<AstralMapController>();
+            //mapController.StartCoroutine(mapController.Init());
 
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
         }
 
         static bool CalledInit;
+
+        [HarmonyPatch(typeof(AstralMapController), "Start"), HarmonyPrefix]
+        static void AstralMapStartPatch()
+        {
+            if (SaveHandler.LoadSavedData)
+            {
+                CalledInit = true;
+            }
+        }
 
         [HarmonyPatch(typeof(AstralMapController), "InitSections"), HarmonyPrefix]
         static void InitSectionsPrefix(AstralMapController __instance)
