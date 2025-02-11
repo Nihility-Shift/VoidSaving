@@ -1,5 +1,4 @@
 ﻿using CG.Client.Ship;
-using CG.Galaxy;
 using CG.Game.Scenarios;
 using CG.Game.SpaceObjects.Controllers;
 using CG.Objects;
@@ -472,7 +471,7 @@ namespace VoidSaving
                     sectorInternal = solarSystem.StagingSector;
                 }
                 GameSessionSector sector = new GameSessionSector(sectorInternal, sectorData.SectorID);
-                
+
                 //load Objective if not default GUID
                 if (sectorData.ObjectiveGUID != default)
                 {
@@ -522,7 +521,6 @@ namespace VoidSaving
             List<SolarSystem> solarSystems = quest.parameters.SolarSystems;
 
 
-
             int length = datas.Length;
             for (int i = 0; i < length; i++)
             {
@@ -535,6 +533,9 @@ namespace VoidSaving
 
                 sections.Add(currentSection);
             }
+
+            //Assigns first completed section to current generated section
+            sections[0] = quest.context.CurrentSection;
 
             quest.context.CompletedSections = sections;
         }
@@ -599,49 +600,59 @@ namespace VoidSaving
 
             sectionData.SolarSystemIndex = quest.context.ActiveSolarSystemIndex;
 
-            List<FullSectorData> CurrentandSideObjective = [new FullSectorData(quest.context.CompletedSectors.Last(), sectionData.SolarSystemIndex)];
+            if (currentSection.InterdictionSector != null)
+                sectionData.InterdictionSector = GetSectorDatasFromList([currentSection.InterdictionSector], sectionData.SolarSystemIndex)[0];
+            else
+                sectionData.InterdictionSector = new FullSectorData() { SectorID = -99 };
 
-            //The only non-main objective sector should be the side sector. If the sector is the active sector, it shouldn't be stored.
-            GameSessionSector SideObjective = currentSection.ObjectiveSectors.FirstOrDefault(sector => sector != quest.context.CompletedSectors.Last() && !sector.SectorObjective.IsMainObjective);
-            if (SideObjective != null) CurrentandSideObjective.Add(new FullSectorData(SideObjective, sectionData.SolarSystemIndex));
-
-            sectionData.ObjectiveSectors = CurrentandSideObjective.ToArray();
+            sectionData.ObjectiveSectors = GetSectorDatasFromList(currentSection.ObjectiveSectors, sectionData.SolarSystemIndex);
 
             return sectionData;
         }
 
-        public static void LoadCurrentSection(EndlessQuest quest, SectionData data, bool PreviousSectorInterdiction)
+        public static void LoadCurrentSection(EndlessQuest quest, SaveGameData saveData)
         {
-            GameSessionSection currentSection = quest.context.CurrentSection;
+            SectionData data = saveData.CurrentSection;
+            GameSessionSection currentSection = new();
 
-            if (!PreviousSectorInterdiction)
+            currentSection.SectionIndex = data.SectionIndex;
+
+            if (data.InterdictionSector.SectorID != -99)
             {
-                currentSection.InterdictionSector = EndlessQuestUtils.GenerateInterdictionSector(ref quest.context.NextSectionParameters);
-                currentSection.InterdictionSector.Visibility = SectorVisibility.Hidden;
-                quest.context.NextSectionParameters.NextSectorId++;
+                currentSection.InterdictionSector = LoadSectorsFromData(quest, [data.InterdictionSector])[0];
             }
 
-            List<GameSessionSector> loadedSectors = LoadSectorsFromData(quest, data.ObjectiveSectors, true);
+            currentSection.ObjectiveSectors = LoadSectorsFromData(quest, data.ObjectiveSectors);
 
-            //Replace staging sector with first sector.
-            loadedSectors[0].Id = currentSection.AdditionalSectors[0].Id;
-            loadedSectors[0].Visibility = SectorVisibility.Visible;
-            currentSection.AdditionalSectors[0] = loadedSectors[0];
-            quest.context.CoreSectors[0] = loadedSectors[0];
-            BepinPlugin.Log.LogInfo(loadedSectors[0].ObjectiveState);
-            loadedSectors.RemoveAt(0);
-
-            //Hide exit sector, else astral map shits itself
-            currentSection.AdditionalSectors[1].Visibility = SectorVisibility.Hidden;
-
-            //load any extra (side obj) sectors to objective sectors 
-            currentSection.ObjectiveSectors = loadedSectors;
-
-            if (currentSection.ObjectiveSectors.Count() > 1)
-            {
-                currentSection.ObjectiveSectors[1].Id = quest.context.NextSectionParameters.NextSectorId++;
-            }
             currentSection.SolarSystem = quest.parameters.SolarSystems[data.SolarSystemIndex];
+
+
+            //Assign section sectors to historically completed sectors (replace references so reference comparisons match)
+            List<GameSessionSector> completedSectors = quest.context.CompletedSectors;
+            int CompletedSectorsCount = completedSectors.Count();
+            List<GameSessionSector> SectionSectors = currentSection.AllAvailableSectors;
+            int length = SectionSectors.Count();
+            for (int i = 0; i < length; i++)
+            {
+                int SectionSectorID = SectionSectors[i].Id;
+                int DetectedSectorIndex = -1;
+                for (int j = Math.Max(CompletedSectorsCount - 6, 0); j < CompletedSectorsCount; j++)
+                {
+                    if (completedSectors[j].Id == SectionSectorID)
+                    {
+                        DetectedSectorIndex = j;
+                        break;
+                    }
+                }
+                if (DetectedSectorIndex != -1)
+                {
+                    BepinPlugin.Log.LogInfo($"Detected sector at index {DetectedSectorIndex}");
+                    completedSectors[DetectedSectorIndex] = SectionSectors[i];
+                }
+            }
+
+            quest.context.CurrentSection = currentSection;
+            EndlessQuestManager.Instance.OnSectionChange(new GameSessionSection(), null, currentSection);
         }
     }
 }
