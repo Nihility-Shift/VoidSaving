@@ -1,5 +1,7 @@
 ﻿using CG.Game;
 using CG.Game.SpaceObjects.Controllers;
+using CG.GameLoopStateMachine;
+using CG.GameLoopStateMachine.GameStates;
 using System.Collections.Generic;
 using UnityEngine;
 using VoidManager.CustomGUI;
@@ -85,6 +87,12 @@ namespace VoidSaving
             {
                 DrawSaveFileList();
                 Label("Must be in hub to load a save file");
+                return;
+            }
+            if (GameStateMachine.I.CurrentState is not GSIngame)
+            {
+                DrawSaveFileList();
+                Label("Must be in hub or in-game to load/save");
                 return;
             }
 
