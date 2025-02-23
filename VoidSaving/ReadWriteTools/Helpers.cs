@@ -480,12 +480,12 @@ namespace VoidSaving.ReadWriteTools
                     //All objective Types exist in data container.
                     Objective objective = new Objective(ObjectiveDataContainer.Instance.GetAssetDefById(sectorData.ObjectiveGUID).Asset);
 
-                    objective.PrimarySector = sector;
                     objective.ObjectiveSectors = new List<GameSessionSector> { sector };
+                    objective.PrimarySector = sector;
                     objective.OffWorldSector = quest.OffWorldSector;
 
-                    //Create objectives
-                    if (LoadMissions)
+                    //Create objectives for all but last sector (to avoid loading objectives for latest sector, which causes exceptions on load.)
+                    if (LoadMissions && sector.Id != SaveHandler.ActiveData.LastSectorID)
                     {
                         objective.AddClassifiersData(objective.Asset.GetAllClassifiers());
                         List<Mission> list2 = MissionsLoader.CreateMissions(objective.Classifiers);
@@ -494,6 +494,11 @@ namespace VoidSaving.ReadWriteTools
                             list2[j].Id = j + sectorData.MissionID;
                         }
                         objective.ObjectiveMissions.AddRange(list2);
+                        QuestGeneratorUtils.CreateObjectiveLogic(objective);
+                        foreach (IQuestLogic questLogic in objective.GetAllLogic())
+                        {
+                            questLogic.SetDynamicReferences(objective, false);
+                        }
                     }
                     sector.SetObjective(objective, sectorData.IsMainObjective);
                     sector.SectorObjective.Objective.State = sectorData.State;
