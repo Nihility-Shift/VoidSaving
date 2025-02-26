@@ -176,7 +176,7 @@ namespace VoidSaving.Patches
             {
                 //Load completed sectors before moving to initial sector.
                 int LastDataIndex = SaveHandler.ActiveData.CompletedSectors.Length - 1;
-                FullSectorData data = default;
+                FullSectorData data;
                 for (int i = 0; i < LastDataIndex; i++)
                 {
                     data = SaveHandler.ActiveData.CompletedSectors[i];
@@ -204,6 +204,7 @@ namespace VoidSaving.Patches
                     });
                 }
 
+                data = SaveHandler.ActiveData.CompletedSectors[LastDataIndex];
                 //Set objective state before entering the sector to allow skip code to function.
                 GameSessionManager.ActiveSession.GetSectorById(data.SectorID, true).SectorObjective.Objective.State = ((byte)data.State == 4 ? ObjectiveState.Completed : ObjectiveState.Failed);
 
