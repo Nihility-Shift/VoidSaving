@@ -1,4 +1,5 @@
 ﻿using CG.Game;
+using CG.Game.Scenarios;
 using CG.Game.SpaceObjects.Controllers;
 using CG.GameLoopStateMachine.GameStates;
 using CG.Ship.Hull;
@@ -7,14 +8,13 @@ using CG.Ship.Modules.Shield;
 using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
-using Client.Utils;
 using Gameplay.CompositeWeapons;
 using Gameplay.Defects;
 using Gameplay.Power;
 using Gameplay.Quests;
 using HarmonyLib;
+using Photon.Pun;
 using ToolClasses;
-using UI.AstralMap;
 using VoidSaving.ReadWriteTools;
 
 namespace VoidSaving.Patches
@@ -168,98 +168,53 @@ namespace VoidSaving.Patches
             }
         }
 
-        //Collect last sector ID.
-        [HarmonyPatch(typeof(EndlessQuestManager), "SectorEntered"), HarmonyPrefix]
-        static void SectorEnteredDataCollectionPatch(EndlessQuestManager __instance, GameSessionSector sector)
-        {
-            if(!SaveHandler.LoadSavedData)
-            {
-                SaveHandler.LatestData.LastSectorID = sector.Id;
-            }
-        }
-
         //Load into last sector.
         [HarmonyPatch(typeof(GameSessionManager), "LoadActiveSector"), HarmonyPrefix]
         static bool LoadCurrentSectionPatch(GameSessionManager __instance)
         {
             if (SaveHandler.LoadSavedData)
             {
-                EndlessQuest quest = (EndlessQuest)__instance.activeGameSession.ActiveQuest;
-                Helpers.LoadCurrentSection(quest, SaveHandler.ActiveData);
-                GameSessionSectorManager.Instance.EnterSector(SaveHandler.ActiveData.LastSectorID);
-                GameSessionSectorManager.Instance.SetDestinationSector(-1);
-                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.LoadCurrentSection);
-                return false;
-            }
-            else return true;
-        }
-
-        //Section generation data loaded - Runs after entering a sector belonging to the next section.
-        [HarmonyPatch(typeof(EndlessQuest), "GenerateNextSection"), HarmonyPrefix]
-        static void SectionDataLoadPatch(EndlessQuest __instance)
+                //Load completed sectors before moving to initial sector.
+                int LastDataIndex = SaveHandler.ActiveData.CompletedSectors.Length - 1;
+                FullSectorData data = default;
+                for (int i = 0; i < LastDataIndex; i++)
         {
-            BepinPlugin.Log.LogInfo("GNS called");
+                    data = SaveHandler.ActiveData.CompletedSectors[i];
 
-            if (SaveHandler.LoadSavedData)
+                    SectorCompletionStatus sectorCompletionStatus = (SectorCompletionStatus)0;
+                    switch (data.State)
             {
-                //Load saved random and quest data
-                __instance.context.NextSectionParameters.Seed = SaveHandler.ActiveData.ParametersSeed;
-
-                __instance.context.ActiveSolarSystemIndex = SaveHandler.ActiveData.ActiveSolarSystemID;
-                __instance.context.NextSectionParameters.SolarSystem = __instance.parameters.SolarSystems[SaveHandler.ActiveData.ActiveSolarSystemID];
-
-                __instance.context.NextSolarSystemIndex = SaveHandler.ActiveData.NextSolarSystemID;
-                __instance.context.NextSectionParameters.EnemyLevelRange.Min = SaveHandler.ActiveData.EnemyLevelRangeMin;
-                __instance.context.NextSectionParameters.EnemyLevelRange.Max = SaveHandler.ActiveData.EnemyLevelRangeMax;
-                __instance.context.SectorsUsedInSolarSystem = SaveHandler.ActiveData.SectorsUsedInSolarSystem;
-                __instance.context.SectorsToUseInSolarSystem = SaveHandler.ActiveData.SectorsToUseInSolarSystem;
-                __instance.context.SideObjectiveGuaranteeInterval = SaveHandler.ActiveData.SideObjectiveGuaranteeInterval;
-                __instance.context.NextSectionParameters.SectionIndex = SaveHandler.ActiveData.NextSectionID;
-                __instance.context.NextSectionParameters.NextSectorId = SaveHandler.ActiveData.NextSectorID;
-                __instance.context.NextSectionParameters.MissionId = SaveHandler.ActiveData.NextMissionID;
-                Helpers.LoadLastGeneratedSectors(__instance, SaveHandler.ActiveData.GenerationResultsUsedSectors);
-                Helpers.LoadLastGeneratedMainObjectives(__instance, SaveHandler.ActiveData.GenerationResultsUsedObjectives);
-                Helpers.LoadCompletedSectors(__instance, SaveHandler.ActiveData.CompletedSectors);
-                Helpers.LoadCompletedSections(__instance, SaveHandler.ActiveData.CompletedSections);
-
-                __instance.context.Random = SaveHandler.ActiveData.Random.DeepCopy();
-
-                GameSessionTracker.Instance._statistics = SaveHandler.ActiveData.SessionStats;
-
-                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.QuestData);
-
-                if (VoidManager.BepinPlugin.Bindings.IsDebugMode)
-                {
-                    BepinPlugin.Log.LogInfo("Reading used Sectors");
-                    foreach (var sector in __instance.context.lastGenerationResults.UsedSectors)
-                    {
-                        if (sector != default)
-                            BepinPlugin.Log.LogInfo(sector.DisplayName);
+                        case ObjectiveState.Inactive:
+                        case ObjectiveState.Available:
+                        case ObjectiveState.Started:
+                        case ObjectiveState.Failed:
+                            sectorCompletionStatus = SectorCompletionStatus.Failed;
+                            break;
+                        case ObjectiveState.Completed:
+                            sectorCompletionStatus = SectorCompletionStatus.Completed;
+                            break;
+                        case ObjectiveState.NoObjective:
+                            sectorCompletionStatus = SectorCompletionStatus.NothingToDo;
+                            break;
                     }
-                    BepinPlugin.Log.LogInfo("Reading used objectives");
-                    foreach (var objective in __instance.context.lastGenerationResults.UsedMainObjectiveDefinitions)
+                    EndlessQuestManager.Instance.photonView.RPC("CompleteSector", RpcTarget.AllBuffered, new object[]
                     {
-                        if (objective != default)
-                            BepinPlugin.Log.LogInfo(objective.Filename);
+                        data.SectorID,
+                        (byte)sectorCompletionStatus,
+                    });
                     }
+
+                //Set objective state before entering the sector to allow skip code to function.
+                GameSessionManager.ActiveSession.GetSectorById(data.SectorID, true).SectorObjective.Objective.State = ((byte)data.State == 4 ? ObjectiveState.Completed : ObjectiveState.Failed);
+
+                //Enter sector as initial sector, ensuring it appears on the astral map.
+                GameSessionSectorManager.Instance.EnterSector(data.SectorID);
+                GameSessionSectorManager.Instance.SetDestinationSector(-1);
+                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.SectorLoad);
+                return false;
                 }
+            else return true;
             }
-            else if (!GameSessionManager.InHub)
-            {
-                //Capture current random and quest data for saving prior to generation of next section.
-                SaveHandler.LatestData.ParametersSeed = __instance.Context.NextSectionParameters.Seed;
-                SaveHandler.LatestData.ActiveSolarSystemID = __instance.context.ActiveSolarSystemIndex;
-                SaveHandler.LatestData.NextSolarSystemID = __instance.context.NextSolarSystemIndex;
-                SaveHandler.LatestData.EnemyLevelRangeMin = __instance.context.NextSectionParameters.EnemyLevelRange.Min;
-                SaveHandler.LatestData.EnemyLevelRangeMax = __instance.context.NextSectionParameters.EnemyLevelRange.Max;
-                SaveHandler.LatestData.SectorsUsedInSolarSystem = __instance.context.SectorsUsedInSolarSystem;
-                SaveHandler.LatestData.SectorsToUseInSolarSystem = __instance.context.SectorsToUseInSolarSystem;
-                SaveHandler.LatestData.SideObjectiveGuaranteeInterval = __instance.context.SideObjectiveGuaranteeInterval;
-                SaveHandler.LatestData.NextSectionID = __instance.context.NextSectionParameters.SectionIndex;
-                SaveHandler.LatestData.NextSectorID = __instance.context.NextSectionParameters.NextSectorId;
-                SaveHandler.LatestData.NextMissionID = __instance.context.NextSectionParameters.MissionId;
-                SaveHandler.LatestData.GenerationResultsUsedSectors = Helpers.GetLastGeneratedSectors(__instance);
-                SaveHandler.LatestData.GenerationResultsUsedObjectives = Helpers.GetLastGeneratedMainObjectives(__instance);
 
 
                 SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
@@ -319,8 +274,6 @@ namespace VoidSaving.Patches
 
             //Jump System loaded post-start due to start() race condition conflicts with astral map
             VoidJumpSystem jumpSystem = playerShip.GetComponent<VoidJumpSystem>();
-            jumpSystem.DebugTransitionToExitVectorSetState();
-            jumpSystem.DebugTransitionToRotatingState();
             jumpSystem.DebugTransitionToSpinningUpState();
 
             //forcing next state via debug method ignores interdiction instant unstable chance. Instead, we'll force SpinUp start time -3 seconds
@@ -334,34 +287,10 @@ namespace VoidSaving.Patches
             //AstralMapController mapController = playerShip.GetComponentInChildren<AstralMapController>();
             //mapController.StartCoroutine(mapController.Init());
 
+            //assign session stats.
+            GameSessionTracker.Instance._statistics = SaveHandler.ActiveData.SessionStats;
+
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
-        }
-
-        static bool CalledInit;
-
-        [HarmonyPatch(typeof(AstralMapController), "Start"), HarmonyPrefix]
-        static void AstralMapStartPatch()
-        {
-            if (SaveHandler.LoadSavedData)
-            {
-                CalledInit = true;
-            }
-        }
-
-        [HarmonyPatch(typeof(AstralMapController), "InitSections"), HarmonyPrefix]
-        static void InitSectionsPrefix(AstralMapController __instance)
-        {
-            if (!CalledInit) return;
-
-            __instance._gameStart = true;
-        }
-
-        [HarmonyPatch(typeof(AstralMapController), "InitSections"), HarmonyPostfix]
-        static void InitSectionsPostfix(AstralMapController __instance)
-        {
-            if (!CalledInit) return;
-
-            __instance._gameStart = false;
         }
     }
 }

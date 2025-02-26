@@ -221,8 +221,6 @@ namespace VoidSaving
                 saveGameData.SessionStats = GameSessionTracker.Statistics;
 
                 saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest);
-                saveGameData.CompletedSections = Helpers.GetCompletedSections(activeQuest);
-                saveGameData.CurrentSection = Helpers.GetCurrentSection(activeQuest);
 
 
                 //Peek Data
@@ -339,29 +337,12 @@ namespace VoidSaving
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.Seed = reader.ReadInt32();
-                        data.ParametersSeed = reader.ReadInt32();
                         data.JumpCounter = reader.ReadInt32();
                         data.InterdictionCounter = reader.ReadInt32();
                         data.CurrentInterdictionChance = reader.ReadSingle();
-                        data.Random = reader.ReadRandom();
-                        data.ActiveSolarSystemID = reader.ReadInt32();
-                        data.NextSolarSystemID = reader.ReadInt32();
-                        data.EnemyLevelRangeMin = reader.ReadInt32();
-                        data.EnemyLevelRangeMax = reader.ReadInt32();
-                        data.SectorsUsedInSolarSystem = reader.ReadInt32();
-                        data.SectorsToUseInSolarSystem = reader.ReadInt32();
-                        data.SideObjectiveGuaranteeInterval = reader.ReadInt32();
-                        data.NextSectionID = reader.ReadInt32();
-                        data.LastSectorID = reader.ReadInt32();
-                        data.NextSectorID = reader.ReadInt32();
-                        data.NextMissionID = reader.ReadInt32();
-                        data.GenerationResultsUsedSectors = reader.ReadSimpleSectorDatas();
-                        data.GenerationResultsUsedObjectives = reader.ReadGUIDUnionArray();
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Read {fileStream.Position} Bytes");
 
                         data.CompletedSectors = reader.ReadFullSectorDatas();
-                        data.CompletedSections = reader.ReadSectionDatas();
-                        data.CurrentSection = reader.ReadSectionData(true);
                         data.SessionStats = reader.ReadSessionStats();
 
                         BepinPlugin.Log.LogInfo($"Finalized read at {fileStream.Position} Bytes");
@@ -491,29 +472,12 @@ namespace VoidSaving
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.Seed);
-                        writer.Write(data.ParametersSeed);
                         writer.Write(data.JumpCounter);
                         writer.Write(data.InterdictionCounter);
                         writer.Write(data.CurrentInterdictionChance);
-                        writer.Write(data.Random);
-                        writer.Write(data.ActiveSolarSystemID);
-                        writer.Write(data.NextSolarSystemID);
-                        writer.Write(data.EnemyLevelRangeMin);
-                        writer.Write(data.EnemyLevelRangeMax);
-                        writer.Write(data.SectorsUsedInSolarSystem);
-                        writer.Write(data.SectorsToUseInSolarSystem);
-                        writer.Write(data.SideObjectiveGuaranteeInterval);
-                        writer.Write(data.NextSectionID);
-                        writer.Write(data.LastSectorID);
-                        writer.Write(data.NextSectorID);
-                        writer.Write(data.NextMissionID);
-                        writer.Write(data.GenerationResultsUsedSectors);
-                        writer.Write(data.GenerationResultsUsedObjectives);
                         if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Wrote {fileStream.Length} Bytes");
 
                         writer.Write(data.CompletedSectors);
-                        writer.Write(data.CompletedSections);
-                        writer.Write(data.CurrentSection, true);
                         writer.Write(data.SessionStats);
 
                         BepinPlugin.Log.LogInfo($"Finalized write at {fileStream.Length} Bytes");

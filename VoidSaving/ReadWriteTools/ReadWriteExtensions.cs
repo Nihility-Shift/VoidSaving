@@ -422,15 +422,7 @@ namespace VoidSaving.ReadWriteTools
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Writing {sectorDatas.Length} sector datas");
             foreach (FullSectorData sectorData in sectorDatas)
             {
-                Writer.Write((byte)sectorData.SolarSystemIndex);
-                Writer.Write(sectorData.SectorContainerGUID);
-                Writer.Write(sectorData.ObjectiveGUID);
-                Writer.Write((byte)sectorData.Difficulty);
-                Writer.Write(sectorData.EnemyLevelMin);
-                Writer.Write(sectorData.EnemyLevelMax);
                 Writer.Write((byte)sectorData.State);
-                Writer.Write(sectorData.IsMainObjective);
-                Writer.Write(sectorData.MissionID);
                 Writer.Write(sectorData.SectorID);
             }
         }
@@ -444,15 +436,7 @@ namespace VoidSaving.ReadWriteTools
             {
                 sectors[i] = new FullSectorData()
                 {
-                    SolarSystemIndex = reader.ReadByte(),
-                    SectorContainerGUID = reader.ReadGUIDUnion(),
-                    ObjectiveGUID = reader.ReadGUIDUnion(),
-                    Difficulty = (DifficultyModifier)reader.ReadByte(),
-                    EnemyLevelMin = reader.ReadInt32(),
-                    EnemyLevelMax = reader.ReadInt32(),
                     State = (ObjectiveState)reader.ReadByte(),
-                    IsMainObjective = reader.ReadBoolean(),
-                    MissionID = reader.ReadInt32(),
                     SectorID = reader.ReadInt32(),
                 };
             }

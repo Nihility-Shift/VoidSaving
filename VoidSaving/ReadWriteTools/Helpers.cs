@@ -352,7 +352,7 @@ namespace VoidSaving.ReadWriteTools
             }
         }
 
-
+        /*
         public static List<SimpleSectorData> GetLastGeneratedSectors(EndlessQuest quest)
         {
             if (quest.context.lastGenerationResults.UsedSectors == null) return new();
@@ -402,7 +402,7 @@ namespace VoidSaving.ReadWriteTools
             return;
             //One liner hehe, but barely readable.
             //quest.context.lastGenerationResults.UsedMainObjectiveDefinitions = data.Select(objectiveGUID => quest.parameters.MainObjectiveDefinitions.FirstOrDefault(objective => objective.AssetGuid == objectiveGUID)).ToList();
-        }
+        }*/
 
 
         public static FullSectorData[] GetSectorDatasFromList(List<GameSessionSector> sectors, List<SolarSystem> solarSystems)
@@ -418,6 +418,7 @@ namespace VoidSaving.ReadWriteTools
             return sectorDatas.ToArray();
         }
 
+        /*
         public static FullSectorData[] GetSectorDatasFromList(List<GameSessionSector> sectors, int solarSystem)
         {
             int SectorCount = sectors.Count;
@@ -553,7 +554,7 @@ namespace VoidSaving.ReadWriteTools
             sections[0] = quest.context.CurrentSection;
 
             quest.context.CompletedSections = sections;
-        }
+        }*/
 
         public static FullSectorData[] GetCompletedSectorDatas(EndlessQuest quest)
         {
@@ -566,6 +567,7 @@ namespace VoidSaving.ReadWriteTools
             return sectorDatas;
         }
 
+        /*
         public static void LoadCompletedSectors(EndlessQuest endlessQuest, FullSectorData[] sectorDatas)
         {
             int sectorDataLength = sectorDatas.Length;
@@ -668,6 +670,6 @@ namespace VoidSaving.ReadWriteTools
 
             quest.context.CurrentSection = currentSection;
             EndlessQuestManager.Instance.OnSectionChange(new GameSessionSection(), null, currentSection);
-        }
+        }*/
     }
 }
