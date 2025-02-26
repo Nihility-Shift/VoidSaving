@@ -270,7 +270,10 @@ namespace VoidSaving.Patches
             FirstLoadJump = true;
             AutoSavePatch.FirstJump = true;
             VoidJumpSystem jumpSystem = playerShip.GetComponent<VoidJumpSystem>();
+            jumpSystem.DebugTransitionToExitVectorSetState();
+            jumpSystem.DebugTransitionToRotatingState();
             jumpSystem.DebugTransitionToSpinningUpState();
+            BlockSpinUpSignalResolution = true; // UpdateState sends the discharge signal, canceling/breaking void jump.
 
             //forcing next state via debug method ignores interdiction instant unstable chance. Instead, we'll force SpinUp start time -3 seconds
             var spinUpState = (VoidJumpSpinningUp)jumpSystem.activeState;
@@ -287,6 +290,21 @@ namespace VoidSaving.Patches
             GameSessionTracker.Instance._statistics = SaveHandler.ActiveData.SessionStats;
 
             SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.InGameLoad);
+        }
+
+        //Blocks Void Drive from disabling itself early
+        static bool BlockSpinUpSignalResolution;
+
+        [HarmonyPatch(typeof(VoidJumpSpinningUp), "ResolveSignal")]
+        static bool Prefix()
+        {
+            return !BlockSpinUpSignalResolution;
+        }
+
+        [HarmonyPatch(typeof(VoidJumpSpinningUp), "OnExit")]
+        static void Postfix()
+        {
+            BlockSpinUpSignalResolution = false;
         }
     }
 }
