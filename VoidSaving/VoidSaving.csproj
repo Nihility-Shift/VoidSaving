@@ -4,7 +4,7 @@
     <AssemblyName>VoidSaving</AssemblyName>
     <Description>
     </Description>
-    <Version>0.2.0</Version>
+    <Version>0.4.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -22,9 +22,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>embedded</DebugType>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="VanillaFixes\AstralMapStartPatch.cs" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" PrivateAssets="all" />
