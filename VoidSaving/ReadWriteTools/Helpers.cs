@@ -405,17 +405,15 @@ namespace VoidSaving.ReadWriteTools
         }*/
 
 
-        public static FullSectorData[] GetSectorDatasFromList(List<GameSessionSector> sectors, List<SolarSystem> solarSystems)
+        public static FullSectorData[] GetSectorDatasFromList(List<GameSessionSector> sectors)
         {
             int SectorCount = sectors.Count;
             FullSectorData[] sectorDatas = new FullSectorData[SectorCount];
             for (int i = 0; i < SectorCount; i++)
             {
-                GameSessionSector sector = sectors[i];
-
-                sectorDatas[i] = new FullSectorData(sector, solarSystems.IndexOf(sector.SectorAsset.ParentSolarSystem));
+                sectorDatas[i] = new FullSectorData(sectors[i]);
             }
-            return sectorDatas.ToArray();
+            return sectorDatas;
         }
 
         /*
@@ -558,10 +556,10 @@ namespace VoidSaving.ReadWriteTools
 
         public static FullSectorData[] GetCompletedSectorDatas(EndlessQuest quest)
         {
-            List<GameSessionSector> sectors = quest.context.CompletedSectors.GetRange(0, quest.context.CompletedSectors.Count());
-            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collecting data of {sectors.Count()} sectors");
+            //List<GameSessionSector> sectors = quest.context.CompletedSectors.GetRange(0, quest.context.CompletedSectors.Count());
+            if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collecting data of {quest.context.CompletedSectors.Count()} sectors");
 
-            FullSectorData[] sectorDatas = GetSectorDatasFromList(sectors, quest.parameters.SolarSystems);
+            FullSectorData[] sectorDatas = GetSectorDatasFromList(quest.context.CompletedSectors);
 
             if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Collected data of {sectorDatas.Length} sectors");
             return sectorDatas;

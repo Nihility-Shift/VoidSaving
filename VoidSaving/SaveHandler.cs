@@ -238,15 +238,14 @@ namespace VoidSaving
         public enum LoadingStage
         {
             None = 0,
-            LoadCurrentSection = 1,
+            SectorLoad = 1,
             AbstractPlayerShipStart = 2,
-            QuestData = 4,
-            InGameLoad = 8,
+            InGameLoad = 4,
         }
 
         static LoadingStage CompletedStages;
 
-        static LoadingStage AllLoadingStages = LoadingStage.LoadCurrentSection | LoadingStage.AbstractPlayerShipStart | LoadingStage.QuestData | LoadingStage.InGameLoad;
+        static LoadingStage AllLoadingStages = LoadingStage.SectorLoad | LoadingStage.AbstractPlayerShipStart | LoadingStage.InGameLoad;
 
         public static void CompleteLoadingStage(LoadingStage stage)
         {
@@ -258,6 +257,11 @@ namespace VoidSaving
                 BepinPlugin.Log.LogInfo("Finished all loading stages");
                 CancelOrFinalzeLoad();
             }
+        }
+
+        public static bool HasCompletedStage(LoadingStage stage)
+        {
+            return CompletedStages.HasFlag(stage);
         }
 
         /// <summary>

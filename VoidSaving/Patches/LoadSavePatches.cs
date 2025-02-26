@@ -178,12 +178,12 @@ namespace VoidSaving.Patches
                 int LastDataIndex = SaveHandler.ActiveData.CompletedSectors.Length - 1;
                 FullSectorData data = default;
                 for (int i = 0; i < LastDataIndex; i++)
-        {
+                {
                     data = SaveHandler.ActiveData.CompletedSectors[i];
 
                     SectorCompletionStatus sectorCompletionStatus = (SectorCompletionStatus)0;
                     switch (data.State)
-            {
+                    {
                         case ObjectiveState.Inactive:
                         case ObjectiveState.Available:
                         case ObjectiveState.Started:
@@ -202,7 +202,7 @@ namespace VoidSaving.Patches
                         data.SectorID,
                         (byte)sectorCompletionStatus,
                     });
-                    }
+                }
 
                 //Set objective state before entering the sector to allow skip code to function.
                 GameSessionManager.ActiveSession.GetSectorById(data.SectorID, true).SectorObjective.Objective.State = ((byte)data.State == 4 ? ObjectiveState.Completed : ObjectiveState.Failed);
@@ -212,29 +212,22 @@ namespace VoidSaving.Patches
                 GameSessionSectorManager.Instance.SetDestinationSector(-1);
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.SectorLoad);
                 return false;
-                }
+            }
             else return true;
+        }
+
+        static bool FirstLoadJump;
+
+        //Block Sector completion on first jump from null sector.
+        [HarmonyPatch(typeof(EndlessQuestManager), "SectorExited"), HarmonyPrefix]
+        static bool StopFirstSectorCompletionPatch()
+        {
+            if (FirstLoadJump)
+            {
+                FirstLoadJump = false;
+                return false;
             }
-
-
-                SaveHandler.LatestData.Random = __instance.Context.Random.DeepCopy();
-
-                if (VoidManager.BepinPlugin.Bindings.IsDebugMode && __instance.context.lastGenerationResults.UsedSectors != null)
-                {
-                    BepinPlugin.Log.LogInfo("Reading used Sectors");
-                    foreach (var sector in __instance.context.lastGenerationResults.UsedSectors)
-                    {
-                        if (sector != default)
-                            BepinPlugin.Log.LogInfo(sector.DisplayName);
-                    }
-                    BepinPlugin.Log.LogInfo("Reading used objectives");
-                    foreach (var objective in __instance.context.lastGenerationResults.UsedMainObjectiveDefinitions)
-                    {
-                        if (objective != default)
-                            BepinPlugin.Log.LogInfo(objective.Filename);
-                    }
-                }
-            }
+            return true;
         }
 
         //Load Alloy, biomass and sheilds post OnEnter (alloy assigned late in the target method, shield healths assigned in unordered start methods
@@ -273,6 +266,8 @@ namespace VoidSaving.Patches
 
 
             //Jump System loaded post-start due to start() race condition conflicts with astral map
+            FirstLoadJump = true;
+            AutoSavePatch.FirstJump = true;
             VoidJumpSystem jumpSystem = playerShip.GetComponent<VoidJumpSystem>();
             jumpSystem.DebugTransitionToSpinningUpState();
 

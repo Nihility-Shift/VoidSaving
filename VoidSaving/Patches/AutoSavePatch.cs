@@ -6,9 +6,11 @@ namespace VoidSaving.Patches
     [HarmonyPatch(typeof(VoidJumpSystem), "EnterVoid")]
     internal class AutoSavePatch
     {
+        internal static bool FirstJump;
         static void Postfix()
         {
             if (!Config.AutoSavingEnabled.Value || SaveHandler.LoadSavedData || !SaveHandler.StartedAsHost) return;
+            if (FirstJump) { FirstJump = false; return; }
 
 
             if (SaveHandler.IsIronManMode)
