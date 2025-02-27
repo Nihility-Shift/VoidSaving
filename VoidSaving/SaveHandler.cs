@@ -10,6 +10,7 @@ using Gameplay.CompositeWeapons;
 using Gameplay.Defects;
 using Gameplay.Power;
 using Gameplay.Quests;
+using ResourceAssets;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -222,9 +223,16 @@ namespace VoidSaving
 
                 saveGameData.CompletedSectors = Helpers.GetCompletedSectorDatas(activeQuest);
 
+                //Collect Ship Name for PeekData
+                string ShipName;
+                if (ShipLoadoutDataContainer.Instance.TryGetByGuid(saveGameData.ShipLoadoutGUID, out ShipLoadoutDataDef assetDefById))
+                    ShipName = assetDefById.ShipContextInfo.HeaderText + ": " + assetDefById.ContextInfo.HeaderText;
+                else
+                    ShipName = playerShip.DisplayName;
+
 
                 //Peek Data
-                saveGameData.PeekInfo = $"{playerShip.DisplayName},{saveGameData.JumpCounter + 1},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours},{saveGameData.ProgressionDisabled}";
+                saveGameData.PeekInfo = $"{ShipName},{saveGameData.JumpCounter + 1},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours},{saveGameData.ProgressionDisabled}";
             }
             catch (Exception e)
             {
