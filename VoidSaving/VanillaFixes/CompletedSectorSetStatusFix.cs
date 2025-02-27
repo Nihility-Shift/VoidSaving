@@ -13,12 +13,21 @@ namespace VoidSaving.VanillaFixes
     {
         static void PatchMethod(EndlessQuestManager instance, byte status)
         {
-            ObjectiveState state = status == 4 ? ObjectiveState.Completed : ObjectiveState.Failed;
-
             GameSessionSector sector = instance.endlessQuest.Context.CompletedSectors.Last();
             if (sector.SectorObjective != null)
             {
-                sector.SectorObjective.Objective.State = state;
+                switch((SectorCompletionStatus)status)
+                {
+                    case SectorCompletionStatus.Completed:
+                        sector.SectorObjective.Objective.State = ObjectiveState.Completed;
+                        break;
+                    case SectorCompletionStatus.Failed:
+                        sector.SectorObjective.Objective.State = ObjectiveState.Failed;
+                        break;
+                    case SectorCompletionStatus.NothingToDo:
+                        sector.SectorObjective.Objective.State = ObjectiveState.NoObjective;
+                        break;
+                }
             }
         }
 
