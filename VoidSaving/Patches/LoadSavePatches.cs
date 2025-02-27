@@ -175,9 +175,9 @@ namespace VoidSaving.Patches
             if (SaveHandler.LoadSavedData)
             {
                 //Load completed sectors before moving to initial sector.
-                int LastDataIndex = SaveHandler.ActiveData.CompletedSectors.Length - 1;
-                FullSectorData data;
-                for (int i = 0; i < LastDataIndex; i++)
+                int CompletedDataCount = SaveHandler.ActiveData.CompletedSectors.Length;
+                FullSectorData data = default;
+                for (int i = 0; i < CompletedDataCount; i++)
                 {
                     data = SaveHandler.ActiveData.CompletedSectors[i];
 
@@ -204,9 +204,8 @@ namespace VoidSaving.Patches
                     });
                 }
 
-                data = SaveHandler.ActiveData.CompletedSectors[LastDataIndex];
                 //Set objective state before entering the sector to allow skip code to function.
-                GameSessionManager.ActiveSession.GetSectorById(data.SectorID, true).SectorObjective.Objective.State = ((byte)data.State == 4 ? ObjectiveState.Completed : ObjectiveState.Failed);
+                GameSessionManager.ActiveSession.GetSectorById(data.SectorID, false).SectorObjective.Objective.State = ((byte)data.State == 4 ? ObjectiveState.Completed : ObjectiveState.Failed);
 
                 //Enter sector as initial sector, ensuring it appears on the astral map.
                 GameSessionSectorManager.Instance.EnterSector(data.SectorID);
