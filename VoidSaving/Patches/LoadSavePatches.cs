@@ -264,6 +264,9 @@ namespace VoidSaving.Patches
             //Defects loaded post-start due to the DamageController gathering defectSystems via start methods.
             Helpers.LoadDefectStates(playerShip.GetComponent<PlayerShipDefectDamageController>(), SaveHandler.ActiveData.Defects);
 
+            //Starts in homunculus mode, despite homunculus having been dispensed by now.
+            playerShip.GetComponentInChildren<HomunculusAndBiomassSocket>().SwitchToBiomassSocket();
+
 
             //Jump System loaded post-start due to start() race condition conflicts with astral map
             FirstLoadJump = true;
@@ -280,10 +283,6 @@ namespace VoidSaving.Patches
 
             //Load module state after jumping.
             Helpers.LoadVoidDriveModule(ClientGame.Current.PlayerShip, SaveHandler.ActiveData.JumpModule);
-
-            //reload astral map.
-            //AstralMapController mapController = playerShip.GetComponentInChildren<AstralMapController>();
-            //mapController.StartCoroutine(mapController.Init());
 
             //assign session stats.
             GameSessionTracker.Instance._statistics = SaveHandler.ActiveData.SessionStats;
