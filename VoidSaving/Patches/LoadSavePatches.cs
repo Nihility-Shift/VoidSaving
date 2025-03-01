@@ -205,7 +205,9 @@ namespace VoidSaving.Patches
                 }
 
                 //Set objective state before entering the sector to allow skip code to function.
-                GameSessionManager.ActiveSession.GetSectorById(data.SectorID, false).SectorObjective.Objective.State = data.State;
+                GameSessionSector sector = GameSessionManager.ActiveSession.GetSectorById(data.SectorID, false);
+                if (sector.SectorObjective != null)
+                    sector.SectorObjective.Objective.State = data.State;
 
                 //Enter sector as initial sector, ensuring it appears on the astral map.
                 GameSessionSectorManager.Instance.EnterSector(data.SectorID);
