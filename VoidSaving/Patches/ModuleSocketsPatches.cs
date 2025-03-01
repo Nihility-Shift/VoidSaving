@@ -164,6 +164,15 @@ namespace VoidSaving.Patches
             }
         }
 
+        //Saves JData for objects stored in modules (Objects in shelves are fine, but objects in scoop and whatnot don't save extra jdata.)
+        static void StoreExtraData(List<CarryablesSocket> Sockets, int j, ShipAssetRef[] assets)
+        {
+            if (Sockets[j].Payload.SerializeExtraData)
+            {
+                assets[j].ExtraData = Sockets[j].Payload.ExtraJData;
+            }
+        }
+
         // Collects list and current index for processing payloads
         [HarmonyPatch(typeof(ShipLoadout), "LoadSocketData"), HarmonyTranspiler]
         static IEnumerable<CodeInstruction> ModuleSocketsSavePatch(IEnumerable<CodeInstruction> instructions)
@@ -186,7 +195,11 @@ namespace VoidSaving.Patches
             {
                 new CodeInstruction(OpCodes.Ldloc_S, (byte)5),
                 new CodeInstruction(OpCodes.Ldloc_S, (byte)6),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "SaveModuleResourceContainers"))
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "SaveModuleResourceContainers")),
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)5),
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)6),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModuleSocketsLoadPatches), "StoreExtraData"))
             };
 
             return PatchBySequence(PatchCarryableSockets(instructions), tSequence, pSequence, PatchMode.AFTER, CheckMode.NONNULL);
