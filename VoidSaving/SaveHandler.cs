@@ -279,6 +279,13 @@ namespace VoidSaving
         {
             ActiveData = null;
             CompletedStages = LoadingStage.None;
+
+            //On Cancel, clear selected ship and quest.
+            if (GameSessionManager.InHub)
+            {
+                HubQuestManager.Instance.SelectShip([0, 0, 0, 0]);
+                HubQuestManager.Instance.SelectQuest(null);
+            }
         }
 
         /// <summary>
@@ -367,11 +374,16 @@ namespace VoidSaving
                 return false;
             }
 
+            //Ready hub for users to simply sit down. Call before activeData assigned to avoid getting caught by BlockQUestChanging
+            HubQuestManager.Instance.SelectShip(data.ShipLoadoutGUID.AsIntArray());
+            HubQuestManager.Instance.SelectQuest(HubQuestManager.Instance.GetEndlessQuest().QuestParameters);
+
             ActiveData = data;
             LatestData = data;
             Messaging.Echo($"Loading save '{SaveName}' on next game start.", false);
             if(data.ProgressionDisabled)
                 Messaging.Echo("Progress will be disabled after starting.");
+
             return true;
         }
 
