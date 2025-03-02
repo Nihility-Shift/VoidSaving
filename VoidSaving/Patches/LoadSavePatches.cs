@@ -108,7 +108,10 @@ namespace VoidSaving.Patches
 
                 InstalledModuleIndex++;
             }
-            Helpers.LoadBuildSocketPayloads(bsc, SaveHandler.ActiveData.BuildSocketCarryables);
+
+            if (activeData.SaveDataVersion >= 1) 
+                Helpers.LoadBuildSocketPayloads(bsc, SaveHandler.ActiveData.BuildSocketCarryables);
+
 
             Helpers.LoadEnhancements(__instance, activeData.Enhancements);
             Helpers.LoadBoosterStates(__instance, activeData.BoosterStates);

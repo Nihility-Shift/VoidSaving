@@ -324,6 +324,7 @@ namespace VoidSaving
 
                         data.ShipLoadoutGUID = reader.ReadGUIDUnion();
                         data.ShipLoadout = reader.ReadJObject();
+                        if (data.SaveDataVersion >= 1) data.BuildSocketCarryables = reader.ReadIndexedSocketPayloads();
                         data.AmmoResourceValues = reader.ReadSingleList();
                         data.PowerResourceValues = reader.ReadSingleList();
                         data.Relics = reader.ReadGUIDUnionArray();
@@ -421,7 +422,7 @@ namespace VoidSaving
         }
 
 
-        public const uint CurrentDataVersion = 0;
+        public const uint CurrentDataVersion = 1;
 
         /// <summary>
         /// Writes file to path. Adds extension if missing.
@@ -463,6 +464,7 @@ namespace VoidSaving
 
                         writer.Write(data.ShipLoadoutGUID);
                         writer.Write(data.ShipLoadout);
+                        writer.Write(data.BuildSocketCarryables);
                         writer.Write(data.AmmoResourceValues);
                         writer.Write(data.PowerResourceValues);
                         writer.Write(data.Relics);
