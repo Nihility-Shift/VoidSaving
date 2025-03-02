@@ -234,7 +234,7 @@ namespace VoidSaving
 
 
                 //Peek Data
-                saveGameData.PeekInfo = $"{ShipName},{saveGameData.JumpCounter + 1},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours},{saveGameData.ProgressionDisabled}";
+                saveGameData.PeekInfo = $"{ShipName},{saveGameData.CompletedSectors.Length},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours},{saveGameData.ProgressionDisabled}";
             }
             catch (Exception e)
             {
