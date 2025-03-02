@@ -1,12 +1,12 @@
 ﻿using CG.Game.Scenarios;
+using CG.Ship.Hull;
 using CG.Ship.Modules;
 using Gameplay.Atmosphere;
 using Gameplay.Enhancements;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Photon.Pun;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace VoidSaving
 {
@@ -48,6 +48,8 @@ namespace VoidSaving
         public GUIDUnion ShipLoadoutGUID;
 
         public JObject ShipLoadout;
+
+        public ShipSocketData[] BuildSocketCarryables;
 
         public bool ShipPowered;
 
@@ -231,5 +233,21 @@ namespace VoidSaving
         public bool[] engineChargedStates;
 
         public float JumpCharge;
+    }
+
+    public struct ShipSocketData
+    {
+        public ShipSocketData(BuildSocket socket)
+        {
+            SocketID = socket.Index;
+            ObjectGUID = socket.Payload.assetGuid;
+            JData = socket.Payload.ExtraJData.ToString(Formatting.None);
+        }
+
+        public int SocketID;
+
+        public GUIDUnion ObjectGUID;
+
+        public string JData;
     }
 }

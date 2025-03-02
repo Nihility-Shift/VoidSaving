@@ -1,8 +1,7 @@
-﻿using CG.Client.Quests;
-using CG.Client.Ship;
-using CG.Game.Missions;
+﻿using CG.Client.Ship;
 using CG.Game.Scenarios;
 using CG.Game.SpaceObjects.Controllers;
+using CG.Network;
 using CG.Objects;
 using CG.Ship.Hull;
 using CG.Ship.Modules;
@@ -10,17 +9,16 @@ using CG.Ship.Repair;
 using CG.Ship.Shield;
 using CG.Space;
 using Client.Utils;
-using Code.Gameplay;
 using Gameplay.Atmosphere;
 using Gameplay.Defects;
 using Gameplay.Enhancements;
 using Gameplay.Power;
 using Gameplay.Quests;
 using Photon.Pun;
-using ResourceAssets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WebSocketSharp;
 
 namespace VoidSaving.ReadWriteTools
 {
@@ -351,6 +349,50 @@ namespace VoidSaving.ReadWriteTools
                 }
             }
         }
+
+
+        public static void LoadBuildSocketPayloads(BuildSocketController BSC, ShipSocketData[] datas)
+        {
+            int CurrentSocketIndex = 0;
+            int socketCount = BSC.Sockets.Count;
+            foreach (ShipSocketData data in datas)
+            {
+                while (CurrentSocketIndex < socketCount)
+                {
+                    if (data.SocketID == CurrentSocketIndex)
+                    {
+                        BuildSocket socket = BSC.Sockets[CurrentSocketIndex];
+
+                        Dictionary<byte, object> InstantiationData = new Dictionary<byte, object> { { 1, socket.photonView.ViewID } };
+
+                        if (!data.JData.IsNullOrEmpty())
+                            InstantiationData.Add(0, data.JData);
+
+                        CarryableObject carryable = ObjectFactory.InstantiateSpaceObjectByGUID(data.ObjectGUID, socket.WorldPosition, socket.WorldRotation, InstantiationData).GetComponent<CarryableObject>();
+                        socket.TryInsertCarryable(carryable);
+                        CurrentSocketIndex++;
+                        break;
+                    }
+                    CurrentSocketIndex++;
+                }
+            }
+        }
+
+        public static ShipSocketData[] GetBuildSocketPayloads(BuildSocketController BSC)
+        {
+            List<ShipSocketData> socketData = new();
+
+            foreach (BuildSocket socket in BSC.Sockets)
+            {
+                if (socket.Payload != null && socket.InstalledModule == null)
+                {
+                    socketData.Add(new ShipSocketData(socket));
+                }
+            }
+
+            return socketData.ToArray();
+        }
+
 
         /*
         public static List<SimpleSectorData> GetLastGeneratedSectors(EndlessQuest quest)

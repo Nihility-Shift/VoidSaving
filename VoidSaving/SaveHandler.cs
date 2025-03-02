@@ -194,6 +194,8 @@ namespace VoidSaving
                         LifeSupportSwitches.Add(lifeSupportModule.TemperatureSwitch.Value);
                     }
                 }
+
+                saveGameData.BuildSocketCarryables = Helpers.GetBuildSocketPayloads(bsc);
                 saveGameData.ModulePowerStates = ModulePoweredValues.ToArray();
                 saveGameData.ShieldDirections = shieldDirections.ToArray();
                 saveGameData.KPDBullets = kPDBullets.ToArray();

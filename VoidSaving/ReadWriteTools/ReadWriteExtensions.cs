@@ -393,6 +393,38 @@ namespace VoidSaving.ReadWriteTools
         }
 
 
+        public static void Write(this BinaryWriter Writer, ShipSocketData[] IndexedSocketPayloads)
+        {
+            int count = IndexedSocketPayloads.Length;
+            Writer.Write(count);
+            for(int i = 0; i < count; i++)
+            {
+                ShipSocketData current = IndexedSocketPayloads[i];
+                Writer.Write(current.SocketID);
+                Writer.Write(current.ObjectGUID);
+                Writer.Write(current.JData);
+            }
+        }
+
+        public static ShipSocketData[] ReadIndexedSocketPayloads(this BinaryReader reader)
+        {
+            int count = reader.ReadInt32();
+            ShipSocketData[] Data = new ShipSocketData[count];
+
+            for(int i = 0; i < count; i++)
+            {
+                ShipSocketData IndexedPayload = new()
+                {
+                    SocketID = reader.ReadInt32(),
+                    ObjectGUID = reader.ReadGUIDUnion(),
+                    JData = reader.ReadString()
+                };
+                Data[i] = IndexedPayload;
+            }
+            return Data;
+        }
+
+
         public static void Write(this BinaryWriter Writer, List<SimpleSectorData> Values)
         {
             int count = Values.Count;
