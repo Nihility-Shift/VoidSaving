@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace VoidSaving.VanillaFixes
+namespace VoidSaving.Patches
 {
     //Some sector loading is not needed or breaks, so stop early.
     [HarmonyPatch(typeof(GameSessionSector), "CreateTwist")]
