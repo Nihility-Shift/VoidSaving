@@ -20,6 +20,11 @@ namespace VoidSaving
                 if (DataEntries.Length > 3)
                 {
                     ProgressDisabled = bool.Parse(DataEntries[3]);
+
+                    if (DataEntries.Length > 4)
+                    {
+                        HealthPercent = float.Parse(DataEntries[4]);
+                    }
                 }
             }
             else
@@ -27,6 +32,7 @@ namespace VoidSaving
                 TimePlayed = TimeSpan.FromHours(-99.99);
                 JumpCounter = -1;
                 ShipName = "Couldn't peek file info";
+                HealthPercent = -0.99f;
             }
 
 
@@ -44,5 +50,7 @@ namespace VoidSaving
         public bool IronMan;
 
         public bool ProgressDisabled;
+
+        public float HealthPercent;
     }
 }

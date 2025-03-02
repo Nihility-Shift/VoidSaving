@@ -42,7 +42,7 @@ namespace VoidSaving
             {
                 BeginHorizontal();
                 SaveFilePeekData data = KVP.Value;
-                if (GUITools.DrawButtonSelected($"{KVP.Key}{(data.IronMan ? " (IronMan)" : string.Empty)}{(data.ProgressDisabled ? " (Progress Disabled)" : string.Empty)} - {data.writeTime} | {data.ShipName}, {data.JumpCounter} Jumps. {(int)data.TimePlayed.TotalHours}:{data.TimePlayed.Minutes.ToString("00")} Played", SaveName == KVP.Key))
+                if (GUITools.DrawButtonSelected($"{KVP.Key}{(data.IronMan ? " (IronMan)" : string.Empty)}{(data.ProgressDisabled ? " (Progress Disabled)" : string.Empty)} - {data.writeTime} | {data.ShipName}, {data.JumpCounter} Jumps, Hull {data.HealthPercent*100:N0}%. {(int)data.TimePlayed.TotalHours}:{data.TimePlayed.Minutes:00} Played", SaveName == KVP.Key))
                 {
                     SaveName = KVP.Key;
                 }
