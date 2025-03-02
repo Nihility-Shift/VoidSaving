@@ -241,7 +241,7 @@ namespace VoidSaving
         {
             SocketID = socket.Index;
             ObjectGUID = socket.Payload.assetGuid;
-            JData = socket.Payload.ExtraJData.ToString(Formatting.None);
+            JData = socket.Payload.SerializeExtraData ? socket.Payload.ExtraJData?.ToString(Formatting.None) : string.Empty;
         }
 
         public int SocketID;
