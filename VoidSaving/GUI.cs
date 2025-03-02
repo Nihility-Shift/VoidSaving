@@ -115,7 +115,7 @@ namespace VoidSaving
                 {
                     Label("Select a save");
                 }
-                else if (Button(SaveHandler.LoadSavedData ? $"Loading {SaveName} on next session start" : "Load Save"))
+                else if (Button(SaveHandler.LoadSavedData ? $"Loading {SaveHandler.LastSaveName} on next session start" : "Load Save"))
                 {
                     if (!SaveHandler.LoadSave(SaveName))
                     {
@@ -130,7 +130,7 @@ namespace VoidSaving
 
                 if (SaveHandler.LoadSavedData)
                 {
-                    if (Button("Cancel")) { SaveHandler.CancelOrFinalzeLoad(); }
+                    if (Button("Cancel Load")) { SaveHandler.CancelOrFinalzeLoad(); }
                 }
                 else
                 {
