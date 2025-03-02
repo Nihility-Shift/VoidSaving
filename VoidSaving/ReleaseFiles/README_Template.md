@@ -9,6 +9,7 @@ For Game Version [GameVersion]
 Developed by [Authors]  
 Requires: [Dependencies]
 
+!!! This mod is mostly finished, but may still have bugs. Please report feedback and bugs in the discord server (link above).
 
 ---------------------
 
