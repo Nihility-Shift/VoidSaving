@@ -16,6 +16,7 @@ using HarmonyLib;
 using Photon.Pun;
 using ToolClasses;
 using VoidSaving.ReadWriteTools;
+using VoidSaving.VanillaFixes;
 
 namespace VoidSaving.Patches
 {
@@ -109,7 +110,7 @@ namespace VoidSaving.Patches
                 InstalledModuleIndex++;
             }
 
-            if (activeData.SaveDataVersion >= 1) 
+            if (activeData.SaveDataVersion >= 1)
                 Helpers.LoadBuildSocketPayloads(bsc, SaveHandler.ActiveData.BuildSocketCarryables);
 
 
@@ -179,47 +180,48 @@ namespace VoidSaving.Patches
             if (!SaveHandler.LoadSavedData) return true;
 
 
-                //Load completed sectors before moving to initial sector.
-                int CompletedDataCount = SaveHandler.ActiveData.CompletedSectors.Length;
-                FullSectorData data = default;
-                for (int i = 0; i < CompletedDataCount; i++)
-                {
-                    data = SaveHandler.ActiveData.CompletedSectors[i];
+            //Load completed sectors before moving to initial sector.
+            int CompletedDataCount = SaveHandler.ActiveData.CompletedSectors.Length;
+            FullSectorData data = default;
+            for (int i = 0; i < CompletedDataCount; i++)
+            {
+                data = SaveHandler.ActiveData.CompletedSectors[i];
 
-                    SectorCompletionStatus sectorCompletionStatus = (SectorCompletionStatus)0;
-                    switch (data.State)
-                    {
-                        case ObjectiveState.Inactive:
-                        case ObjectiveState.Available:
-                        case ObjectiveState.Started:
-                        case ObjectiveState.Failed:
-                            sectorCompletionStatus = SectorCompletionStatus.Failed;
-                            break;
-                        case ObjectiveState.Completed:
-                            sectorCompletionStatus = SectorCompletionStatus.Completed;
-                            break;
-                        case ObjectiveState.NoObjective:
-                            sectorCompletionStatus = SectorCompletionStatus.NothingToDo;
-                            break;
-                    }
-                    EndlessQuestManager.Instance.photonView.RPC("CompleteSector", RpcTarget.AllBuffered, new object[]
-                    {
+                SectorCompletionStatus sectorCompletionStatus = (SectorCompletionStatus)0;
+                switch (data.State)
+                {
+                    case ObjectiveState.Inactive:
+                    case ObjectiveState.Available:
+                    case ObjectiveState.Started:
+                    case ObjectiveState.Failed:
+                        sectorCompletionStatus = SectorCompletionStatus.Failed;
+                        break;
+                    case ObjectiveState.Completed:
+                        sectorCompletionStatus = SectorCompletionStatus.Completed;
+                        break;
+                    case ObjectiveState.NoObjective:
+                        sectorCompletionStatus = SectorCompletionStatus.NothingToDo;
+                        break;
+                }
+                EndlessQuestManager.Instance.photonView.RPC("CompleteSector", RpcTarget.AllBuffered, new object[]
+                {
                         data.SectorID,
                         (byte)sectorCompletionStatus,
-                    });
-                }
-
-                //Set objective state before entering the sector to allow skip code to function.
-                GameSessionSector sector = GameSessionManager.ActiveSession.GetSectorById(data.SectorID, false);
-                if (sector.SectorObjective != null)
-                    sector.SectorObjective.Objective.State = data.State;
-
-                //Enter sector as initial sector, ensuring it appears on the astral map.
-                GameSessionSectorManager.Instance.EnterSector(data.SectorID);
-                GameSessionSectorManager.Instance.SetDestinationSector(-1);
-                SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.SectorLoad);
-                return false;
+                });
             }
+
+            //Set objective state before entering the sector to allow skip code to function.
+            GameSessionSector sector = GameSessionManager.ActiveSession.GetSectorById(data.SectorID, false);
+            if (sector.SectorObjective != null)
+                sector.SectorObjective.Objective.State = data.State;
+
+            //Enter sector as initial sector, ensuring it appears on the astral map.
+            SessionManagerPropertiesFix.BlockLoadingExecution = true;
+            GameSessionSectorManager.Instance.EnterSector(data.SectorID);
+            GameSessionSectorManager.Instance.SetDestinationSector(-1);
+            SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.SectorLoad);
+            return false;
+        }
 
         static bool FirstLoadJump;
 
