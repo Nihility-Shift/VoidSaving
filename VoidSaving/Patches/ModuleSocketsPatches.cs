@@ -32,9 +32,9 @@ namespace VoidSaving.Patches
         //Add Carryables Sockets list for Gravity scoops
         static void MSLPatchMethod(CellModule module, List<CarryablesSocket> sockets)
         {
-            if (sockets.Count == 0 && module is GravityScoopModule or ChargeStationModule)
+            if (sockets.Count == 0 && module is GravityScoopModule or ChargeStationModule or KineticPointDefenseModule)
             {
-                if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Attempting to patch GravScoop or batteryCharger. {module.CarryablesSockets.Count} sockets found.");
+                if (VoidManager.BepinPlugin.Bindings.IsDebugMode) BepinPlugin.Log.LogInfo($"Attempting to patch GravScoop, batteryCharger, or KPD. {module.CarryablesSockets.Count} sockets found.");
                 sockets.AddRange(module.CarryablesSockets);
             }
         }
