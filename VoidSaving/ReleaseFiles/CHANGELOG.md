@@ -1,3 +1,6 @@
+## 0.4.7
+- Fixed sector loading failure when host is not piloting
+
 ## 0.4.6
 - Fixed issue with loading KPDs
 
