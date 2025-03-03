@@ -176,8 +176,9 @@ namespace VoidSaving.Patches
         [HarmonyPatch(typeof(GameSessionManager), "LoadActiveSector"), HarmonyPrefix]
         static bool LoadCurrentSectionPatch(GameSessionManager __instance)
         {
-            if (SaveHandler.LoadSavedData)
-            {
+            if (!SaveHandler.LoadSavedData) return true;
+
+
                 //Load completed sectors before moving to initial sector.
                 int CompletedDataCount = SaveHandler.ActiveData.CompletedSectors.Length;
                 FullSectorData data = default;
@@ -219,8 +220,6 @@ namespace VoidSaving.Patches
                 SaveHandler.CompleteLoadingStage(SaveHandler.LoadingStage.SectorLoad);
                 return false;
             }
-            else return true;
-        }
 
         static bool FirstLoadJump;
 
