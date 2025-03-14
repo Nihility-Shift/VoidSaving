@@ -16,7 +16,18 @@ namespace VoidSaving
 
         public string FileName;
 
-        public string PeekInfo = string.Empty;
+
+        //PeekData
+        public string PeekInfo = string.Empty; // - Old/Obsolete
+
+        public string ShipName = string.Empty;
+
+        public int PeekJumpCounter;
+
+        public double TimePlayed;
+
+        public float HealthPercent;
+
 
         public bool IronManMode = Config.DefaultIronMan.Value;
 

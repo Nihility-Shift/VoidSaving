@@ -234,7 +234,10 @@ namespace VoidSaving
 
 
                 //Peek Data
-                saveGameData.PeekInfo = $"{ShipName},{saveGameData.CompletedSectors.Length},{DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours},{saveGameData.ProgressionDisabled},{saveGameData.ShipHealth/playerShip.startingHitPoints}";
+                saveGameData.ShipName = ShipName;
+                saveGameData.PeekJumpCounter = saveGameData.CompletedSectors.Length;
+                saveGameData.TimePlayed = DateTime.Now.Subtract(saveGameData.SessionStats.QuestStartTime).TotalHours;
+                saveGameData.HealthPercent = saveGameData.ShipHealth / playerShip.startingHitPoints;
             }
             catch (Exception e)
             {
@@ -313,7 +316,17 @@ namespace VoidSaving
                     using (BinaryReader reader = new BinaryReader(fileStream))
                     {
                         data.SaveDataVersion = reader.ReadUInt32();
+                        if (data.SaveDataVersion <= 2)
+                        {
                         data.PeekInfo = reader.ReadString();
+                        }
+                        else
+                        {
+                            data.ShipName = reader.ReadString();
+                            data.PeekJumpCounter = reader.ReadInt32();
+                            data.TimePlayed = reader.ReadDouble();
+                            data.HealthPercent = reader.ReadSingle();
+                        }
                         data.IronManMode = reader.ReadBoolean();
                         data.ProgressionDisabled = reader.ReadBoolean();
 
@@ -408,8 +421,19 @@ namespace VoidSaving
                     using (BinaryReader reader = new BinaryReader(fileStream))
                     {
                         data.SaveDataVersion = reader.ReadUInt32();
+                        if (data.SaveDataVersion <= 2)
+                        {
                         data.PeekInfo = reader.ReadString();
+                        }
+                        else
+                        {
+                            data.ShipName = reader.ReadString();
+                            data.PeekJumpCounter = reader.ReadInt32();
+                            data.TimePlayed = reader.ReadDouble();
+                            data.HealthPercent = reader.ReadSingle();
+                        }
                         data.IronManMode = reader.ReadBoolean();
+                        data.ProgressionDisabled = reader.ReadBoolean();
                     }
                 }
             }
@@ -422,7 +446,7 @@ namespace VoidSaving
         }
 
 
-        public const uint CurrentDataVersion = 1;
+        public const uint CurrentDataVersion = 3;
 
         /// <summary>
         /// Writes file to path. Adds extension if missing.
@@ -453,7 +477,10 @@ namespace VoidSaving
                     using (BinaryWriter writer = new BinaryWriter(fileStream))
                     {
                         writer.Write(CurrentDataVersion);
-                        writer.Write(data.PeekInfo);
+                        writer.Write(data.ShipName);
+                        writer.Write(data.PeekJumpCounter);
+                        writer.Write(data.TimePlayed);
+                        writer.Write(data.HealthPercent);
                         writer.Write(data.IronManMode);
                         writer.Write(data.ProgressionDisabled);
 

@@ -11,9 +11,25 @@ namespace VoidSaving
 
             SaveGameData PeekData = SaveHandler.PeekSaveFile(FileName);
 
+            if (PeekData.SaveDataVersion >= 3) //Post version 3 utilizes binary due to localization issues with string read/write and parsing
+            {
+                ShipName = PeekData.ShipName;
+                JumpCounter = PeekData.PeekJumpCounter;
+                TimePlayed = TimeSpan.FromHours(PeekData.TimePlayed);
+                HealthPercent = PeekData.HealthPercent;
+                IronMan = PeekData.IronManMode;
+                ProgressDisabled = PeekData.ProgressionDisabled;
+                return;
+            }
+
             if (!PeekData.PeekInfo.IsNullOrEmpty())
             {
-                string[] DataEntries = PeekData.PeekInfo.Split(',');
+                string[] DataEntries;
+                if (PeekData.SaveDataVersion >= 2)
+                    DataEntries = PeekData.PeekInfo.Split(';');
+                else
+                    DataEntries = PeekData.PeekInfo.Split(',');
+
                 ShipName = DataEntries[0];
                 JumpCounter = int.Parse(DataEntries[1]);
                 TimePlayed = TimeSpan.FromHours(Double.Parse(DataEntries[2]));
