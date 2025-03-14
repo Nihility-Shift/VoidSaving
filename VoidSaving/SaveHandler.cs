@@ -114,8 +114,15 @@ namespace VoidSaving
             {
                 if (file.EndsWith(SaveExtension))
                 {
-                    string FileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
-                    FilesAndDates.Add(FileNameWithoutExtension, new SaveFilePeekData(FileNameWithoutExtension, File.GetLastWriteTime(file)));
+                    try
+                    {
+                        string FileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+                        FilesAndDates.Add(FileNameWithoutExtension, new SaveFilePeekData(FileNameWithoutExtension, File.GetLastWriteTime(file)));
+                    }
+                    catch(Exception e)
+                    {
+                        BepinPlugin.Log.LogError(e);
+                    }
                 }
             }
 
@@ -318,7 +325,7 @@ namespace VoidSaving
                         data.SaveDataVersion = reader.ReadUInt32();
                         if (data.SaveDataVersion <= 2)
                         {
-                        data.PeekInfo = reader.ReadString();
+                            data.PeekInfo = reader.ReadString();
                         }
                         else
                         {
@@ -423,7 +430,7 @@ namespace VoidSaving
                         data.SaveDataVersion = reader.ReadUInt32();
                         if (data.SaveDataVersion <= 2)
                         {
-                        data.PeekInfo = reader.ReadString();
+                            data.PeekInfo = reader.ReadString();
                         }
                         else
                         {
