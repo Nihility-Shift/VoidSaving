@@ -149,6 +149,8 @@ namespace VoidSaving.ReadWriteTools
 
         public static void LoadEnhancements(AbstractPlayerControlledShip PlayerShip, EnhancementData[] datas)
         {
+            if (Config.EnhancementsDisabled.Value) return;
+
             //Gather modules w/indexes
             BuildSocketController BSC = PlayerShip.GetComponent<BuildSocketController>();
             Dictionary<CellModule, int> ModuleIndexes = new();

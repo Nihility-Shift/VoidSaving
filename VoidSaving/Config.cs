@@ -6,6 +6,7 @@ namespace VoidSaving
     {
         internal static void Load(ConfigFile configFile)
         {
+            EnhancementsDisabled = configFile.Bind("Settings", "EnhancementsDisabled", true, "Disables enhancement loading due to a current bug related to improper saving/loading.");
             SavesLocation = configFile.Bind("Settings", "SavesLocation", string.Empty);
             LastSave = configFile.Bind("Settings", "LastSave", string.Empty);
             AutoSavingEnabled = configFile.Bind("Settings", "AutoSaving", true, "Auto Saving Enabled/Disabled");
@@ -18,6 +19,7 @@ namespace VoidSaving
         internal static ConfigEntry<string> SavesLocation;
         internal static ConfigEntry<string> LastSave;
         internal static ConfigEntry<bool> AutoSavingEnabled;
+        internal static ConfigEntry<bool> EnhancementsDisabled;
         internal static ConfigEntry<int> AutoSaveLimit;
         internal static ConfigEntry<int> LastAutoSave;
         internal static ConfigEntry<bool> DefaultIronMan;
