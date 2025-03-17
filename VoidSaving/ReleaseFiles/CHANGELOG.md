@@ -1,3 +1,6 @@
+## 0.4.9
+- Disabled enhancement loading. Can be re-enabled via the config file.
+
 ## 0.4.8
 - Fixed localization issue affecting saving/loading of save files.
 
