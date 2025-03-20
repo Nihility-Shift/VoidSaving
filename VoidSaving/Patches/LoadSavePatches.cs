@@ -243,8 +243,8 @@ namespace VoidSaving.Patches
         {
             if (!SaveHandler.LoadSavedData) return;
 
-            GameSessionSuppliesManager.Instance.AlloyAmount = SaveHandler.ActiveData.Alloy;
-            GameSessionSuppliesManager.Instance.BiomassAmount = SaveHandler.ActiveData.Biomass;
+            GameSessionSuppliesManager.Instance.SetAlloyAmountNoNotification(SaveHandler.ActiveData.Alloy, ResourceChangeAlloy.GAME_STATE_INGAME_ENTER);
+            GameSessionSuppliesManager.Instance.SetBiomassAmountNoNotification(SaveHandler.ActiveData.Biomass, ResourceChangeBiomass.GAMESESSION_SETUP);
 
             AbstractPlayerControlledShip playerShip = ClientGame.Current.PlayerShip;
 
